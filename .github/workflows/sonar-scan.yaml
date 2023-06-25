@@ -33,4 +33,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: cd ./carpooling-parent && mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=npu-apartment-management-system-team_apartment-server_AYjrsup3mjxQhFl7xT9o -Dmaven.test.skip=true
+        run: cd ./apartment-parent && mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=npu-apartment-management-system-team_apartment-server_AYjrsup3mjxQhFl7xT9o -Dmaven.test.skip=true
