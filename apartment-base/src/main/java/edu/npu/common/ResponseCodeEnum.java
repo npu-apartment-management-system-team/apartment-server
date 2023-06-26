@@ -19,7 +19,12 @@ public enum ResponseCodeEnum {
     // ==================== 401 Unauthorized ====================
     ACCESS_TOKEN_EXPIRED_ERROR(4010),
 
+    ACCESS_BLOCKED_BY_SENTINEL(4011),
+
     USER_UNAUTHENTICATED(4012),
+
+    // ==================== 429 TooManyRequests ====================
+    TOO_MANY_REQUESTS(4290),
 
     // ==================== 403 Forbidden ====================
     FORBIDDEN(4030),

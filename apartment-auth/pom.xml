@@ -11,6 +11,13 @@
     </parent>
 
     <artifactId>apartment-auth</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>apartment-auth-api</module>
+        <module>apartment-auth-model</module>
+        <module>apartment-auth-service</module>
+    </modules>
 
 
 </project>

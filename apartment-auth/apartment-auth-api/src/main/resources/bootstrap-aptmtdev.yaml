@@ -16,3 +16,6 @@ spring:
           - data-id: sentinel-config-${spring.profiles.active}.yaml
             group: apartment-system
             refresh: true
+          - data-id: db-config-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
