@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApartmentException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public R handleCarpoolingException(ApartmentException e){
+    public R handleApartmentException(ApartmentException e){
         log.error("ApartmentException:{}", e.getMessage());
         return R.error(ResponseCodeEnum.SERVER_ERROR, e.getMessage());
     }

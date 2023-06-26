@@ -26,9 +26,9 @@ public class RedisConstants {
 
 //    public static final Long CACHE_NULL_TTL = 2L;
 
-    public static final String CACHE_CARPOOLING_KEY = "carpooling:";
+    public static final String CACHE_APARTMENT_KEY = "apartment:";
 
-    public static final Long CACHE_CARPOOLING_TTL = 30L;
+    public static final Long CACHE_APARTMENT_TTL = 30L;
 
-    public static final String LOCK_CARPOOLING_KEY = "lock:carpooling:";
+    public static final String LOCK_APARTMENT_KEY = "lock:apartment:";
 }
