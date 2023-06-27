@@ -1,0 +1,54 @@
+spring:
+  cloud:
+    nacos:
+      server-addr: 103.42.30.248:8848,159.223.86.247:8848,159.223.61.37:8848
+      discovery:
+        namespace: ${spring.profiles.active}
+        group: apartment-system
+      config:
+        namespace: ${spring.profiles.active}
+        extension-configs:
+          # 玄学 我也不知道为什么直接写dev1不行,要这样拼接一下 反正跑起来就算成功
+          - data-id: ${spring.application.name}-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
+        shared-configs:
+          - data-id: sentinel-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
+          - data-id: db-config-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
+          - data-id: redis-config-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
+          - data-id: aliyunsms-config-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
+          - data-id: mail-config-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
+          - data-id: alipay-config-${spring.profiles.active}.properties
+            group: apartment-system
+            refresh: true
+          - data-id: security-sdk-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
+          - data-id: ocr-config-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
+          - data-id: aliyun-face-config-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
+          - data-id: es-config-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
+          - data-id: rabbitmq-mysql-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
+
+# 设置日志打印级别
+logging:
+  level:
+    root: info
+    edu.npu.filter: debug

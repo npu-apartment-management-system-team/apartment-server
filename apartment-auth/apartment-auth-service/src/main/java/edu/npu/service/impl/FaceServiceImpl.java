@@ -1,6 +1,5 @@
 package edu.npu.service.impl;
 
-import cn.hutool.core.codec.Base64;
 import com.aliyun.facebody20191230.models.*;
 import com.aliyun.facebody20200910.models.ExecuteServerSideVerificationRequest;
 import com.aliyun.facebody20200910.models.ExecuteServerSideVerificationResponse;
@@ -14,12 +13,6 @@ import edu.npu.vo.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * @author : [wangminan]

@@ -1,7 +1,8 @@
 package edu.npu.service.impl;
 
 import com.aliyun.ocr_api20210707.Client;
-import com.aliyun.ocr_api20210707.models.*;
+import com.aliyun.ocr_api20210707.models.RecognizeIdcardRequest;
+import com.aliyun.ocr_api20210707.models.RecognizeIdcardResponse;
 import com.aliyun.teautil.models.RuntimeOptions;
 import edu.npu.exception.ApartmentError;
 import edu.npu.exception.ApartmentException;

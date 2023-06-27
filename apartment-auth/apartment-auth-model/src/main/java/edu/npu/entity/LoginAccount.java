@@ -1,13 +1,6 @@
 package edu.npu.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -18,6 +11,12 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 登录账号

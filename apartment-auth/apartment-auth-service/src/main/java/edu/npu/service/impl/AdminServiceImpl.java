@@ -2,8 +2,8 @@ package edu.npu.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.npu.entity.Admin;
-import edu.npu.service.AdminService;
 import edu.npu.mapper.AdminMapper;
+import edu.npu.service.AdminService;
 import org.springframework.stereotype.Service;
 
 /**

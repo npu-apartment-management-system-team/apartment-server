@@ -53,7 +53,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static edu.npu.common.RedisConstants.*;
-import static edu.npu.util.RegexPatterns.*;
+import static edu.npu.util.RegexPatterns.EMAIL_REGEX;
 
 /**
  * @author wangminan
