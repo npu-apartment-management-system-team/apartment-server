@@ -55,6 +55,11 @@ public class User implements Serializable {
     private String faceUrl;
 
     /**
+     * 人脸在阿里云人脸库中的ID
+     */
+    private String faceId;
+
+    /**
      * 职工支付宝uuid
      */
     private String alipayId;

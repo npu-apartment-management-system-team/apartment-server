@@ -1,7 +1,12 @@
 package edu.npu.service;
 
+import edu.npu.dto.AlipayLoginCallbackDto;
+import edu.npu.dto.CheckSmsCodeDto;
+import edu.npu.dto.UserLoginDto;
+import edu.npu.dto.UserRegisterDto;
 import edu.npu.entity.LoginAccount;
 import com.baomidou.mybatisplus.extension.service.IService;
+import edu.npu.vo.R;
 
 /**
 * @author wangminan
@@ -10,4 +15,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface LoginAccountService extends IService<LoginAccount> {
 
+    String handleAlipayLogin(AlipayLoginCallbackDto alipayLoginCallbackDto);
+
+    R login(UserLoginDto userLoginDto);
+
+    R registerUser(UserRegisterDto userRegisterDto);
+
+    R loginByPhone(CheckSmsCodeDto checkSmsCodeDto);
+
+    R logout(LoginAccount loginAccount);
 }

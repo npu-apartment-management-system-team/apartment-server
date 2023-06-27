@@ -13,6 +13,7 @@
             <result property="personalId" column="personal_id" jdbcType="VARCHAR"/>
             <result property="personalCardUrl" column="personal_card_url" jdbcType="VARCHAR"/>
             <result property="faceUrl" column="face_url" jdbcType="VARCHAR"/>
+            <result property="faceId" column="face_id" jdbcType="VARCHAR"/>
             <result property="alipayId" column="alipay_id" jdbcType="VARCHAR"/>
             <result property="email" column="email" jdbcType="VARCHAR"/>
             <result property="sex" column="sex" jdbcType="INTEGER"/>
@@ -26,7 +27,7 @@
     <sql id="Base_Column_List">
         id,login_account_id,department_id,
         bed_id,name,personal_id,
-        personal_card_url,face_url,alipay_id,
+        personal_card_url,face_url,face_id,alipay_id,
         email,sex,is_cadre,
         status,pay_type,network_enabled,
         is_deleted

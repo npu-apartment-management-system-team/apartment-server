@@ -58,5 +58,17 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
         </dependency>
+
+        <!-- 阿里云人脸 -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>facebody20191230</artifactId>
+        </dependency>
+
+        <!-- 阿里云人证核身 -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>facebody20200910</artifactId>
+        </dependency>
     </dependencies>
 </project>

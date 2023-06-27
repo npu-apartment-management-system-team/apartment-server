@@ -19,6 +19,7 @@
         <module>../apartment-accommodation</module>
         <module>../apartment-finance</module>
         <module>../apartment-station-message</module>
+        <module>../apartment-user</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -62,6 +63,8 @@
         <alipay-sdk.version>4.35.171.ALL</alipay-sdk.version>
         <aliyun-oss.version>3.17.0</aliyun-oss.version>
         <aliyun-ocr.version>1.1.15</aliyun-ocr.version>
+        <aliyun-facebody2019.version>3.0.8</aliyun-facebody2019.version>
+        <aliyun-facebody2020.version>3.0.0</aliyun-facebody2020.version>
     </properties>
 
     <dependencyManagement>
@@ -220,6 +223,20 @@
                 <groupId>com.aliyun</groupId>
                 <artifactId>ocr_api20210707</artifactId>
                 <version>${aliyun-ocr.version}</version>
+            </dependency>
+
+            <!-- 阿里云人脸 -->
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>facebody20191230</artifactId>
+                <version>${aliyun-facebody2019.version}</version>
+            </dependency>
+
+            <!-- 阿里云人证核身 -->
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>facebody20200910</artifactId>
+                <version>${aliyun-facebody2020.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

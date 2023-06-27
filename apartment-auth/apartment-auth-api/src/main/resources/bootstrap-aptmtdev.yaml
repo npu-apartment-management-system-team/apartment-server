@@ -19,7 +19,7 @@ spring:
           - data-id: db-config-${spring.profiles.active}.yaml
             group: apartment-system
             refresh: true
-          - data-id: redis-cluster-config-${spring.profiles.active}.yaml
+          - data-id: redis-config-${spring.profiles.active}.yaml
             group: apartment-system
             refresh: true
           - data-id: aliyunsms-config-${spring.profiles.active}.yaml
@@ -35,6 +35,9 @@ spring:
             group: apartment-system
             refresh: true
           - data-id: ocr-config-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
+          - data-id: aliyun-face-config-${spring.profiles.active}.yaml
             group: apartment-system
             refresh: true
 
