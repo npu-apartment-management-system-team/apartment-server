@@ -1,13 +1,23 @@
 package edu.npu.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import edu.npu.common.RoleEnum;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * 登录账号
@@ -15,7 +25,15 @@ import lombok.Data;
  */
 @TableName(value ="login_account")
 @Data
-public class LoginAccount implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+// Json转换时只需要id,username,password,role,isDeleted这些loginAccount自己的字段
+// 忽略UserDetails中的其他字段
+@JsonIgnoreProperties(
+        value = {"accountNonExpired", "accountNonLocked",
+                "credentialsNonExpired", "enabled", "authorities"})
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class LoginAccount implements Serializable, UserDetails {
     /**
      * 用户唯一ID
      */
@@ -35,11 +53,13 @@ public class LoginAccount implements Serializable {
     /**
      * 用户角色
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Integer role;
 
     /**
      * 账号是否已删除 0未删除 1已删除
      */
+    @TableLogic(value = "0", delval = "1")
     private Integer isDeleted;
 
     @Serial
@@ -47,49 +67,28 @@ public class LoginAccount implements Serializable {
     private static final long serialVersionUID = 2589L;
 
     @Override
-    public boolean equals(Object that) {
-        if (this == that) {
-            return true;
-        }
-        if (that == null) {
-            return false;
-        }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        LoginAccount other = (LoginAccount) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getUsername() == null ? other.getUsername() == null : this.getUsername().equals(other.getUsername()))
-            && (this.getPassword() == null ? other.getPassword() == null : this.getPassword().equals(other.getPassword()))
-            && (this.getRole() == null ? other.getRole() == null : this.getRole().equals(other.getRole()))
-            && (this.getIsDeleted() == null ? other.getIsDeleted() == null : this.getIsDeleted().equals(other.getIsDeleted()));
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(
+                Objects.requireNonNull(RoleEnum.fromValue(role)).name()));
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getUsername() == null) ? 0 : getUsername().hashCode());
-        result = prime * result + ((getPassword() == null) ? 0 : getPassword().hashCode());
-        result = prime * result + ((getRole() == null) ? 0 : getRole().hashCode());
-        result = prime * result + ((getIsDeleted() == null) ? 0 : getIsDeleted().hashCode());
-        return result;
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
     @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", username=").append(username);
-        sb.append(", password=").append(password);
-        sb.append(", role=").append(role);
-        sb.append(", isDeleted=").append(isDeleted);
-        sb.append(", serialVersionUID=").append(serialVersionUID);
-        sb.append("]");
-        return sb.toString();
+    public boolean isAccountNonLocked() {
+        return isDeleted == 0;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

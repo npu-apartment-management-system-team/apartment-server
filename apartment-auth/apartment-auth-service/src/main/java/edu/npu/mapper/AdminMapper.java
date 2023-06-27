@@ -2,6 +2,7 @@ package edu.npu.mapper;
 
 import edu.npu.entity.Admin;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
 * @author wangminan
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @createDate 2023-06-26 21:19:29
 * @Entity edu.npu.entity.Admin
 */
+@Mapper
 public interface AdminMapper extends BaseMapper<Admin> {
 
 }
