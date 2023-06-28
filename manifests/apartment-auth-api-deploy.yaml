@@ -52,6 +52,7 @@ spec:
     - protocol: TCP
       port: 63020
       targetPort: 63020
-      nodePort: 63020
+      # nodePort默认范围30000-32767
+      nodePort: 32020
   type: NodePort
   sessionAffinity: None

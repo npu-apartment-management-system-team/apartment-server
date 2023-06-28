@@ -53,6 +53,7 @@ spec:
       protocol: TCP
       port: 63030
       targetPort: 63030
-      nodePort: 63030
+      # nodePort默认范围30000-32767
+      nodePort: 32030
   type: NodePort
   sessionAffinity: None
