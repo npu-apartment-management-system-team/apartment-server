@@ -20,7 +20,7 @@ public class AdminController {
     private AdminService adminService;
 
     @PostMapping
-    public R addAdmin(AdminDto adminDto) {
+    public R addAdmin(@RequestBody AdminDto adminDto) {
         return adminService.addAdmin(adminDto);
     }
 
@@ -30,12 +30,12 @@ public class AdminController {
     }
 
     @PutMapping("/{id}")
-    public R updateAdmin(@PathVariable("id") Long id, AdminDto adminDto) {
+    public R updateAdmin(@PathVariable("id") Long id, @RequestBody AdminDto adminDto) {
         return adminService.updateAdmin(id, adminDto);
     }
 
     @GetMapping
-    public R getAdminList(AdminPageQueryDto adminPageQueryDto) {
+    public R getAdminList(@RequestParam AdminPageQueryDto adminPageQueryDto) {
         return adminService.getAdminList(adminPageQueryDto);
     }
 

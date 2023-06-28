@@ -41,7 +41,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static edu.npu.common.EsConstants.USER_INDEX;
@@ -203,9 +205,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         PageResultVo pageResult = handlePageResponse(response);
         R r = new R();
         r.put("code", ResponseCodeEnum.SUCCESS.getValue());
-        r.put("total", pageResult.total());
-        r.put("data", pageResult.data());
-        return r;
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", pageResult.data());
+        result.put("total", pageResult.total());
+        return r.put("result", result);
     }
 
     @Override

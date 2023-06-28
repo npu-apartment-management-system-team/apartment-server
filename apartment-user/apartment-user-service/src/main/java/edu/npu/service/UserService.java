@@ -9,6 +9,7 @@ import edu.npu.dto.UserPageQueryDto;
 import edu.npu.dto.UserUpdateDto;
 import edu.npu.entity.User;
 import edu.npu.vo.R;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
 * @author wangminan
@@ -19,8 +20,10 @@ public interface UserService extends IService<User> {
 
     R getUsersInfo(UserPageQueryDto userPageQueryDto);
 
+    @Transactional(rollbackFor = Exception.class)
     R updateUserInfo(Long id, UserUpdateDto userUpdateDto);
 
+    @Transactional(rollbackFor = Exception.class)
     R deleteUser(Long id);
 
     String bindAlipayToUser(BindAlipayCallbackDto bindAlipayCallbackDto);

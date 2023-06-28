@@ -1,26 +1,26 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: apartment-gateway
+  name: apartment-user-api
   namespace: apartment-system
   labels:
-    app: apartment-gateway
+    app: apartment-user-api
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: apartment-gateway
+      app: apartment-user-api
   template:
     metadata:
       labels:
-        app: apartment-gateway
+        app: apartment-user-api
     spec:
       containers:
-        - name: apartment-gateway
-          image: wangminan/apartment-gateway:latest
+        - name: apartment-user-api
+          image: wangminan/apartment-user-api:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 63010
+            - containerPort: 63030
               protocol: TCP
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -32,8 +32,8 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 1
-      maxSurge: 1
+      maxUnavailable: 50%
+      maxSurge: 50%
   revisionHistoryLimit: 10
   progressDeadlineSeconds: 600
 
@@ -41,17 +41,18 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: apartment-gateway
+  name: apartment-user-api
   namespace: apartment-system
   labels:
-      app: apartment-gateway
+      app: apartment-user-api
 spec:
   selector:
-    app: apartment-gateway
+    app: apartment-user-api
   ports:
-    - protocol: TCP
-      port: 63010
-      targetPort: 63010
-      nodePort: 63010
+    - name: tcp-svc-63030
+      protocol: TCP
+      port: 63030
+      targetPort: 63030
+      nodePort: 63030
   type: NodePort
   sessionAffinity: None

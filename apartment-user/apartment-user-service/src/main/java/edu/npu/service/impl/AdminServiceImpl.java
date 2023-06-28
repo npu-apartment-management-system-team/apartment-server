@@ -95,14 +95,12 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
         int insert = adminMapper.insert(admin);
         return insert == 1 ? R.ok("管理员新增成功") :
                 R.error(ResponseCodeEnum.SERVER_ERROR, ADD_FAILED_MSG);
-
-
     }
 
     /**
      * 删除管理员账号
-     * @param id
-     * @return
+     * @param id 管理员id
+     * @return R
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -120,7 +118,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
 
         Long loginAccountId = admin.getLoginAccountId();
 
-        //从login_accout表中删除账号
+        //从login_account表中删除账号
         loginAccountMapper.deleteById(loginAccountId);
 
         //检验是否删除成功
@@ -139,8 +137,8 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
 
     /**
      * 修改管理员账号
-     * @param id
-     * @return
+     * @param id 管理员id
+     * @return 修改结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -181,25 +179,28 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
 
     /**
      * 查询管理员账号列表
-     * @param adminPageQueryDto
-     * @return
+     * @param adminPageQueryDto 查询条件
+     * @return 列表
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R getAdminList(AdminPageQueryDto adminPageQueryDto) {
-
         try {
-            IPage<Admin> page = new Page<>(adminPageQueryDto.pageNum(), adminPageQueryDto.pageSize());
+            IPage<Admin> page = new Page<>(
+                    adminPageQueryDto.pageNum(), adminPageQueryDto.pageSize());
 
             //query和departmentId共同查询
-            if(adminPageQueryDto.departmentId() != null && adminPageQueryDto.query() != null) {
+            if(adminPageQueryDto.departmentId() != null &&
+                    adminPageQueryDto.query() != null) {
                 adminMapper.selectPage(page, new LambdaQueryWrapper<Admin>()
                         .eq(Admin::getDepartmentId, adminPageQueryDto.departmentId())
                         .like(Admin::getName, adminPageQueryDto.query()));
-            } else if(adminPageQueryDto.departmentId() != null && adminPageQueryDto.query() == null) {
+            } else if(adminPageQueryDto.departmentId() != null &&
+                    adminPageQueryDto.query() == null) {
                 adminMapper.selectPage(page, new LambdaQueryWrapper<Admin>()
                         .eq(Admin::getDepartmentId, adminPageQueryDto.departmentId()));
-            } else if(adminPageQueryDto.departmentId() == null && adminPageQueryDto.query() != null) {
+            } else if(adminPageQueryDto.departmentId() == null &&
+                    adminPageQueryDto.query() != null) {
                 adminMapper.selectPage(page, new LambdaQueryWrapper<Admin>()
                         .like(Admin::getName, adminPageQueryDto.query()));
             } else {
@@ -219,7 +220,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
 
     /**
      * 查询班组长列表
-     * @return
+     * @return 班组长列表
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -233,23 +234,16 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
                     new LambdaQueryWrapper<Admin>().
                             select(Admin::getId, Admin::getName).
                             eq(Admin::getDepartmentId, 0L));
-
-            for(int i = 0; i < adminList.size(); i++) {
+            for (Admin admin : adminList) {
                 Map<String, Object> map = new HashMap<>();
-                map.put("id", adminList.get(i).getId());
-                map.put("name", adminList.get(i).getName());
+                map.put("id", admin.getId());
+                map.put("name", admin.getName());
                 list.add(map);
             }
-
             resultMap.put("list", list);
-
             return R.ok().put("result", resultMap);
-
         } catch (Exception e) {
             throw new ApartmentException("查询班组长列表失败！");
         }
-
     }
-
-
 }

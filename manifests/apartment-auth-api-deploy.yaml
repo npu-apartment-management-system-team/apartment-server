@@ -1,26 +1,26 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: apartment-gateway
+  name: apartment-auth-api
   namespace: apartment-system
   labels:
-    app: apartment-gateway
+    app: apartment-auth-api
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: apartment-gateway
+      app: apartment-auth-api
   template:
     metadata:
       labels:
-        app: apartment-gateway
+        app: apartment-auth-api
     spec:
       containers:
-        - name: apartment-gateway
-          image: wangminan/apartment-gateway:latest
+        - name: apartment-auth-api
+          image: wangminan/apartment-auth-api:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 63010
+            - containerPort: 63020
               protocol: TCP
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -41,17 +41,17 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: apartment-gateway
+  name: apartment-auth-api
   namespace: apartment-system
   labels:
-      app: apartment-gateway
+      app: apartment-auth-api
 spec:
   selector:
-    app: apartment-gateway
+    app: apartment-auth-api
   ports:
     - protocol: TCP
-      port: 63010
-      targetPort: 63010
-      nodePort: 63010
+      port: 63020
+      targetPort: 63020
+      nodePort: 63020
   type: NodePort
   sessionAffinity: None
