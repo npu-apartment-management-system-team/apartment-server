@@ -1,9 +1,6 @@
 package edu.npu.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.io.Serial;
@@ -40,6 +37,7 @@ public class LoginAccount implements Serializable {
     /**
      * 账号是否已删除 0未删除 1已删除
      */
+    @TableLogic(value = "0", delval = "1")
     private Integer isDeleted;
 
     @Serial

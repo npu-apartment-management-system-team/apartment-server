@@ -1,8 +1,8 @@
 package edu.npu.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import edu.npu.dto.AddAdminDto;
-import edu.npu.dto.PageQueryDto;
+import edu.npu.dto.AdminDto;
+import edu.npu.dto.AdminPageQueryDto;
 import edu.npu.entity.Admin;
 import edu.npu.vo.R;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,16 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 public interface AdminService extends IService<Admin> {
 
     @Transactional(rollbackFor = Exception.class)
-    R addAdmin(AddAdminDto addAdminDto);
+    R addAdmin(AdminDto adminDto);
 
     @Transactional(rollbackFor = Exception.class)
-    R deleteAdmin(Integer id);
+    R deleteAdmin(Long id);
 
     @Transactional(rollbackFor = Exception.class)
-    R updateAdmin(Integer id);
+    R updateAdmin(Long id, AdminDto adminDto);
 
     @Transactional(rollbackFor = Exception.class)
-    R getAdminList(PageQueryDto pageQueryDto);
+    R getAdminList(AdminPageQueryDto adminPageQueryDto);
 
     @Transactional(rollbackFor = Exception.class)
     R getForemanList();
