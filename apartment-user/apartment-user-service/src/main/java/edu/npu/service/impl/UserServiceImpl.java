@@ -1,10 +1,13 @@
 package edu.npu.service.impl;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.request.AlipaySystemOauthTokenRequest;
@@ -15,8 +18,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.npu.common.ResponseCodeEnum;
-import edu.npu.dto.UserPageQueryDto;
+import edu.npu.doc.UserDoc;
 import edu.npu.dto.BindAlipayCallbackDto;
+import edu.npu.dto.UserPageQueryDto;
 import edu.npu.dto.UserUpdateDto;
 import edu.npu.entity.LoginAccount;
 import edu.npu.entity.User;
@@ -26,15 +30,19 @@ import edu.npu.mapper.LoginAccountMapper;
 import edu.npu.mapper.UserMapper;
 import edu.npu.service.UserService;
 import edu.npu.util.JwtTokenProvider;
+import edu.npu.vo.PageResultVo;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import static edu.npu.common.EsConstants.USER_INDEX;
-
 import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.util.List;
+
+import static edu.npu.common.EsConstants.USER_INDEX;
 
 /**
 * @author wangminan
@@ -47,11 +55,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     implements UserService{
     @Resource
     private LoginAccountMapper loginAccountMapper;
+
     @Resource
     private JwtTokenProvider jwtTokenProvider;
     @Resource
     private AlipayClient alipayClient;
 
+    @Resource
+    private ElasticsearchClient elasticsearchClient;
 
     /**
      * 获取用户信息列表
@@ -61,7 +72,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public R getUsersInfo(UserPageQueryDto userPageQueryDto) {
         SearchRequest searchRequest = buildBasicQuery(userPageQueryDto);
-        return null;
+        try {
+            SearchResponse<UserDoc> searchResponse =
+                    elasticsearchClient.search(searchRequest, UserDoc.class);
+            return resolveRestResponse(searchResponse);
+        } catch (IOException e) {
+            throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "用户信息查询失败");
+        }
     }
 
     @Override
@@ -173,6 +190,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
                     .must(keywordQuery)
                     .build()._toQuery();
         }
+    }
+
+    @Override
+    public R resolveRestResponse(SearchResponse<UserDoc> response) {
+        PageResultVo pageResult = handlePageResponse(response);
+        R r = new R();
+        r.put("code", ResponseCodeEnum.SUCCESS.getValue());
+        r.put("total", pageResult.total());
+        r.put("data", pageResult.data());
+        return r;
+    }
+
+    private PageResultVo handlePageResponse(SearchResponse<UserDoc> response) {
+        // 4.1 获取数据
+        List<Hit<UserDoc>> hits = response.hits().hits();
+        // 4.1.总条数
+        long total = 0;
+        if (response.hits().total() != null) {
+            total = response.hits().total().value();
+        }
+        List<UserDoc> userDocs = hits.stream().map(Hit::source).toList();
+        return new PageResultVo(total, userDocs);
     }
 
     @Override

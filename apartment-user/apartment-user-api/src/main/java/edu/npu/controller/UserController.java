@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.*;
  * @description : [一句话描述该类的功能]
  */
 
-@RestController("/user")
+@RestController
+@RequestMapping("/user")
 public class UserController {
     @Resource
     private UserService userService;
