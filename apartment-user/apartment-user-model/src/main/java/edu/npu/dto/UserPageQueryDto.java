@@ -1,6 +1,6 @@
 package edu.npu.dto;
 
-public record UserListQueryDto(
+public record UserPageQueryDto(
         Integer pageNum,
         Integer pageSize,
         String query,

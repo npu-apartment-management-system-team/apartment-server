@@ -16,8 +16,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import static edu.npu.common.RedisConstants.LOCK_APARTMENT_KEY;
-
 /**
  * @author : [wangminan]
  * @description : [Redis查询工具类]
@@ -47,14 +45,16 @@ public class RedisClient {
         stringRedisTemplate.delete(key);
     }
 
-    public <ID> void setWithLogicalExpire(String keyPrefix, ID id, Object value, Long time, TimeUnit unit) {
+    public <ID> void setWithLogicalExpire(
+            String keyPrefix, ID id, Object value, Long time, TimeUnit unit) {
         String key = keyPrefix + id;
         // 设置逻辑过期
         RedisData redisData = new RedisData(
                 LocalDateTime.now().plusSeconds(unit.toSeconds(time)), value);
         // 写入Redis
         try {
-            stringRedisTemplate.opsForValue().set(key, objectMapper.writeValueAsString(redisData));
+            stringRedisTemplate.opsForValue()
+                    .set(key, objectMapper.writeValueAsString(redisData));
         } catch (JsonProcessingException e) {
             log.error("RedisClient setWithLogicalExpire error", e);
         }
@@ -75,7 +75,10 @@ public class RedisClient {
      * @param <ID> ID
      */
     public <R, ID> R queryWithLogicalExpire(
-            String keyPrefix, ID id, Class<R> type, Function<ID, R> dbFallback, Long time, TimeUnit unit) {
+            String keyPrefix, ID id, Class<R> type,
+            Function<ID, R> dbFallback, Long time, TimeUnit unit,
+            // 互斥锁prefix
+            String lockKeyPrefix) {
         String key = keyPrefix + id;
         // 1.从redis查询商铺缓存
         String json = stringRedisTemplate.opsForValue().get(key);
@@ -107,7 +110,7 @@ public class RedisClient {
         // 5.2.已过期，需要缓存重建
         // 6.缓存重建
         // 6.1.获取互斥锁
-        String lockKey = LOCK_APARTMENT_KEY + id;
+        String lockKey = lockKeyPrefix + id;
         boolean isLock = tryLock(lockKey);
         // 6.2.判断是否获取锁成功
         if (isLock){

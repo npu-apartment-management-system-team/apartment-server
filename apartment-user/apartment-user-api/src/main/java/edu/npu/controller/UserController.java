@@ -1,6 +1,6 @@
 package edu.npu.controller;
 
-import edu.npu.dto.UserListQueryDto;
+import edu.npu.dto.UserPageQueryDto;
 import edu.npu.dto.UserUpdateDto;
 import edu.npu.service.UserService;
 import edu.npu.vo.R;
@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Resource
     private UserService userService;
+
     @GetMapping
-    public R getUsersInfo(UserListQueryDto userListQueryDto){
-        return userService.getUsersInfo(userListQueryDto);
+    public R getUsersInfo(UserPageQueryDto userPageQueryDto){
+        return userService.getUsersInfo(userPageQueryDto);
     }
+
     @PutMapping("/{id}")
     public R updateUserInfo(@PathVariable("id") Long id, UserUpdateDto userUpdateDto){
         return userService.updateUserInfo(id,userUpdateDto);

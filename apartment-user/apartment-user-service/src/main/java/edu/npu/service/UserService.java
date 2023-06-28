@@ -1,7 +1,8 @@
 package edu.npu.service;
 
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
-import edu.npu.dto.UserListQueryDto;
+import edu.npu.dto.UserPageQueryDto;
 import edu.npu.dto.UserUpdateDto;
 import edu.npu.entity.User;
 import edu.npu.vo.R;
@@ -13,9 +14,11 @@ import edu.npu.vo.R;
 */
 public interface UserService extends IService<User> {
 
-    R getUsersInfo(UserListQueryDto userListQueryDto);
+    R getUsersInfo(UserPageQueryDto userPageQueryDto);
 
     R updateUserInfo(Long id, UserUpdateDto userUpdateDto);
 
     R deleteUser(Long id);
+
+    SearchRequest buildBasicQuery(UserPageQueryDto pageQueryDto);
 }

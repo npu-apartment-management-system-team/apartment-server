@@ -1,9 +1,14 @@
 package edu.npu.service.impl;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.npu.common.ResponseCodeEnum;
-import edu.npu.dto.UserListQueryDto;
+import edu.npu.dto.UserPageQueryDto;
 import edu.npu.dto.UserUpdateDto;
 import edu.npu.entity.LoginAccount;
 import edu.npu.entity.User;
@@ -20,6 +25,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static edu.npu.common.EsConstants.CARPOOLING_INDEX;
+import static edu.npu.common.EsConstants.USER_INDEX;
+
+import org.springframework.util.StringUtils;
+
 /**
 * @author wangminan
 * @description 针对表【user(住宿职工表)】的数据库操作Service实现
@@ -35,32 +45,39 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     private JwtTokenProvider jwtTokenProvider;
 
 
+    /**
+     * 获取用户信息列表
+     * @param userPageQueryDto 参数
+     * @return R
+     */
     @Override
-    public R getUsersInfo(UserListQueryDto userListQueryDto) {
+    public R getUsersInfo(UserPageQueryDto userPageQueryDto) {
+        SearchRequest searchRequest = buildBasicQuery()
         return null;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public R updateUserInfo(Long id, UserUpdateDto userUpdateDto) {
-        User user=this.getOne(
+        User user = this.getOne(
                 new LambdaQueryWrapper<User>()
-                        .eq(User::getId,id));
-        if (user==null){
+                        .eq(User::getId, id));
+        if (user == null) {
             log.error("所需更新的用户不存在");
             return R.error(ResponseCodeEnum.NOT_FOUND, "所需更新的用户不存在");
         }
-        int updateById=0;
+        int updateById = 0;
         LoginAccount loginAccount = loginAccountMapper.selectById(user.getLoginAccountId());
-        if(!loginAccount.getUsername().equals(userUpdateDto.username())){
+        if (!loginAccount.getUsername().equals(userUpdateDto.username())) {
             loginAccount.setUsername(userUpdateDto.username());
             updateById = loginAccountMapper.updateById(loginAccount);
         }
-        BeanUtils.copyProperties(userUpdateDto,user);
-        boolean userUpdate=this.updateById(user);
-        if(userUpdate&&updateById == 1) {
+        BeanUtils.copyProperties(userUpdateDto, user);
+        boolean userUpdate = this.updateById(user);
+        if (userUpdate && updateById == 1) {
             return R.ok("用户信息更新成功");
-        }else {
-            return R.error(ResponseCodeEnum.SERVER_ERROR, "数据库更新用户信息失败");
+        } else {
+            throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "用户信息更新失败");
         }
     }
 
@@ -80,6 +97,73 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return R.ok("用户信息删除成功");
         }else{
             throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "用户信息更新失败");
+        }
+    }
+
+    @Override
+    public SearchRequest buildBasicQuery(UserPageQueryDto pageQueryDto) {
+        Query query = formBoolQuery(pageQueryDto);
+        // 2.2.分页
+        int page = pageQueryDto.pageNum();
+        int size = pageQueryDto.pageSize();
+        // 拼装
+        return new SearchRequest.Builder()
+                .index(USER_INDEX)
+                .query(query)
+                .from((page - 1) * size)
+                .size(size)
+                .build();
+    }
+
+    private static Query formBoolQuery(UserPageQueryDto pageQueryDto) {
+        Query keywordQuery;
+        // 1.关键字
+        String keyword = pageQueryDto.query();
+        if (StringUtils.hasText(keyword)) {
+            keywordQuery = new MatchQuery.Builder()
+                    .field("all").query(keyword)
+                    .build()._toQuery();
+        } else {
+            keywordQuery = new MatchAllQuery.Builder()
+                    .build()._toQuery();
+        }
+        // 2. departmentId
+        Long departmentId = pageQueryDto.departmentId();
+        Query departmentIdQuery = null;
+        if (departmentId != null) {
+            departmentIdQuery = new MatchQuery.Builder()
+                    .field("departmentId").query(departmentId)
+                    .build()._toQuery();
+        }
+        // 3. apartmentId
+        Long apartmentId = pageQueryDto.apartmentId();
+        Query apartmentIdQuery = null;
+        if (apartmentId != null) {
+            apartmentIdQuery = new MatchQuery.Builder()
+                    .field("apartmentId").query(apartmentId)
+                    .build()._toQuery();
+        }
+        // 3. 拼装
+        if (departmentIdQuery != null && apartmentIdQuery != null) {
+            return new BoolQuery.Builder()
+                    .must(keywordQuery)
+                    .must(departmentIdQuery)
+                    .must(apartmentIdQuery)
+                    .build()._toQuery();
+        } else if (departmentId != null) {
+            return new BoolQuery.Builder()
+                    .must(keywordQuery)
+                    .must(departmentIdQuery)
+                    .build()._toQuery();
+        } else if (apartmentId != null) {
+            return new BoolQuery.Builder()
+                    .must(keywordQuery)
+                    .must(apartmentIdQuery)
+                    .build()._toQuery();
+        } else {
+            return new BoolQuery.Builder()
+                    .must(keywordQuery)
+                    .build()._toQuery();
         }
     }
 }
