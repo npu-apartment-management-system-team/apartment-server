@@ -59,8 +59,8 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
 
     /**
      * 新增管理员账号
-     * @param adminDto
-     * @return
+     * @param adminDto admin账号信息
+     * @return R
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -195,12 +195,10 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
                 adminMapper.selectPage(page, new LambdaQueryWrapper<Admin>()
                         .eq(Admin::getDepartmentId, adminPageQueryDto.departmentId())
                         .like(Admin::getName, adminPageQueryDto.query()));
-            } else if(adminPageQueryDto.departmentId() != null &&
-                    adminPageQueryDto.query() == null) {
+            } else if(adminPageQueryDto.departmentId() != null) {
                 adminMapper.selectPage(page, new LambdaQueryWrapper<Admin>()
                         .eq(Admin::getDepartmentId, adminPageQueryDto.departmentId()));
-            } else if(adminPageQueryDto.departmentId() == null &&
-                    adminPageQueryDto.query() != null) {
+            } else if(adminPageQueryDto.query() != null) {
                 adminMapper.selectPage(page, new LambdaQueryWrapper<Admin>()
                         .like(Admin::getName, adminPageQueryDto.query()));
             } else {

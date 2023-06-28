@@ -86,6 +86,7 @@ jobs:
           kubeconfig: ${{ secrets.K8S_KUBECONFIG }}
           context: kubernetes-admin@cluster.local
 
+      # 调用K8S上下文以部署到集群
       - uses: Azure/k8s-deploy@v4
         with:
           action: deploy
