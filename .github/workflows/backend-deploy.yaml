@@ -1,9 +1,10 @@
 name: Backend-Deploy
 
+# 更换触发条件 在有Tag时才进行打包操作
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -26,6 +27,10 @@ jobs:
       - name: Build with Maven
         run: cd ./apartment-parent && mvn -DskipTests -B package --file pom.xml
 
+      - name: Get version from tag
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF/refs\/tags\//}
+
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -43,16 +48,20 @@ jobs:
           context: ./apartment-gateway
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-gateway:latest
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-gateway:${{ steps.vars.outputs.tag }} 
+            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-gateway:latest
 
       - name: Build and push Auth
         id: docker_build_auth
         uses: docker/build-push-action@v4
         with:
-          context: ./apartment-auth
+          context: ./apartment-auth/apartment-auth-api
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-auth:latest
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-auth-api:${{ steps.vars.outputs.tag }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-auth-api:latest
 
       - name: Build and push User
         id: docker_build_user
@@ -61,7 +70,9 @@ jobs:
           context: ./apartment-user/apartment-user-api
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-user-api:latest
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-user-api:${{ steps.vars.outputs.tag }}, 
+            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-user-api:latest
 
 #  deploy:
 #    runs-on: ubuntu-latest
