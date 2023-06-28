@@ -1,18 +1,29 @@
 package edu.npu.listener;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.npu.doc.UserDoc;
 import edu.npu.entity.User;
 import edu.npu.exception.ApartmentError;
 import edu.npu.exception.ApartmentException;
+import edu.npu.util.RedisClient;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import static edu.npu.common.EsConstants.USER_INDEX;
+import static edu.npu.common.RedisConstants.CACHE_USER_KEY;
+import static edu.npu.common.RedisConstants.CACHE_USER_TTL;
 
 /**
  * @author : [wangminan]
@@ -24,6 +35,15 @@ public class MqUserListener {
 
     @Resource
     private ObjectMapper objectMapper;
+
+    @Resource
+    private RedisClient redisClient;
+
+    @Resource
+    private ElasticsearchClient elasticsearchClient;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     // 负责执行新线程上其他任务的线程池
     private static final ExecutorService cachedThreadPool =
@@ -154,12 +174,95 @@ public class MqUserListener {
     }
 
     private void handleInsert(JsonNode jsonNode) {
+        User user = extractUserFromJsonNode(jsonNode);
+        log.info("收到user:{}的新增消息", user);
+        // Redis缓存预热
+        redisClient.setWithLogicalExpire(
+                CACHE_USER_KEY, user.getId(), user, CACHE_USER_TTL, TimeUnit.MINUTES);
+        // ElasticSearch缓存预热 新线程
+        cachedThreadPool.execute(() -> {
+            log.info("开始保存user:{}到ES",user);
+            UserDoc userDoc = new UserDoc(user);
+            IndexResponse indexResponse;
+            try {
+                indexResponse = elasticsearchClient.index(index ->
+                        index.index(USER_INDEX)
+                                .id(String.valueOf(user.getId()))
+                                .document(userDoc)
+                );
+            } catch (IOException e) {
+                log.error("新增用户失败,userDoc:{}, error:{}", userDoc, e.getMessage());
+                throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "ES保存失败");
+            }
+            if (indexResponse == null) {
+                log.error("新增用户失败,userDoc:{}", userDoc);
+                throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "ES保存失败");
+            }
+            log.info("新增用户成功");
+        });
     }
 
     private void handleUpdate(JsonNode jsonNode) {
+        User user = extractUserFromJsonNode(jsonNode);
+        log.info("收到user:{}的更新消息", user);
+        // Redis缓存更新 先删除再重建
+        stringRedisTemplate.delete(CACHE_USER_KEY + user.getId());
+        redisClient.setWithLogicalExpire(
+                CACHE_USER_KEY, user.getId(), user, CACHE_USER_TTL, TimeUnit.MINUTES);
+        // ElasticSearch缓存更新 新线程
+        cachedThreadPool.execute(() -> {
+            log.info("开始更新user:{}到ES",user);
+            UserDoc userDoc = new UserDoc(user);
+            UpdateRequest<UserDoc, UserDoc> updateRequest =
+                new UpdateRequest.Builder<UserDoc, UserDoc>()
+                    .index(USER_INDEX)
+                    .id(String.valueOf(user.getId()))
+                    .doc(userDoc)
+                    .upsert(userDoc)
+                    .build();
+            UpdateResponse<UserDoc> updateResponse = null;
+            // 3.发送请求
+            try {
+                updateResponse =
+                        elasticsearchClient.update(updateRequest, UserDoc.class);
+            } catch (IOException e) {
+                log.error("更新用户失败,userDoc:{}, error:{}", userDoc, e.getMessage());
+                throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "ES更新失败");
+            }
+            if (updateResponse == null) {
+                log.error("更新用户失败,userDoc:{}", userDoc);
+                throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "ES更新失败");
+            }
+            log.info("更新用户成功");
+        });
     }
 
     private void handleDelete(JsonNode jsonNode) {
+        User user = extractUserFromJsonNode(jsonNode);
+        // 删除Redis缓存
+        stringRedisTemplate.delete(CACHE_USER_KEY + user.getId());
+        // 删除ElasticSearch缓存 新线程
+        cachedThreadPool.execute(() -> {
+            log.info("开始删除user:{}到ES",user);
+            DeleteRequest deleteRequest = new DeleteRequest.Builder()
+                    .index(USER_INDEX)
+                    .id(String.valueOf(user.getId()))
+                    .build();
+            DeleteResponse deleteResponse;
+            // 3.发送请求
+            try {
+                deleteResponse =
+                        elasticsearchClient.delete(deleteRequest);
+            } catch (IOException e) {
+                log.error("删除用户失败,userDoc:{}, error:{}", user, e.getMessage());
+                throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "ES删除失败");
+            }
+            if (deleteResponse == null) {
+                log.error("删除用户失败,userDoc:{}", user);
+                throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "ES删除失败");
+            }
+            log.info("删除用户成功");
+        });
     }
 
     private User extractUserFromJsonNode(JsonNode jsonNode) {
