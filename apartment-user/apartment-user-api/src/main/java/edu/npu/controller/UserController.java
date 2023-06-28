@@ -5,10 +5,7 @@ import edu.npu.dto.UserUpdateDto;
 import edu.npu.service.UserService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author : [wangminan]
@@ -26,5 +23,9 @@ public class UserController {
     @PutMapping("/{id}")
     public R updateUserInfo(@PathVariable("id") Long id, UserUpdateDto userUpdateDto){
         return userService.updateUserInfo(id,userUpdateDto);
+    }
+    @DeleteMapping("/{id}")
+    public R deleteUserInfo(@PathVariable("id") Long id){
+        return userService.deleteUser(id);
     }
 }

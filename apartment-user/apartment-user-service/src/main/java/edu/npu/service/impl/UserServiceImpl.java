@@ -7,6 +7,8 @@ import edu.npu.dto.UserListQueryDto;
 import edu.npu.dto.UserUpdateDto;
 import edu.npu.entity.LoginAccount;
 import edu.npu.entity.User;
+import edu.npu.exception.ApartmentError;
+import edu.npu.exception.ApartmentException;
 import edu.npu.mapper.LoginAccountMapper;
 import edu.npu.mapper.UserMapper;
 import edu.npu.service.UserService;
@@ -16,6 +18,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
 * @author wangminan
@@ -58,6 +61,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return R.ok("用户信息更新成功");
         }else {
             return R.error(ResponseCodeEnum.SERVER_ERROR, "数据库更新用户信息失败");
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public R deleteUser(Long id) {
+        User user=this.getOne(
+                new LambdaQueryWrapper<User>()
+                        .eq(User::getId,id));
+        if (user==null){
+            log.error("所需删除的用户不存在");
+            return R.error(ResponseCodeEnum.NOT_FOUND, "所需删除的用户不存在");
+        }
+        boolean userDelete=this.removeById(id);
+        int DeleteById = loginAccountMapper.deleteById(id);
+        if(userDelete&&DeleteById==1){
+            return R.ok("用户信息删除成功");
+        }else{
+            throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "用户信息更新失败");
         }
     }
 }

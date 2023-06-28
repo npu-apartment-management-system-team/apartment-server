@@ -16,4 +16,6 @@ public interface UserService extends IService<User> {
     R getUsersInfo(UserListQueryDto userListQueryDto);
 
     R updateUserInfo(Long id, UserUpdateDto userUpdateDto);
+
+    R deleteUser(Long id);
 }
