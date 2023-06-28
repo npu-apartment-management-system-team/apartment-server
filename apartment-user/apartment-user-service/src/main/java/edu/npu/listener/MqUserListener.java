@@ -3,12 +3,16 @@ package edu.npu.listener;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.npu.entity.User;
 import edu.npu.exception.ApartmentError;
 import edu.npu.exception.ApartmentException;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author : [wangminan]
@@ -20,6 +24,13 @@ public class MqUserListener {
 
     @Resource
     private ObjectMapper objectMapper;
+
+    // 负责执行新线程上其他任务的线程池
+    private static final ExecutorService cachedThreadPool =
+        Executors.newFixedThreadPool(
+            // 获取系统核数
+            Runtime.getRuntime().availableProcessors()
+        );
 
     /**
      * 接收由canal转发的数据库变动信息
@@ -105,15 +116,58 @@ public class MqUserListener {
         }
      */
     @RabbitListener(queues = "mysql.user.queue")
-    public void listenSimpleQueue(String msg) {
+    public void listenUserQueue(String msg) {
         log.info("消费者接收到mysql.user.queue的消息：【" + msg + "】");
         JsonNode jsonNode;
         try {
             jsonNode = objectMapper.readTree(msg);
             // 我们需要两个线程 同时在ElasticSearch与Redis中进行操作。
+            if (!jsonNode.get("database").asText().equals("apartment_system")) {
+                log.info("接收到非本项目数据库的消息,db:{}",
+                        jsonNode.get("database").asText());
+                return;
+            } else if (!jsonNode.get("table").asText().equals("user")) {
+                // 由于用的是fanout 所以确实存在这种可能 我们一个业务需要对应一个listener
+                log.info("接收到非本业务消息,table:{}",
+                        jsonNode.get("table").asText());
+                return;
+            }
+            // ok 是我们要处理的内容
+            if (jsonNode.get("type").asText().equals("INSERT")) {
+                log.info("开始处理新增User的同步");
+                handleInsert(jsonNode);
+            } else if (jsonNode.get("type").asText().equals("UPDATE")) {
+                log.info("开始处理更新User的同步");
+                handleUpdate(jsonNode);
+            } else if (jsonNode.get("type").asText().equals("DELETE")) {
+                log.info("开始处理删除User的同步");
+                handleDelete(jsonNode);
+            } else {
+                log.info("接收到非常规业务类型,type:{}",
+                        jsonNode.get("type").asText());
+                return;
+            }
         } catch (JsonProcessingException e) {
             throw new ApartmentException(ApartmentError.PARAMS_ERROR, "消息解析失败");
         }
         log.info("消费者处理消息成功！");
+    }
+
+    private void handleInsert(JsonNode jsonNode) {
+    }
+
+    private void handleUpdate(JsonNode jsonNode) {
+    }
+
+    private void handleDelete(JsonNode jsonNode) {
+    }
+
+    private User extractUserFromJsonNode(JsonNode jsonNode) {
+        try {
+            return objectMapper
+                    .treeToValue(jsonNode.get("data").get(0), User.class);
+        } catch (JsonProcessingException e) {
+            throw new ApartmentException(ApartmentError.PARAMS_ERROR, "JSON解析失败");
+        }
     }
 }
