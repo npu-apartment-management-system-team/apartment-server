@@ -19,17 +19,17 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import static edu.npu.util.RegexPatterns.EMAIL_REGEX;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static edu.npu.util.RegexPatterns.EMAIL_REGEX;
 
 /**
 * @author wangminan
