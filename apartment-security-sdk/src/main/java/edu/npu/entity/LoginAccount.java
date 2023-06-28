@@ -2,21 +2,12 @@ package edu.npu.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import edu.npu.common.RoleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * 登录账号
@@ -26,13 +17,7 @@ import java.util.Objects;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-// Json转换时只需要id,username,password,role,isDeleted这些loginAccount自己的字段
-// 忽略UserDetails中的其他字段
-@JsonIgnoreProperties(
-        value = {"accountNonExpired", "accountNonLocked",
-                "credentialsNonExpired", "enabled", "authorities"})
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class LoginAccount implements Serializable, UserDetails {
+public class LoginAccount implements Serializable {
     /**
      * 用户唯一ID
      */
@@ -64,30 +49,4 @@ public class LoginAccount implements Serializable, UserDetails {
     @Serial
     @TableField(exist = false)
     private static final long serialVersionUID = 2589L;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(
-                Objects.requireNonNull(RoleEnum.fromValue(role)).name()));
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return isDeleted == 0;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

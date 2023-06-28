@@ -6,9 +6,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.npu.doc.UserDoc;
+import edu.npu.entity.LoginAccount;
 import edu.npu.entity.User;
 import edu.npu.exception.ApartmentError;
 import edu.npu.exception.ApartmentException;
+import edu.npu.mapper.LoginAccountMapper;
 import edu.npu.util.RedisClient;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -17,17 +19,18 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static edu.npu.common.EsConstants.USER_INDEX;
-import static edu.npu.common.RedisConstants.CACHE_USER_KEY;
-import static edu.npu.common.RedisConstants.CACHE_USER_TTL;
+import static edu.npu.common.RedisConstants.*;
 
 /**
  * @author : [wangminan]
- * @description : [一句话描述该类的功能]
+ * @description : [承接Canal消息转发的后端服务]
  */
 @Slf4j
 @Component
@@ -44,6 +47,9 @@ public class MqUserListener {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private LoginAccountMapper loginAccountMapper;
 
     // 负责执行新线程上其他任务的线程池
     private static final ExecutorService cachedThreadPool =
@@ -176,9 +182,6 @@ public class MqUserListener {
     private void handleInsert(JsonNode jsonNode) {
         User user = extractUserFromJsonNode(jsonNode);
         log.info("收到user:{}的新增消息", user);
-        // Redis缓存预热
-        redisClient.setWithLogicalExpire(
-                CACHE_USER_KEY, user.getId(), user, CACHE_USER_TTL, TimeUnit.MINUTES);
         // ElasticSearch缓存预热 新线程
         cachedThreadPool.execute(() -> {
             log.info("开始保存user:{}到ES",user);
@@ -200,27 +203,26 @@ public class MqUserListener {
             }
             log.info("新增用户成功");
         });
+        // Redis缓存预热
+        redisClient.setWithLogicalExpire(
+                CACHE_USER_KEY, user.getId(), user, CACHE_USER_TTL, TimeUnit.MINUTES);
     }
 
     private void handleUpdate(JsonNode jsonNode) {
         User user = extractUserFromJsonNode(jsonNode);
         log.info("收到user:{}的更新消息", user);
-        // Redis缓存更新 先删除再重建
-        stringRedisTemplate.delete(CACHE_USER_KEY + user.getId());
-        redisClient.setWithLogicalExpire(
-                CACHE_USER_KEY, user.getId(), user, CACHE_USER_TTL, TimeUnit.MINUTES);
         // ElasticSearch缓存更新 新线程
         cachedThreadPool.execute(() -> {
             log.info("开始更新user:{}到ES",user);
             UserDoc userDoc = new UserDoc(user);
             UpdateRequest<UserDoc, UserDoc> updateRequest =
-                new UpdateRequest.Builder<UserDoc, UserDoc>()
-                    .index(USER_INDEX)
-                    .id(String.valueOf(user.getId()))
-                    .doc(userDoc)
-                    .upsert(userDoc)
-                    .build();
-            UpdateResponse<UserDoc> updateResponse = null;
+                    new UpdateRequest.Builder<UserDoc, UserDoc>()
+                            .index(USER_INDEX)
+                            .id(String.valueOf(user.getId()))
+                            .doc(userDoc)
+                            .upsert(userDoc)
+                            .build();
+            UpdateResponse<UserDoc> updateResponse;
             // 3.发送请求
             try {
                 updateResponse =
@@ -235,12 +237,26 @@ public class MqUserListener {
             }
             log.info("更新用户成功");
         });
+        // Redis缓存更新 先删除再重建
+        stringRedisTemplate.delete(CACHE_USER_KEY + user.getId());
+        redisClient.setWithLogicalExpire(
+                CACHE_USER_KEY, user.getId(), user, CACHE_USER_TTL, TimeUnit.MINUTES);
+        // 还需要查登录信息 如果有则同步更新
+        LoginAccount loginAccount =
+                loginAccountMapper.selectById(user.getLoginAccountId());
+        // 更新map中的HASH_LOGIN_ACCOUNT_KEY指向的value
+        try {
+            stringRedisTemplate.opsForHash()
+                    .put(LOGIN_ACCOUNT_KEY_PREFIX + loginAccount.getUsername(),
+                            HASH_LOGIN_ACCOUNT_KEY,
+                            objectMapper.writeValueAsString(loginAccount));
+        } catch (JsonProcessingException e) {
+            throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "JSON序列化失败");
+        }
     }
 
     private void handleDelete(JsonNode jsonNode) {
         User user = extractUserFromJsonNode(jsonNode);
-        // 删除Redis缓存
-        stringRedisTemplate.delete(CACHE_USER_KEY + user.getId());
         // 删除ElasticSearch缓存 新线程
         cachedThreadPool.execute(() -> {
             log.info("开始删除user:{}到ES",user);
@@ -263,6 +279,8 @@ public class MqUserListener {
             }
             log.info("删除用户成功");
         });
+        // 删除Redis缓存
+        stringRedisTemplate.delete(CACHE_USER_KEY + user.getId());
     }
 
     private User extractUserFromJsonNode(JsonNode jsonNode) {

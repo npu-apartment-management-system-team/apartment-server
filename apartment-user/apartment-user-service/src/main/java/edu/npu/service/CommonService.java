@@ -3,7 +3,6 @@ package edu.npu.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import edu.npu.dto.UpdatePasswordDto;
 import edu.npu.entity.LoginAccount;
-import edu.npu.mapper.LoginAccountMapper;
 import edu.npu.vo.R;
 
 public interface CommonService extends IService<LoginAccount> {
