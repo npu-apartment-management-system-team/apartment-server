@@ -1,7 +1,10 @@
 package edu.npu.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import edu.npu.dto.UserListQueryDto;
+import edu.npu.dto.UserUpdateDto;
 import edu.npu.entity.User;
+import edu.npu.vo.R;
 
 /**
 * @author wangminan
@@ -10,4 +13,7 @@ import edu.npu.entity.User;
 */
 public interface UserService extends IService<User> {
 
+    R getUsersInfo(UserListQueryDto userListQueryDto);
+
+    R updateUserInfo(Long id, UserUpdateDto userUpdateDto);
 }
