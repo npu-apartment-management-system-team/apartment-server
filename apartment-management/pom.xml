@@ -11,6 +11,12 @@
     </parent>
 
     <artifactId>apartment-management</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>apartment-management-api</module>
+        <module>apartment-management-model</module>
+        <module>apartment-management-service</module>
+    </modules>
 
 
 </project>

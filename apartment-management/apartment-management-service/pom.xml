@@ -5,22 +5,16 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>edu.npu</groupId>
-        <artifactId>apartment-user</artifactId>
+        <artifactId>apartment-management</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>apartment-user-service</artifactId>
-
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <artifactId>apartment-management-service</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>edu.npu</groupId>
-            <artifactId>apartment-user-model</artifactId>
+            <artifactId>apartment-management-model</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -40,11 +34,5 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>com.alipay.sdk</groupId>
-            <artifactId>alipay-sdk-java</artifactId>
-        </dependency>
     </dependencies>
-
 </project>
