@@ -2,6 +2,7 @@ package edu.npu.service;
 
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
+import edu.npu.dto.BindAlipayCallbackDto;
 import edu.npu.dto.UserPageQueryDto;
 import edu.npu.dto.UserUpdateDto;
 import edu.npu.entity.User;
@@ -19,6 +20,8 @@ public interface UserService extends IService<User> {
     R updateUserInfo(Long id, UserUpdateDto userUpdateDto);
 
     R deleteUser(Long id);
+
+    String bindAlipayToUser(BindAlipayCallbackDto bindAlipayCallbackDto);
 
     SearchRequest buildBasicQuery(UserPageQueryDto pageQueryDto);
 }

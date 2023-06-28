@@ -5,10 +5,18 @@ import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.request.AlipaySystemOauthTokenRequest;
+import com.alipay.api.request.AlipayUserInfoShareRequest;
+import com.alipay.api.response.AlipaySystemOauthTokenResponse;
+import com.alipay.api.response.AlipayUserInfoShareResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.npu.common.ResponseCodeEnum;
 import edu.npu.dto.UserPageQueryDto;
+import edu.npu.dto.BindAlipayCallbackDto;
 import edu.npu.dto.UserUpdateDto;
 import edu.npu.entity.LoginAccount;
 import edu.npu.entity.User;
@@ -24,8 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static edu.npu.common.EsConstants.CARPOOLING_INDEX;
 import static edu.npu.common.EsConstants.USER_INDEX;
 
 import org.springframework.util.StringUtils;
@@ -43,6 +49,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     private LoginAccountMapper loginAccountMapper;
     @Resource
     private JwtTokenProvider jwtTokenProvider;
+    @Resource
+    private AlipayClient alipayClient;
 
 
     /**
@@ -52,7 +60,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      */
     @Override
     public R getUsersInfo(UserPageQueryDto userPageQueryDto) {
-        SearchRequest searchRequest = buildBasicQuery()
+        SearchRequest searchRequest = buildBasicQuery(userPageQueryDto);
         return null;
     }
 
@@ -165,6 +173,59 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
                     .must(keywordQuery)
                     .build()._toQuery();
         }
+    }
+
+    @Override
+    public String bindAlipayToUser(BindAlipayCallbackDto bindAlipayCallbackDto) {
+        String token = bindAlipayCallbackDto.state();
+        AlipaySystemOauthTokenRequest tokenRequest = new AlipaySystemOauthTokenRequest();
+        tokenRequest.setGrantType("authorization_code");
+        tokenRequest.setCode(bindAlipayCallbackDto.auth_code());
+        AlipaySystemOauthTokenResponse tokenResponse;
+        log.info(alipayClient.toString());
+        try {
+            tokenResponse = alipayClient.execute(tokenRequest);
+        } catch (AlipayApiException e) {
+            throw new ApartmentException("调用获取支付宝AK接口失败");
+        }
+        if (tokenResponse.isSuccess()) {
+            String accessToken = tokenResponse.getAccessToken();
+            AlipayUserInfoShareRequest alipayIdRequest = new AlipayUserInfoShareRequest();
+            AlipayUserInfoShareResponse alipayIdResponse;
+            try {
+                alipayIdResponse = alipayClient.execute(alipayIdRequest, accessToken);
+            } catch (AlipayApiException e) {
+                throw new ApartmentException("调用获取支付宝ID接口失败");
+            }
+            if (alipayIdResponse.isSuccess()) {
+                // 支付宝的工作完成了 现在需要把支付宝ID和User表的User绑定
+                // 因为接口是从支付宝回调来的 所以没有登录状态 需要从state读到的token字段中获取信息
+                String username = jwtTokenProvider.extractUsername(token);
+                LoginAccount loginAccount =
+                        // 直接写 不注入service的loadUserByUsername方法
+                        loginAccountMapper.selectOne(
+                                new LambdaQueryWrapper<LoginAccount>()
+                                        .eq(LoginAccount::getUsername, username));
+                User user =
+                        this.getOne(
+                                new QueryWrapper<User>().lambda()
+                                        .eq(User::getLoginAccountId, loginAccount.getId()));
+                user.setAlipayId(alipayIdResponse.getUserId());
+                // 没有参数 也可以加 但建议前端缓存环境变量
+                return this.updateById(user) ?
+                        "redirect:" +
+                                "https://apartment-client.wangminan.me" +
+                                "/#/main/my/bind-alipay/success?token=" + token :
+                        "redirect:" +
+                                "https://apartment-client.wangminan.me" +
+                                "/#/main/my/bind-alipay/failure?token=" + token;
+            } else {
+                log.error("调用获取支付宝ID接口失败, resp: {}", alipayIdResponse);
+            }
+        } else {
+            log.error("调用获取支付宝AK接口失败, resp: {}", tokenResponse);
+        }
+        return "redirect:https://apartment-client.wangminan.me/#/main/mybind-alipay/failure";
     }
 }
 
