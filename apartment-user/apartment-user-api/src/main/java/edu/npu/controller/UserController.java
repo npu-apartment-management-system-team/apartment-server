@@ -23,6 +23,11 @@ public class UserController {
         return userService.getUsersInfo(userPageQueryDto);
     }
 
+    @GetMapping("/detail")
+    public R getUserInfo(@RequestParam(value = "id") Long id){
+        return userService.getUserInfo(id);
+    }
+
     @PutMapping("/{id}")
     public R updateUserInfo(@PathVariable("id") Long id, UserUpdateDto userUpdateDto){
         return userService.updateUserInfo(id,userUpdateDto);

@@ -28,4 +28,6 @@ public interface UserService extends IService<User> {
     SearchRequest buildBasicQuery(UserPageQueryDto pageQueryDto);
 
     R resolveRestResponse(SearchResponse<UserDoc> response);
+
+    R getUserInfo(Long id);
 }

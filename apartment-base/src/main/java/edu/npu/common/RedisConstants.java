@@ -30,6 +30,8 @@ public class RedisConstants {
 
     public static final Long CACHE_USER_TTL = 30L;
 
+    public static final String LOCK_USER_KEY = "lock:user:";
+
     public static final String CACHE_APARTMENT_KEY = "apartment:";
 
     public static final Long CACHE_APARTMENT_TTL = 30L;

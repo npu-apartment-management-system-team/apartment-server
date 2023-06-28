@@ -30,6 +30,7 @@ import edu.npu.mapper.LoginAccountMapper;
 import edu.npu.mapper.UserMapper;
 import edu.npu.service.UserService;
 import edu.npu.util.JwtTokenProvider;
+import edu.npu.util.RedisClient;
 import edu.npu.vo.PageResultVo;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
@@ -41,8 +42,10 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static edu.npu.common.EsConstants.USER_INDEX;
+import static edu.npu.common.RedisConstants.*;
 
 /**
 * @author wangminan
@@ -63,6 +66,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Resource
     private ElasticsearchClient elasticsearchClient;
+
+    @Resource
+    private RedisClient redisClient;
 
     /**
      * 获取用户信息列表
@@ -200,6 +206,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         r.put("total", pageResult.total());
         r.put("data", pageResult.data());
         return r;
+    }
+
+    @Override
+    public R getUserInfo(Long id) {
+        // 调用redisClient做搜索
+        User user =
+            redisClient.queryWithLogicalExpire(
+                CACHE_USER_KEY, String.valueOf(id), User.class,
+                this::getById, CACHE_USER_TTL, TimeUnit.MINUTES,
+                LOCK_USER_KEY
+            );
+        if (user == null) {
+            return R.error(ResponseCodeEnum.NOT_FOUND, "用户不存在");
+        }
+        return R.ok().put("result", user);
     }
 
     private PageResultVo handlePageResponse(SearchResponse<UserDoc> response) {
