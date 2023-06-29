@@ -82,6 +82,10 @@ jobs:
       - name: Check out
         uses: actions/checkout@v3
 
+      - name: Get version from tag
+        id: vars
+        run: echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+
       # 设置k8s上下文
       - uses: azure/k8s-set-context@v1
         id: set_k8s_context
@@ -98,3 +102,7 @@ jobs:
           namespace: 'apartment-system'
           manifests: |
             ./manifests
+          images: |
+            wangminan/apartment-gateway:${{ steps.vars.outputs.tag }} 
+            wangminan/apartment-auth-api:${{ steps.vars.outputs.tag }} 
+            wangminan/apartment-user-api:${{ steps.vars.outputs.tag }} 
