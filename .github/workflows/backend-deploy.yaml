@@ -74,6 +74,17 @@ jobs:
             ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-user-api:${{ steps.vars.outputs.tag }} 
             ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-user-api:latest
 
+      - name: Build and push management
+        id: docker_build_management
+        uses: docker/build-push-action@v4
+        with:
+          context: ./apartment-management/apartment-management-api
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-management-api:${{ steps.vars.outputs.tag }} 
+            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-management-api:latest
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -103,6 +114,7 @@ jobs:
           manifests: |
             ./manifests
           images: |
-            wangminan/apartment-gateway:${{ steps.vars.outputs.tag }} 
-            wangminan/apartment-auth-api:${{ steps.vars.outputs.tag }} 
-            wangminan/apartment-user-api:${{ steps.vars.outputs.tag }} 
+            wangminan/apartment-gateway:${{ steps.vars.outputs.tag }}
+            wangminan/apartment-auth-api:${{ steps.vars.outputs.tag }}
+            wangminan/apartment-user-api:${{ steps.vars.outputs.tag }}
+            wangminan/apartment-management-api:${{ steps.vars.outputs.tag }}
