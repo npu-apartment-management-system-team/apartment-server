@@ -1,7 +1,12 @@
 package edu.npu.service;
 
+import edu.npu.dto.AddBedDto;
+import edu.npu.dto.BedPageQueryDto;
+import edu.npu.dto.BedQueryDto;
+import edu.npu.dto.UpdateBedDto;
 import edu.npu.entity.Bed;
 import com.baomidou.mybatisplus.extension.service.IService;
+import edu.npu.vo.R;
 
 /**
 * @author wangminan
@@ -10,4 +15,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface BedService extends IService<Bed> {
 
+    R getBedList(BedPageQueryDto bedListQueryDto);
+
+    R getBedById(BedQueryDto bedQueryDto);
+
+    R addBed(AddBedDto addBedDto);
+
+    R updateBed(Long id, UpdateBedDto updateBedDto);
+
+    R deleteBed(Long id);
 }
