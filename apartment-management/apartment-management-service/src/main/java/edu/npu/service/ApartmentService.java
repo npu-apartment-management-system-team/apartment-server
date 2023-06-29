@@ -1,7 +1,10 @@
 package edu.npu.service;
 
-import edu.npu.entity.Apartment;
 import com.baomidou.mybatisplus.extension.service.IService;
+import edu.npu.dto.ApartmentDto;
+import edu.npu.entity.Apartment;
+import edu.npu.vo.R;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
 * @author wangminan
@@ -10,4 +13,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface ApartmentService extends IService<Apartment> {
 
+    @Transactional(rollbackFor = Exception.class)
+    R addApartment(ApartmentDto apartmentDto);
+
+    @Transactional(rollbackFor = Exception.class)
+    R deleteApartment(Long id);
+
+    @Transactional(rollbackFor = Exception.class)
+    R updateApartment(Long id, ApartmentDto apartmentDto);
 }
