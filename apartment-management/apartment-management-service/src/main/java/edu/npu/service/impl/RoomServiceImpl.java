@@ -81,7 +81,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
         Room newRoom = new Room();
         BeanUtils.copyProperties(putRoomDto, newRoom);
         newRoom.setApartmentId(Long.valueOf(putRoomDto.apartmentId()));
-        boolean success = save(newRoom);
+        boolean success = updateById(newRoom);
         if (success) {
             log.info("房间[" + putRoomDto.name() + "]更新成功");
             return R.ok("房间[" + putRoomDto.name() + "]更新成功");
@@ -138,7 +138,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
             return R.ok().put("result", result);
         }
 
-        return R.error("查询的房间不存在");
+        return R.error("查询的房间["+id+"]不存在");
     }
 }
 
