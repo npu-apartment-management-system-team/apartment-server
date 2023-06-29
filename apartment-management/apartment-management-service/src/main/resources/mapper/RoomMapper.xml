@@ -8,7 +8,7 @@
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="apartmentId" column="apartment_id" jdbcType="BIGINT"/>
             <result property="name" column="name" jdbcType="VARCHAR"/>
-            <result property="usage" column="usage" jdbcType="VARCHAR"/>
+            <result property="usage" column="`usage`" jdbcType="VARCHAR"/>
             <result property="isForCadre" column="is_for_cadre" jdbcType="TINYINT"/>
             <result property="isReserved" column="is_reserved" jdbcType="TINYINT"/>
             <result property="sex" column="sex" jdbcType="INTEGER"/>
