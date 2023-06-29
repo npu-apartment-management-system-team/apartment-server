@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author : [wangminan]
- * @description : [一句话描述该类的功能]
+ * @description : [通用控制器类]
  */
 @Controller
 @RequestMapping("/password")

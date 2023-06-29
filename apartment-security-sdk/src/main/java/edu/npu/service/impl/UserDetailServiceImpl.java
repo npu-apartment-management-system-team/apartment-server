@@ -29,7 +29,7 @@ public class UserDetailServiceImpl {
 
     @Bean
     public UserDetailsService userDetailsService(){
-        // 从数据库中获取用户信息
+        // 从Redis中获取用户信息
         return username -> {
             try {
                 return new AccountUserDetails(

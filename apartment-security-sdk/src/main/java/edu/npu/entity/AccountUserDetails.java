@@ -21,6 +21,8 @@ import java.util.Objects;
 @AllArgsConstructor
 public class AccountUserDetails implements UserDetails {
 
+    private Long id;
+
     private String password;
 
     private String username;
@@ -54,6 +56,7 @@ public class AccountUserDetails implements UserDetails {
     }
 
     public AccountUserDetails(LoginAccount loginAccount) {
+        this.id = loginAccount.getId();
         this.username = loginAccount.getUsername();
         this.password = loginAccount.getPassword();
         this.role = loginAccount.getRole();

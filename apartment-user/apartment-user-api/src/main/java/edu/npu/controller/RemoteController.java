@@ -2,7 +2,7 @@ package edu.npu.controller;
 
 /**
  * @author : [wangminan]
- * @description : [一句话描述该类的功能]
+ * @description : [用户模块远程调用接口]
  */
 public class RemoteController {
 }

@@ -191,14 +191,14 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
 
             //query和departmentId共同查询
             if(adminPageQueryDto.departmentId() != null &&
-                    adminPageQueryDto.query() != null) {
+                    StringUtils.hasText(adminPageQueryDto.query())) {
                 adminMapper.selectPage(page, new LambdaQueryWrapper<Admin>()
                         .eq(Admin::getDepartmentId, adminPageQueryDto.departmentId())
                         .like(Admin::getName, adminPageQueryDto.query()));
             } else if(adminPageQueryDto.departmentId() != null) {
                 adminMapper.selectPage(page, new LambdaQueryWrapper<Admin>()
                         .eq(Admin::getDepartmentId, adminPageQueryDto.departmentId()));
-            } else if(adminPageQueryDto.query() != null) {
+            } else if(StringUtils.hasText(adminPageQueryDto.query())) {
                 adminMapper.selectPage(page, new LambdaQueryWrapper<Admin>()
                         .like(Admin::getName, adminPageQueryDto.query()));
             } else {
