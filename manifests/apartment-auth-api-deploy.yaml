@@ -32,10 +32,10 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 1
-      maxSurge: 1
+      maxUnavailable: 75%
+      maxSurge: 100%
   revisionHistoryLimit: 10
-  progressDeadlineSeconds: 600
+  progressDeadlineSeconds: 300
 
 ---
 kind: Service

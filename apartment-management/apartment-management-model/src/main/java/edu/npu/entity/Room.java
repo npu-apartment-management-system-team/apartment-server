@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.Data;
 
 /**
  * 房间表
@@ -35,6 +35,7 @@ public class Room implements Serializable {
     /**
      * 房间作用。eg. 住宿 班组长办公室 活动室 空房间...
      */
+    @TableField("`usage`")
     private String usage;
 
     /**

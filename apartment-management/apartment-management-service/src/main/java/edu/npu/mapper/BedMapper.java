@@ -2,6 +2,7 @@ package edu.npu.mapper;
 
 import edu.npu.entity.Bed;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
 * @author wangminan
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @createDate 2023-06-29 09:13:20
 * @Entity edu.npu.entity.Bed
 */
+@Mapper
 public interface BedMapper extends BaseMapper<Bed> {
 
 }

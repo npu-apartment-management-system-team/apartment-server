@@ -3,6 +3,7 @@ package edu.npu.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import edu.npu.entity.LoginAccount;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 /**
 * @author wangminan
@@ -13,6 +14,8 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface LoginAccountMapper extends BaseMapper<LoginAccount> {
 
+    @Select("select 1 from login_account")
+    int initDb();
 }
 
 

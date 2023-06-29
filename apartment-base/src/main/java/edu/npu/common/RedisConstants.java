@@ -24,15 +24,13 @@ public class RedisConstants {
 
     public static final String HASH_LOGIN_ACCOUNT_KEY = "loginAccount";
 
-//    public static final Long CACHE_NULL_TTL = 2L;
-
     public static final String CACHE_USER_KEY = "cache:user:";
 
     public static final Long CACHE_USER_TTL = 30L;
 
     public static final String LOCK_USER_KEY = "lock:user:";
 
-    public static final String CACHE_APARTMENT_KEY = "apartment:";
+    public static final String CACHE_APARTMENT_KEY = "cache:apartment:";
 
     public static final Long CACHE_APARTMENT_TTL = 30L;
 
