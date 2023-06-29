@@ -1,13 +1,11 @@
 package edu.npu.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serial;
 import java.io.Serializable;
 import lombok.Data;
+import org.hibernate.validator.constraints.UniqueElements;
 
 /**
  * 部门表
@@ -55,6 +53,7 @@ public class Department implements Serializable {
     /**
      * 是否已删除 0未删除 1已删除 default 0
      */
+    @TableLogic(value = "0", delval = "1")
     private Integer isDeleted;
 
     @Serial

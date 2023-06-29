@@ -165,7 +165,7 @@ public class LoginAccountServiceImpl extends ServiceImpl<LoginAccountMapper, Log
             return R.ok(result);
         } catch (Exception e) {
             log.error("登录失败,请检查密码", e);
-            return R.error(ResponseCodeEnum.SERVER_ERROR, "登录失败");
+            return R.error(ResponseCodeEnum.SERVER_ERROR, "登录失败, 请检查密码");
         }
     }
 

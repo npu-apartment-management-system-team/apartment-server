@@ -1,0 +1,58 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: apartment-management-api
+  namespace: apartment-system
+  labels:
+    app: apartment-management-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: apartment-management-api
+  template:
+    metadata:
+      labels:
+        app: apartment-management-api
+    spec:
+      containers:
+        - name: apartment-management-api
+          image: wangminan/apartment-management-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 63040
+              protocol: TCP
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: aptmtprod
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 75%
+      maxSurge: 100%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 300
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: apartment-management-api
+  namespace: apartment-system
+  labels:
+    app: apartment-management-api
+spec:
+  selector:
+    app: apartment-management-api
+  ports:
+    - protocol: TCP
+      port: 63040
+      targetPort: 63040
+      # nodePort默认范围30000-32767
+      nodePort: 32040
+  type: NodePort
+  sessionAffinity: None
