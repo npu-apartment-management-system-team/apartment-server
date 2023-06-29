@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: accommodation-api
+  profiles:
+    active: aptmtdev

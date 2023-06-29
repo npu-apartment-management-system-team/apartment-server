@@ -5,16 +5,22 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>edu.npu</groupId>
-        <artifactId>apartment-management</artifactId>
+        <artifactId>apartment-accommodation</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>apartment-management-service</artifactId>
+    <artifactId>apartment-accommodation-service</artifactId>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
             <groupId>edu.npu</groupId>
-            <artifactId>apartment-management-model</artifactId>
+            <artifactId>apartment-accommodation-model</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -34,11 +40,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
-
-        <!-- Spring Cloud 微服务远程调用 -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-        </dependency>
     </dependencies>
+
 </project>

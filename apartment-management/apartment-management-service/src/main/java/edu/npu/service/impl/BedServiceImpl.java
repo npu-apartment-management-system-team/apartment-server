@@ -45,30 +45,43 @@ public class BedServiceImpl extends ServiceImpl<BedMapper, Bed>
     public R getBedList(BedPageQueryDto bedPageQueryDto) {
         try {
             List<Bed> bedList = new ArrayList<>();
+            boolean hasQuery = false;
             if (bedPageQueryDto.apartmentId() != null) {
+                hasQuery = true;
                 List<Room> roomList =
                         roomMapper.selectList(new LambdaQueryWrapper<Room>()
                                 .eq(Room::getApartmentId, bedPageQueryDto.apartmentId()));
                 bedList = list(new LambdaQueryWrapper<Bed>()
                         .in(Bed::getRoomId, roomList.stream().map(Room::getId).toArray()));
             } else if (bedPageQueryDto.roomId() != null) {
+                hasQuery = true;
                 bedList = list(new LambdaQueryWrapper<Bed>()
                         .eq(Bed::getRoomId, bedPageQueryDto.roomId()));
             }
+
             IPage<Bed> page = new Page<>(
                     bedPageQueryDto.pageNum(), bedPageQueryDto.pageSize());
             LambdaQueryWrapper<Bed> queryWrapper = new LambdaQueryWrapper<>();
+
             if (bedPageQueryDto.query() != null) {
+                hasQuery = true;
                 queryWrapper.like(Bed::getName, bedPageQueryDto.query());
             }
             if (bedPageQueryDto.apartmentId() != null ||
                     bedPageQueryDto.roomId() != null) {
+                hasQuery = true;
                 queryWrapper.in(Bed::getId, bedList.stream().map(Bed::getId).toArray());
             }
             if (bedPageQueryDto.isInUse() != null) {
+                hasQuery = true;
                 queryWrapper.eq(Bed::getIsInUse, bedPageQueryDto.isInUse());
             }
-            bedMapper.selectPage(page, queryWrapper);
+            if (hasQuery) {
+                bedMapper.selectPage(page, queryWrapper);
+            } else {
+                bedMapper.selectPage(page, null);
+            }
+
             Map<String, Object> resultMap = new HashMap<>();
             resultMap.put("list", page.getRecords());
             resultMap.put("total", page.getTotal());

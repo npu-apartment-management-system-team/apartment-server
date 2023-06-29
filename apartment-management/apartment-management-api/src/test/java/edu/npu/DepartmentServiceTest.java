@@ -1,6 +1,5 @@
 package edu.npu;
 
-import edu.npu.dto.AdminPageQueryDto;
 import edu.npu.dto.DepartmentDto;
 import edu.npu.dto.DepartmentPageQueryDto;
 import edu.npu.service.DepartmentService;

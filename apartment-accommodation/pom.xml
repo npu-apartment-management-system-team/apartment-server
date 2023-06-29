@@ -11,6 +11,12 @@
     </parent>
 
     <artifactId>apartment-accommodation</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>apartment-accommodation-api</module>
+        <module>apartment-accommodation-model</module>
+        <module>apartment-accommodation-service</module>
+    </modules>
 
 
 </project>

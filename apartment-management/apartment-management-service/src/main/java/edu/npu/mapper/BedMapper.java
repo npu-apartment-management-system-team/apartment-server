@@ -1,9 +1,8 @@
 package edu.npu.mapper;
 
-import edu.npu.entity.Bed;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import edu.npu.entity.Bed;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.web.bind.annotation.Mapping;
 
 /**
 * @author wangminan

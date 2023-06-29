@@ -7,14 +7,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * @author : [wangminan]
- * @description : [Auth模块启动类]
+ * @description : [住宿流程服务启动类]
  */
 @SpringBootApplication
-public class AuthApplication {
-
+public class AccommodationApplication {
     public static void main(String[] args) {
         System.setProperty("nacos.logging.default.config.enabled","false");
         LogFactory.useCustomLogging(StdOutImpl.class);
-        SpringApplication.run(AuthApplication.class, args);
+        SpringApplication.run(AccommodationApplication.class, args);
     }
 }

@@ -1,5 +1,6 @@
 package edu.npu.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 
 /**
@@ -16,8 +17,10 @@ public record DepartmentPageQueryDto(
 
         String query,
 
-        String longitude,
+        @JsonFormat(shape = JsonFormat.Shape.STRING)
+        Double longitude,
 
-        String latitude
+        @JsonFormat(shape = JsonFormat.Shape.STRING)
+        Double latitude
 ) {
 }

@@ -1,11 +1,11 @@
 package edu.npu.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import edu.npu.dto.AddBedDto;
 import edu.npu.dto.BedPageQueryDto;
 import edu.npu.dto.BedQueryDto;
 import edu.npu.dto.UpdateBedDto;
 import edu.npu.entity.Bed;
-import com.baomidou.mybatisplus.extension.service.IService;
 import edu.npu.vo.R;
 
 /**

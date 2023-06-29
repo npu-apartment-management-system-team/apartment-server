@@ -1,9 +1,9 @@
 package edu.npu.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import edu.npu.dto.DepartmentDto;
 import edu.npu.dto.DepartmentPageQueryDto;
 import edu.npu.entity.Department;
-import com.baomidou.mybatisplus.extension.service.IService;
 import edu.npu.vo.R;
 import org.springframework.transaction.annotation.Transactional;
 

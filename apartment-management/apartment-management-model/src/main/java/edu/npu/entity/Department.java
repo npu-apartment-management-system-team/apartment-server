@@ -1,11 +1,10 @@
 package edu.npu.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.Data;
-import org.hibernate.validator.constraints.UniqueElements;
 
 /**
  * 部门表

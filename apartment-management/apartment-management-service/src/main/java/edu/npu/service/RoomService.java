@@ -1,9 +1,9 @@
 package edu.npu.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import edu.npu.dto.AddRoomDto;
 import edu.npu.dto.PutRoomDto;
 import edu.npu.entity.Room;
-import com.baomidou.mybatisplus.extension.service.IService;
 import edu.npu.vo.R;
 
 /**
@@ -12,7 +12,7 @@ import edu.npu.vo.R;
 * @createDate 2023-06-29 09:13:20
 */
 public interface RoomService extends IService<Room> {
-    
+
 
     R addRoom(AddRoomDto addRoomDto);
 

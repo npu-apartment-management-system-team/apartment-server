@@ -1,7 +1,7 @@
 package edu.npu.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.UniqueElements;
 
 /**
  * @Author: Yu
@@ -21,10 +21,12 @@ public record DepartmentDto(
         String position,
 
         @NotNull
-        String positionLongitude,
+        @JsonFormat(shape = JsonFormat.Shape.STRING)
+        Double positionLongitude,
 
         @NotNull
-        String positionLatitude
+        @JsonFormat(shape = JsonFormat.Shape.STRING)
+        Double positionLatitude
 
 ) {
 }

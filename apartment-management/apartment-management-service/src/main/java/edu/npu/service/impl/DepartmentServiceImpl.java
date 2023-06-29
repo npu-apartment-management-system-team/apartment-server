@@ -10,10 +10,9 @@ import edu.npu.dto.DepartmentPageQueryDto;
 import edu.npu.entity.Admin;
 import edu.npu.entity.Department;
 import edu.npu.exception.ApartmentException;
-import edu.npu.mapper.AdminMapper;
-import edu.npu.service.DepartmentService;
+import edu.npu.feignClient.UserServiceClient;
 import edu.npu.mapper.DepartmentMapper;
-import edu.npu.util.RedisClient;
+import edu.npu.service.DepartmentService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
@@ -25,9 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import static edu.npu.common.RedisConstants.*;
 
 /**
 * @author wangminan
@@ -42,15 +38,12 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     private DepartmentMapper departmentMapper;
 
     @Resource
-    private AdminMapper adminMapper;
-
-    @Resource
-    private RedisClient redisClient;
+    private UserServiceClient userServiceClient;
 
 
     /**
      *新增外部单位信息
-     * @param departmentDto
+     * @param departmentDto 外部单位信息
      * @return R 成功或失败信息
      */
     @Override
@@ -58,12 +51,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     public R addDepartment(DepartmentDto departmentDto) {
 
         Department department = new Department();
-        department.setName(departmentDto.name());
-        department.setPosition(departmentDto.position());
-        department.setPayType(departmentDto.payType());
-        department.setIsInterior(departmentDto.isInterior());
-        department.setPositionLongitude(Double.parseDouble(departmentDto.positionLongitude()));
-        department.setPositionLatitude(Double.parseDouble(departmentDto.positionLatitude()));
+        BeanUtils.copyProperties(departmentDto, department);
 
         /*
         新增department
@@ -78,20 +66,20 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     /**
      * 删除外部单位
-     * @param id
+     * @param id 外部单位id
      * @return R 成功或失败信息
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R deleteDepartment(Long id) {
 
-//        Department department = this.getById(id);
-//
-//        //如果单位不存在
-//        if (department == null) {
-//            log.error("所需删除的单位不存在");
-//            return R.error(ResponseCodeEnum.NOT_FOUND, "所需删除的单位不存在");
-//        }
+        Department department = this.getById(id);
+
+        //如果单位不存在
+        if (department == null) {
+            log.error("所需删除的单位不存在");
+            return R.error(ResponseCodeEnum.NOT_FOUND, "所需删除的单位不存在");
+        }
 
         /*
         从department表中删掉
@@ -107,8 +95,8 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     /**
      * 修改外部单位信息
-     * @param id
-     * @param departmentDto
+     * @param id 修改外部单位信息
+     * @param departmentDto 外部单位信息
      * @return R 修改结果成功或失败信息
      */
     @Override
@@ -123,13 +111,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
             return R.error(ResponseCodeEnum.NOT_FOUND, "所需修改的单位不存在");
         }
         //更新
-        department.setName(departmentDto.name());
-        department.setPosition(departmentDto.position());
-        department.setPayType(departmentDto.payType());
-        department.setIsInterior(departmentDto.isInterior());
-        department.setPositionLongitude(Double.parseDouble(departmentDto.positionLongitude()));
-        department.setPositionLatitude(Double.parseDouble(departmentDto.positionLatitude()));
-
+        BeanUtils.copyProperties(departmentDto, department);
         /*
         修改外部单位信息，存数据库
          */
@@ -143,36 +125,47 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     /**
      * 查询外部单位信息列表
-     * @param departmentPageQueryDto
+     * @param departmentPageQueryDto 查询条件
      * @return R 外部单位列表
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R getDepartmentList(DepartmentPageQueryDto departmentPageQueryDto) {
-
         try {
             IPage<Department> page = new Page<>(
                     departmentPageQueryDto.pageNum(), departmentPageQueryDto.pageSize());
 
+            LambdaQueryWrapper<Department> wrapper = new LambdaQueryWrapper<>();
+            boolean hasQuery = false;
             //query和经纬度查询
             //query查询
             if(StringUtils.hasText(departmentPageQueryDto.query())) {
-                this.page(page, new LambdaQueryWrapper<Department>().
-                        like(Department::getName, departmentPageQueryDto.query())
+                hasQuery = true;
+                wrapper.like(Department::getName, departmentPageQueryDto.query())
                         .or()
-                        .like(Department::getPosition, departmentPageQueryDto.query()));
-
-            } else if(StringUtils.hasText(departmentPageQueryDto.latitude())
-                    && StringUtils.hasText(departmentPageQueryDto.longitude())) {
-                //经纬度查询
-                this.page(page, new LambdaQueryWrapper<Department>()
-                        .eq(Department::getPositionLatitude, Double.parseDouble(departmentPageQueryDto.latitude()))
-                        .eq(Department::getPositionLongitude, Double.parseDouble(departmentPageQueryDto.longitude())));
-
-            } else {
-                this.page(page, null);
+                        .like(Department::getPosition, departmentPageQueryDto.query());
             }
-
+            if(departmentPageQueryDto.latitude() != null
+                    && departmentPageQueryDto.longitude() != null) {
+                hasQuery = true;
+                /*// 距离排序 经纬度差求平方和后排序
+                wrapper.last(
+                "order by (position_latitude - " +
+                        departmentPageQueryDto.latitude() + ") * " +
+                        "(position_latitude - " +
+                        departmentPageQueryDto.latitude() + ") + " +
+                        "(position_longitude - " +
+                        departmentPageQueryDto.longitude() + ") * " +
+                        "(position_longitude - " +
+                        departmentPageQueryDto.longitude() + ") asc");*/
+                wrapper.eq(Department::getPositionLatitude, departmentPageQueryDto.latitude())
+                        .eq(Department::getPositionLongitude, departmentPageQueryDto.longitude());
+            }
+            if (hasQuery) {
+                page = this.page(page, wrapper);
+            } else {
+                page = this.page(page, null);
+            }
             //封装
             Map<String, Object> resultMap = new HashMap<>();
             resultMap.put("total", page.getTotal());
@@ -199,9 +192,8 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
             查询
              */
             List<Department> departmentSimpleList = departmentMapper.selectList(
-                    new LambdaQueryWrapper<Department>()
-                            .select(Department::getId, Department::getName));
-
+                new LambdaQueryWrapper<Department>()
+                    .select(Department::getId, Department::getName));
             /*
             遍历departmentSimpleList中的每个department并转换为map加入list
              */
@@ -221,27 +213,21 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     /**
      * 查看外部单位详细信息
-     * @param id
+     * @param id 外部单位ID
      * @return R
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R getDepartmentDetail(Long id) {
-
         Map<String, Object> resultMap = new HashMap<>();
         List<Map<String, Object>> list = new ArrayList<>();
-
         Department department = this.getById(id);
         if (department == null) {
             return R.error(ResponseCodeEnum.NOT_FOUND, "外部单位不存在");
         }
-
         //查询该单位管理员列表
-        List<Admin> adminList = adminMapper.selectList(
-                new LambdaQueryWrapper<Admin>()
-                        .select(Admin::getId, Admin::getName)
-                        .eq(Admin::getDepartmentId, department.getId()));
-
+        List<Admin> adminList =
+                userServiceClient.getAdminByDepartmentId(department.getId());
         /*
         遍历adminList中的每个admin并转换为map加入list
          */
@@ -251,10 +237,8 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
             map.put("id", admin.getId());
             list.add(map);
         }
-
         resultMap.put("department", department);
         resultMap.put("admins", list);
         return R.ok().put("result", resultMap);
-
     }
 }
