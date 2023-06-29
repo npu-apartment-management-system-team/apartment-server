@@ -1,4 +1,4 @@
-package edu.npu;
+package edu.npu.common;
 
 /**
  * @author : [wangminan]

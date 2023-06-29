@@ -3,7 +3,6 @@ package edu.npu.listener;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.npu.doc.ApartmentDoc;
@@ -18,13 +17,11 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
-import static edu.npu.EsConstants.APARTMENT_INDEX;
+import static edu.npu.common.EsConstants.APARTMENT_INDEX;
 import static edu.npu.common.RedisConstants.CACHE_APARTMENT_KEY;
 import static edu.npu.common.RedisConstants.CACHE_APARTMENT_TTL;
 

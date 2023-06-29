@@ -1,7 +1,11 @@
 package edu.npu.service;
 
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
+import edu.npu.doc.ApartmentDoc;
 import edu.npu.dto.ApartmentDto;
+import edu.npu.dto.ApartmentPageQueryDto;
 import edu.npu.entity.Apartment;
 import edu.npu.vo.R;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,4 +25,14 @@ public interface ApartmentService extends IService<Apartment> {
 
     @Transactional(rollbackFor = Exception.class)
     R updateApartment(Long id, ApartmentDto apartmentDto);
+
+    R getApartmentList(ApartmentPageQueryDto apartmentPageQueryDto);
+
+    SearchRequest buildBasicQuery(ApartmentPageQueryDto pageQueryDto);
+
+    R resolveRestResponse(SearchResponse<ApartmentDoc> response);
+
+    R getApartmentSimpleList();
+
+    R getApartmentDetail(Long id);
 }
