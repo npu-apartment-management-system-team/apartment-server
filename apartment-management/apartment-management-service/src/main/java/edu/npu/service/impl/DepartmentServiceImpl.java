@@ -148,7 +148,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
             if(departmentPageQueryDto.latitude() != null
                     && departmentPageQueryDto.longitude() != null) {
                 hasQuery = true;
-                /*// 距离排序 经纬度差求平方和后排序
+                // 距离排序 经纬度差求平方和后排序
                 wrapper.last(
                 "order by (position_latitude - " +
                         departmentPageQueryDto.latitude() + ") * " +
@@ -157,9 +157,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
                         "(position_longitude - " +
                         departmentPageQueryDto.longitude() + ") * " +
                         "(position_longitude - " +
-                        departmentPageQueryDto.longitude() + ") asc");*/
-                wrapper.eq(Department::getPositionLatitude, departmentPageQueryDto.latitude())
-                        .eq(Department::getPositionLongitude, departmentPageQueryDto.longitude());
+                        departmentPageQueryDto.longitude() + ") desc");
             }
             if (hasQuery) {
                 page = this.page(page, wrapper);
