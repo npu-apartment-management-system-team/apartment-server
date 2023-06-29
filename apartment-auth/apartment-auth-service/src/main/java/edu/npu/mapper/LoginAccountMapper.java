@@ -14,7 +14,7 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface LoginAccountMapper extends BaseMapper<LoginAccount> {
 
-    @Select("select 1 from login_account")
+    @Select("select 1")
     int initDb();
 }
 

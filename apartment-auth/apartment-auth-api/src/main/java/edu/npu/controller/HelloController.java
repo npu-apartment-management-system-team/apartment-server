@@ -37,8 +37,8 @@ public class HelloController {
     @GetMapping("/hello")
     public R hello() {
         cachedThreadPool.execute(() -> {
-            log.info("初始化数据库连接");
-            loginAccountMapper.initDb();
+            int result = loginAccountMapper.initDb();
+            log.info("初始化数据库连接, result:{}", result);
         });
         log.info("port:{}, contentPath:{}", port, contentPath);
         return R.ok("hello");

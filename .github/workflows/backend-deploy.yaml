@@ -25,7 +25,7 @@ jobs:
           cache: 'maven'
 
       - name: Build with Maven
-        run: cd ./apartment-parent && mvn -DskipTests -B package --file pom.xml
+        run: cd ./apartment-parent && mvn -Dmaven.test.skip=true -B package --file pom.xml
 
       - name: Get version from tag
         id: vars

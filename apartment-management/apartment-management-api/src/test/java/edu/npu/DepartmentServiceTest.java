@@ -19,7 +19,7 @@ public class DepartmentServiceTest {
 
     @Test
     public void addTest() {
-        DepartmentDto departmentDto = new DepartmentDto("西北工业大学长安校区", 1, 0, "西安市", "108.765108", "34.033330");
+        DepartmentDto departmentDto = new DepartmentDto("西北工业大学长安校区", 1, 0, "西安市", 108.765108, 34.033330);
         departmentService.addDepartment(departmentDto);
     }
 
@@ -31,14 +31,14 @@ public class DepartmentServiceTest {
 
     @Test
     public void updateTest() {
-        DepartmentDto departmentDto = new DepartmentDto("西北工业大学友谊校区", 1, 0, "西安市", "108.765108", "34.033330");
+        DepartmentDto departmentDto = new DepartmentDto("西北工业大学友谊校区", 1, 0, "西安市", 108.765108, 34.033330);
         departmentService.updateDepartment(1L, departmentDto);
 
     }
 
     @Test
     public void getDepartmentListTest() {
-        DepartmentPageQueryDto departmentPageQueryDto = new DepartmentPageQueryDto(1, 2, null, "108.765108", "34.03333");
+        DepartmentPageQueryDto departmentPageQueryDto = new DepartmentPageQueryDto(1, 2, null, 108.765108, 34.03333);
         DepartmentPageQueryDto departmentPageQueryDto2 = new DepartmentPageQueryDto(1, 2, "西北", null, null);
         departmentService.getDepartmentList(departmentPageQueryDto);
         departmentService.getDepartmentList(departmentPageQueryDto2);
