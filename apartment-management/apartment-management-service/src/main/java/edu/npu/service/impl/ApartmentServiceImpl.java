@@ -43,6 +43,7 @@ public class ApartmentServiceImpl extends ServiceImpl<ApartmentMapper, Apartment
         if (apartment == null) {
             return R.error(ResponseCodeEnum.NOT_FOUND, "您希望改动的公寓不存在");
         } else {
+            System.out.println(apartmentDto);
             BeanUtils.copyProperties(apartmentDto, apartment);
             boolean update = this.updateById(apartment);
             return update ? R.ok() : R.error(ResponseCodeEnum.SERVER_ERROR, "更新公寓失败");
