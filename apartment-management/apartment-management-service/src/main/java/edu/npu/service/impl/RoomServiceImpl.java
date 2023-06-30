@@ -46,11 +46,9 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
         if (success) {
             log.info("房间[" + addRoomDto.name() + "]添加成功");
             return R.ok("房间[" + addRoomDto.name() + "]添加成功");
-        } else {
-            log.error("房间[" + addRoomDto.name() + "]添加失败");
-            return R.error("房间[" + addRoomDto.name() + "]添加失败");
         }
-
+        log.error("房间[" + addRoomDto.name() + "]添加失败");
+        return R.error("房间[" + addRoomDto.name() + "]添加失败");
     }
 
     @Override
@@ -66,9 +64,8 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
         if (success) {
             log.info("id[" + id + "]的房间删除成功");
             return R.ok("id[" + id + "]的房间删除成功");
-        } else {
-            return R.error("id[" + id + "]的房间删除失败");
         }
+        return R.error("id[" + id + "]的房间删除失败");
     }
 
     @Override
@@ -85,10 +82,9 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
         if (success) {
             log.info("房间[" + putRoomDto.name() + "]更新成功");
             return R.ok("房间[" + putRoomDto.name() + "]更新成功");
-        } else {
-            log.error("房间[" + putRoomDto.name() + "]更新失败");
-            return R.error("房间[" + putRoomDto.name() + "]更新失败");
         }
+        log.error("房间[" + putRoomDto.name() + "]更新失败");
+        return R.error("房间[" + putRoomDto.name() + "]更新失败");
     }
 
     @Override
@@ -101,12 +97,11 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
                 .eq(type != null, Room::getType, type)
                 .like(query != null, Room::getName, query));
 
-        if(allRoomPage.getTotal()>0){
+        if (allRoomPage.getTotal() > 0) {
             Map<String, Object> result = Map.of("total", allRoomPage.getTotal(), "list", allRoomPage.getRecords());
             return R.ok().put("result", result);
         }
         return R.error("查询的房间暂无数据");
-
     }
 
     @Override
@@ -120,7 +115,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
                 .eq(type != null, Room::getType, type)
                 .like(query != null, Room::getName, query));
 
-        if(unreservedPage.getTotal()>0){
+        if (unreservedPage.getTotal() > 0) {
             Map<String, Object> result = Map.of("total", unreservedPage.getTotal(), "list", unreservedPage.getRecords());
             return R.ok().put("result", result);
         }
@@ -131,14 +126,13 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
     public R getRoomDetail(Long id) {
         Room room = this.baseMapper.selectOne(new LambdaQueryWrapper<Room>()
                 .eq(Room::getId, id));
-        if(room!=null){
+        if (room != null) {
             List<Bed> beds = bedMapper.selectList(new LambdaQueryWrapper<Bed>()
                     .eq(Bed::getRoomId, id));
             Map<String, Object> result = Map.of("room", room, "beds", beds);
             return R.ok().put("result", result);
         }
-
-        return R.error("查询的房间["+id+"]不存在");
+        return R.error("查询的房间[" + id + "]不存在");
     }
 }
 
