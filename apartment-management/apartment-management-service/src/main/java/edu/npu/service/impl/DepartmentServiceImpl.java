@@ -212,7 +212,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     /**
      * 查看外部单位详细信息
      * @param id 外部单位ID
-     * @return R
+     * @return R 外部单位和管理员列表
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
