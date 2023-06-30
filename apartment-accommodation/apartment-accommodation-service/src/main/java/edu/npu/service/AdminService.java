@@ -1,7 +1,7 @@
 package edu.npu.service;
 
-import edu.npu.entity.Admin;
 import com.baomidou.mybatisplus.extension.service.IService;
+import edu.npu.entity.Admin;
 
 /**
 * @author wangminan

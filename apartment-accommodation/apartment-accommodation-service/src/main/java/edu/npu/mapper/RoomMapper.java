@@ -1,7 +1,7 @@
 package edu.npu.mapper;
 
-import edu.npu.entity.Room;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import edu.npu.entity.Room;
 
 /**
 * @author wangminan
