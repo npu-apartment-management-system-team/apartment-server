@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * @author : [wangminan]
- * @description : [一句话描述该类的功能]
+ * @description : [单位控制器类]
  */
 @RestController
 @RequestMapping("/department")
