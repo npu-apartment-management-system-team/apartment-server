@@ -74,7 +74,7 @@ jobs:
             ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-user-api:${{ steps.vars.outputs.tag }} 
             ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-user-api:latest
 
-      - name: Build and push management
+      - name: Build and push Management
         id: docker_build_management
         uses: docker/build-push-action@v4
         with:
@@ -85,8 +85,8 @@ jobs:
             ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-management-api:${{ steps.vars.outputs.tag }} 
             ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-management-api:latest
 
-      - name: Build and push accommodation
-        id: docker_build_management
+      - name: Build and push Accommodation
+        id: docker_build_accommodation
         uses: docker/build-push-action@v4
         with:
           context: ./apartment-accommodation/apartment-accommodation-api
