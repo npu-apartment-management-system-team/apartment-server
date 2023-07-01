@@ -1,6 +1,7 @@
 package edu.npu.controller;
 
 import edu.npu.common.ResponseCodeEnum;
+import edu.npu.dto.ApartmentCenterPageQueryDto;
 import edu.npu.dto.ApartmentDto;
 import edu.npu.dto.ApartmentPageQueryDto;
 import edu.npu.service.ApartmentService;
@@ -73,5 +74,12 @@ public class ApartmentController {
     @GetMapping("/detail")
     public R getApartmentDetail(@RequestParam Long id) {
         return apartmentService.getApartmentDetail(id);
+    }
+
+    @GetMapping("/center/list")
+    public R getApartmentListForAllocationClerk(
+            @Validated ApartmentCenterPageQueryDto apartmentCenterPageQueryDto) {
+        return apartmentService.getApartmentListForAllocationClerk(
+                apartmentCenterPageQueryDto);
     }
 }

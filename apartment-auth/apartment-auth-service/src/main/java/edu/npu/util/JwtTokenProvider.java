@@ -1,5 +1,7 @@
 package edu.npu.util;
 
+import edu.npu.exception.ApartmentError;
+import edu.npu.exception.ApartmentException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -86,13 +88,18 @@ public class JwtTokenProvider {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts
-                .parserBuilder()
-                // setSigningKey(String)的方法已经被弃用，使用setSigningKey(function)替代
-                .setSigningKey(getKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts
+                    .parserBuilder()
+                    // setSigningKey(String)的方法已经被弃用，使用setSigningKey(function)替代
+                    .setSigningKey(getKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            throw new ApartmentException(ApartmentError.PARAMS_ERROR, "token解析失败");
+        }
+
     }
 
     private Key getKey() {

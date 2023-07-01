@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import edu.npu.doc.ApartmentDoc;
+import edu.npu.dto.ApartmentCenterPageQueryDto;
 import edu.npu.dto.ApartmentDto;
 import edu.npu.dto.ApartmentPageQueryDto;
 import edu.npu.entity.Apartment;
@@ -35,4 +36,6 @@ public interface ApartmentService extends IService<Apartment> {
     R getApartmentSimpleList();
 
     R getApartmentDetail(Long id);
+
+    R getApartmentListForAllocationClerk(ApartmentCenterPageQueryDto apartmentCenterPageQueryDto);
 }

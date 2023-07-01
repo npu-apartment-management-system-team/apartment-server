@@ -14,7 +14,7 @@ public enum RoleEnum {
     @JsonProperty("SUPER_ADMIN")
     SUPER_ADMIN(1),
 
-    // 房建公寓段入住办理员
+    // 房建公寓段入住/调宿办理员
     @JsonProperty("CENTER_CHECK_IN_CLERK")
     CENTER_CHECK_IN_CLERK(2),
 

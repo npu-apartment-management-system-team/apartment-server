@@ -1,24 +1,19 @@
 package edu.npu.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * 管理员
  * @TableName admin
  */
-@TableName(value ="admin")
 @Data
 public class Admin implements Serializable {
     /**
      * 管理员唯一ID
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -46,6 +41,6 @@ public class Admin implements Serializable {
      */
     private Integer isDeleted;
 
-    @TableField(exist = false)
+    @Serial
     private static final long serialVersionUID = 1L;
 }

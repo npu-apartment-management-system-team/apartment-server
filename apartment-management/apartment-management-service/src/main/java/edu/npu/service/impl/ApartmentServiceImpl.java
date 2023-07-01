@@ -15,12 +15,18 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.npu.common.ResponseCodeEnum;
 import edu.npu.doc.ApartmentDoc;
+import edu.npu.dto.ApartmentCenterPageQueryDto;
 import edu.npu.dto.ApartmentDto;
 import edu.npu.dto.ApartmentPageQueryDto;
 import edu.npu.entity.Apartment;
+import edu.npu.entity.Department;
+import edu.npu.entity.LoginAccount;
+import edu.npu.entity.User;
 import edu.npu.exception.ApartmentError;
 import edu.npu.exception.ApartmentException;
+import edu.npu.feignClient.UserServiceClient;
 import edu.npu.mapper.ApartmentMapper;
+import edu.npu.mapper.DepartmentMapper;
 import edu.npu.service.ApartmentService;
 import edu.npu.util.RedisClient;
 import edu.npu.vo.ApartmentPageResultVo;
@@ -55,6 +61,12 @@ public class ApartmentServiceImpl extends ServiceImpl<ApartmentMapper, Apartment
 
     @Resource
     private RedisClient redisClient;
+
+    @Resource
+    private DepartmentMapper departmentMapper;
+
+    @Resource
+    private UserServiceClient userServiceClient;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -189,6 +201,30 @@ public class ApartmentServiceImpl extends ServiceImpl<ApartmentMapper, Apartment
                 LOCK_APARTMENT_KEY
         );
         return R.ok().put("result", apartment);
+    }
+
+    @Override
+    public R getApartmentListForAllocationClerk(
+            ApartmentCenterPageQueryDto apartmentCenterPageQueryDto) {
+        User user = userServiceClient.getUserById(
+          apartmentCenterPageQueryDto.userId()
+        );
+        if (user == null) {
+            return R.error(ResponseCodeEnum.NOT_FOUND, "您希望改动的用户不存在");
+        }
+        // 1.获取用户所在部门
+        Department department = departmentMapper.selectById(user.getDepartmentId());
+        if (department == null) {
+            return R.error(ResponseCodeEnum.NOT_FOUND, "您希望改动的用户不属于任何部门");
+        }
+        ApartmentPageQueryDto apartmentPageQueryDto =
+                ApartmentPageQueryDto.builder()
+                        .pageNum(apartmentCenterPageQueryDto.pageNum())
+                        .pageSize(apartmentCenterPageQueryDto.pageSize())
+                        .latitude(department.getPositionLatitude())
+                        .longitude(department.getPositionLongitude())
+                        .build();
+        return getApartmentList(apartmentPageQueryDto);
     }
 
     private ApartmentPageResultVo handlePageResponse(SearchResponse<ApartmentDoc> response) {

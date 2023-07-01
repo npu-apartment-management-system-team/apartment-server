@@ -1,9 +1,13 @@
 package edu.npu.feignClient.fallback;
 
+import edu.npu.entity.Admin;
+import edu.npu.entity.User;
 import edu.npu.feignClient.UserServiceClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * @author : [wangminan]
@@ -14,9 +18,18 @@ import org.springframework.stereotype.Component;
 public class UserServiceClientFallbackFactory implements FallbackFactory<UserServiceClient> {
     @Override
     public UserServiceClient create(Throwable cause) {
-        return departmentId -> {
-            log.error("远程调用user-api服务失败,原因:{}", cause.getMessage());
-            return null;
+        return new UserServiceClient() {
+            @Override
+            public List<Admin> getAdminByDepartmentId(Long departmentId) {
+                log.error("调用user-api服务获取Admin列表失败，原因：{}", cause.getMessage());
+                return null;
+            }
+
+            @Override
+            public User getUserById(Long id) {
+                log.error("调用user-api服务获取User失败，原因：{}", cause.getMessage());
+                return null;
+            }
         };
     }
 }
