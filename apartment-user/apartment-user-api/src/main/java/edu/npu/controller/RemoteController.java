@@ -6,10 +6,7 @@ import edu.npu.entity.User;
 import edu.npu.service.AdminService;
 import edu.npu.service.UserService;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -46,5 +43,33 @@ public class RemoteController {
     @GetMapping("/user")
     public User getUserById(@RequestParam(value = "id") Long id) {
         return userService.getById(id);
+    }
+
+    @GetMapping("/admin/loginAccountId")
+    public Admin getAdminByLoginAccountId(
+            @RequestParam(value = "id") Long id) {
+        return adminService.getOne(
+            new LambdaQueryWrapper<Admin>()
+                .eq(Admin::getLoginAccountId, id));
+    }
+
+    @GetMapping("/user/department/list")
+    public List<User> getUserListByDepartmentId(
+            @RequestParam(value = "departmentId") Long departmentId) {
+        return userService.list(
+            new LambdaQueryWrapper<User>()
+                .eq(User::getDepartmentId, departmentId));
+    }
+
+    @PutMapping("/user")
+    public boolean updateUser(@RequestBody User user) {
+        return userService.updateById(user);
+    }
+
+    @GetMapping("/user/bed")
+    public List<User> getUserByBedId(@RequestParam(value = "bedId") Long bedId) {
+        return userService.list(
+            new LambdaQueryWrapper<User>()
+                .eq(User::getBedId, bedId));
     }
 }

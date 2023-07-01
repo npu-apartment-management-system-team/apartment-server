@@ -6,7 +6,6 @@ import edu.npu.dto.UserStatusPageQueryDto;
 import edu.npu.entity.AccountUserDetails;
 import edu.npu.entity.Application;
 import edu.npu.vo.R;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
 * @author wangminan
@@ -18,9 +17,7 @@ public interface UserApplicationService extends IService<Application> {
     R getApplicationStatus(AccountUserDetails accountUserDetails,
                            UserStatusPageQueryDto pageQueryDto);
 
-    @Transactional(rollbackFor = Exception.class)
     R handleSaveUserApplication(AccountUserDetails accountUserDetails, UserApplicationDto userApplicationDto);
 
-    @Transactional(rollbackFor = Exception.class)
     R handleWithdrawApplication(AccountUserDetails accountUserDetails, Integer id);
 }

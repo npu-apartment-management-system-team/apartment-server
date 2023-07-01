@@ -19,6 +19,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.npu.common.ResponseCodeEnum;
 import edu.npu.doc.UserDoc;
+import edu.npu.dto.AddFaceDto;
 import edu.npu.dto.BindAlipayCallbackDto;
 import edu.npu.dto.UserPageQueryDto;
 import edu.npu.dto.UserUpdateDto;
@@ -26,6 +27,7 @@ import edu.npu.entity.LoginAccount;
 import edu.npu.entity.User;
 import edu.npu.exception.ApartmentError;
 import edu.npu.exception.ApartmentException;
+import edu.npu.feignClient.AuthServiceClient;
 import edu.npu.mapper.LoginAccountMapper;
 import edu.npu.mapper.UserMapper;
 import edu.npu.service.UserService;
@@ -44,6 +46,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static edu.npu.common.EsConstants.USER_INDEX;
@@ -71,6 +75,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Resource
     private RedisClient redisClient;
+
+    @Resource
+    private AuthServiceClient authServiceClient;
+
+    private static final ExecutorService FACE_EXECUTOR =
+            Executors.newFixedThreadPool(
+                    Runtime.getRuntime().availableProcessors());
 
     /**
      * 获取用户信息列表
@@ -105,6 +116,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             loginAccount.setUsername(userUpdateDto.username());
             updateById = loginAccountMapper.updateById(loginAccount);
         }
+
+        if (!userUpdateDto.faceUrl().equals(user.getFaceUrl())) {
+            // 更新人脸
+            authServiceClient.deleteFace(user.getFaceId());
+            String faceId = authServiceClient.addFace(new AddFaceDto(
+                    loginAccount.getUsername(),
+                    userUpdateDto.faceUrl()
+            ));
+            user.setFaceId(faceId);
+        }
+
         BeanUtils.copyProperties(userUpdateDto, user);
         boolean userUpdate = this.updateById(user);
         if (userUpdate && updateById == 1) {
@@ -124,6 +146,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             log.error("所需删除的用户不存在");
             return R.error(ResponseCodeEnum.NOT_FOUND, "所需删除的用户不存在");
         }
+        // 删除人脸实体
+        LoginAccount loginAccount = loginAccountMapper.selectById(user.getLoginAccountId());
+        FACE_EXECUTOR.execute(() -> {
+            authServiceClient.deleteFaceEntity(loginAccount.getUsername());
+        });
         boolean userDelete=this.removeById(id);
         int DeleteById = loginAccountMapper.deleteById(id);
         if(userDelete&&DeleteById==1){

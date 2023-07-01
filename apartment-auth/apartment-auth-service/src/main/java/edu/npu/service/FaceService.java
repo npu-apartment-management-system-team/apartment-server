@@ -11,7 +11,7 @@ public interface FaceService {
 
     boolean deleteFaceEntity(String entityId);
 
-    boolean deleteFace(String entityId);
+    boolean deleteFace(String faceId);
 
     String getEntityIdByFace(String faceUrl);
 

@@ -15,9 +15,9 @@ import edu.npu.feignClient.UserServiceClient;
 import edu.npu.mapper.ApplicationMapper;
 import edu.npu.service.UserApplicationService;
 import edu.npu.vo.R;
+import io.seata.spring.annotation.GlobalTransactional;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Map;
@@ -58,8 +58,14 @@ public class UserApplicationServiceImpl extends ServiceImpl<ApplicationMapper, A
         return R.ok(result);
     }
 
+    /**
+     * 处理用户提交申请
+     * @param accountUserDetails 用户信息
+     * @param userApplicationDto 申请信息
+     * @return R
+     */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @GlobalTransactional(rollbackFor = Exception.class)
     public R handleSaveUserApplication(
             AccountUserDetails accountUserDetails,
             UserApplicationDto userApplicationDto) {
@@ -74,15 +80,14 @@ public class UserApplicationServiceImpl extends ServiceImpl<ApplicationMapper, A
         wrapper.eq(Application::getUserId, user.getId())
                 .between(Application::getApplicationStatus,
                         CHECK_IN_SUBMIT.getValue(),
-                        CENTER_DORM_MANAGER_CHECK_IN_CONFIRM.getValue())
+                        CHECK_IN_DEPOSIT.getValue())
                 .or()
                 .between(Application::getApplicationStatus,
                         CHANGE_DORM_SUBMIT.getValue(),
-                        CENTER_DORM_MANAGER_CHANGE_CHECK_IN_CONFIRM.getValue())
+                        CENTER_DORM_MANAGER_CHANGE_CHECK_OUT_CONFIRM.getValue())
                 .or()
-                .between(Application::getApplicationStatus,
-                        CHECK_OUT_SUBMIT.getValue(),
-                        CENTER_DORM_MANAGER_CHECK_OUT_CONFIRM.getValue());
+                .eq(Application::getApplicationStatus,
+                        CHECK_OUT_SUBMIT.getValue());
         if (count(wrapper) > 0) {
             return R.error(ResponseCodeEnum.PRE_CHECK_FAILED,
                     "您有进行中的申请,请勿重复申请");
@@ -98,6 +103,7 @@ public class UserApplicationServiceImpl extends ServiceImpl<ApplicationMapper, A
         } else {
             status = ApplicationStatusEnum.CHECK_OUT_SUBMIT;
         }
+
         Application application = Application.builder()
                 .userId(user.getId())
                 .type(userApplicationDto.type())
@@ -106,13 +112,18 @@ public class UserApplicationServiceImpl extends ServiceImpl<ApplicationMapper, A
                 .createTime(new Date(System.currentTimeMillis()))
                 .updateTime(new Date(System.currentTimeMillis()))
                 .build();
-        return save(application) ? R.ok() : R.error(
+
+        // 更新用户状态到申请中
+        user.setStatus(UserStatusEnum.CHECK_IN_APPLICATION.getValue());
+        boolean updateUser = userServiceClient.updateUser(user);
+
+        return save(application) && updateUser? R.ok() : R.error(
                 ResponseCodeEnum.CREATION_ERROR, "数据库问题,创建申请失败"
         );
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @GlobalTransactional(rollbackFor = Exception.class)
     public R handleWithdrawApplication(AccountUserDetails accountUserDetails, Integer id) {
         preCheckAccountForUser(accountUserDetails);
         User user = getUserFromAccountUserDetails(accountUserDetails);
@@ -137,6 +148,7 @@ public class UserApplicationServiceImpl extends ServiceImpl<ApplicationMapper, A
                 return R.error(ResponseCodeEnum.PRE_CHECK_FAILED,
                         "已超过可撤回阶段,请等待流程完成后重新申请");
             }
+            user.setStatus(UserStatusEnum.NOT_CHECK_IN.getValue());
             status = CHECK_IN_WITHDRAW;
         } else if (ApplicationTypeEnum.fromValue(application.getType()) ==
                 CHANGE_DORM) {
@@ -150,6 +162,7 @@ public class UserApplicationServiceImpl extends ServiceImpl<ApplicationMapper, A
                 return R.error(ResponseCodeEnum.PRE_CHECK_FAILED,
                         "已超过可撤回阶段,请等待流程完成后重新申请");
             }
+            user.setStatus(UserStatusEnum.CHECK_IN.getValue());
             status = CHANGE_DORM_WITHDRAW;
         } else {
             // 正在执行流程中 预检 是否满足撤回条件
@@ -157,11 +170,15 @@ public class UserApplicationServiceImpl extends ServiceImpl<ApplicationMapper, A
                 return R.error(ResponseCodeEnum.PRE_CHECK_FAILED,
                         "非可撤回阶段,请重新提交申请");
             }
+            user.setStatus(UserStatusEnum.CHECK_IN.getValue());
             status = CHECK_OUT_WITHDRAW;
         }
         application.setApplicationStatus(status.getValue());
         application.setUpdateTime(new Date(System.currentTimeMillis()));
-        return updateById(application) ? R.ok() : R.error(
+
+        boolean updateUser = userServiceClient.updateUser(user);
+
+        return updateById(application) && updateUser ? R.ok() : R.error(
                 ResponseCodeEnum.SERVER_ERROR, "数据库问题,更新申请失败"
         );
     }
@@ -184,7 +201,3 @@ public class UserApplicationServiceImpl extends ServiceImpl<ApplicationMapper, A
         }
     }
 }
-
-
-
-

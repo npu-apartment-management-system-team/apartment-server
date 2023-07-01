@@ -16,22 +16,19 @@ spring:
           - data-id: sentinel-${spring.profiles.active}.yaml
             group: apartment-system
             refresh: true
+          - data-id: seata-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
           - data-id: db-config-${spring.profiles.active}.yaml
             group: apartment-system
             refresh: true
           - data-id: redis-config-${spring.profiles.active}.yaml
             group: apartment-system
             refresh: true
-          - data-id: alipay-config-${spring.profiles.active}.properties
-            group: apartment-system
-            refresh: true
           - data-id: security-sdk-${spring.profiles.active}.yaml
             group: apartment-system
             refresh: true
-          - data-id: es-config-${spring.profiles.active}.yaml
-            group: apartment-system
-            refresh: true
-          - data-id: rabbitmq-mysql-${spring.profiles.active}.yaml
+          - data-id: mail-config-${spring.profiles.active}.yaml
             group: apartment-system
             refresh: true
 

@@ -44,15 +44,13 @@ public class ApartmentController {
      */
     @GetMapping
     public R getApartmentList(@Validated ApartmentPageQueryDto apartmentPageQueryDto) {
-        if (
-            (apartmentPageQueryDto.latitude() == null &&
-            apartmentPageQueryDto.longitude() != null) ||
-            (apartmentPageQueryDto.latitude() != null &&
-            apartmentPageQueryDto.longitude() == null)
-        ) {
+        if (apartmentPageQueryDto.latitude() > 90 ||
+                apartmentPageQueryDto.latitude() < -90 ||
+                apartmentPageQueryDto.longitude() > 180 ||
+                apartmentPageQueryDto.longitude() < -180) {
             return R.error(
                     ResponseCodeEnum.PRE_CHECK_FAILED,
-                    "经纬度仅允许同时有值或同时为空");
+                    "经纬度范围不正确");
         }
         return apartmentService.getApartmentList(apartmentPageQueryDto);
     }

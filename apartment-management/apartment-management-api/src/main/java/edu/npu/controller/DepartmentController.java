@@ -46,6 +46,14 @@ public class DepartmentController {
 
     @GetMapping
     public R getDepartmentList(DepartmentPageQueryDto departmentPageQueryDto) {
+        if (departmentPageQueryDto.latitude() > 90 ||
+                departmentPageQueryDto.latitude() < -90 ||
+                departmentPageQueryDto.longitude() > 180 ||
+                departmentPageQueryDto.longitude() < -180) {
+            return R.error(
+                    ResponseCodeEnum.PRE_CHECK_FAILED,
+                    "经纬度范围不正确");
+        }
         return departmentService.getDepartmentList(departmentPageQueryDto);
 
     }

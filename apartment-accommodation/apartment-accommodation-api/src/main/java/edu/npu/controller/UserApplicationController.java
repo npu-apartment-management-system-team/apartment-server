@@ -6,6 +6,7 @@ import edu.npu.entity.AccountUserDetails;
 import edu.npu.service.UserApplicationService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ public class UserApplicationController {
     @Resource
     private UserApplicationService userApplicationService;
 
+    @PreAuthorize("hasAuthority('USER')")
     @GetMapping("/apply/status")
     public R getApplicationStatus(
             @AuthenticationPrincipal AccountUserDetails accountUserDetails,
@@ -29,6 +31,7 @@ public class UserApplicationController {
     }
 
     @PostMapping("/apply")
+    @PreAuthorize("hasAuthority('USER')")
     public R handleUserApplication(
             @AuthenticationPrincipal AccountUserDetails accountUserDetails,
             @Validated @RequestBody UserApplicationDto userApplicationDto) {
