@@ -1,6 +1,5 @@
 package edu.npu.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.io.Serial;

@@ -20,7 +20,6 @@ import edu.npu.dto.ApartmentDto;
 import edu.npu.dto.ApartmentPageQueryDto;
 import edu.npu.entity.Apartment;
 import edu.npu.entity.Department;
-import edu.npu.entity.LoginAccount;
 import edu.npu.entity.User;
 import edu.npu.exception.ApartmentError;
 import edu.npu.exception.ApartmentException;
