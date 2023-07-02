@@ -16,7 +16,6 @@ public interface MessageDetailService extends IService<MessageDetail> {
     @Transactional(rollbackFor = Exception.class)
     R sendMessage(SendMessageDto sendMessageDto);
 
-    @Transactional(rollbackFor = Exception.class)
     R getMessageDetail(String id);
 
     @Transactional(rollbackFor = Exception.class)
