@@ -2,6 +2,8 @@ package edu.npu.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import edu.npu.entity.MessageReceiving;
+import edu.npu.vo.R;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
 * @author wangminan
@@ -10,4 +12,8 @@ import edu.npu.entity.MessageReceiving;
 */
 public interface MessageReceivingService extends IService<MessageReceiving> {
 
+    R getMessageDetail(String id);
+
+    @Transactional(rollbackFor = Exception.class)
+    R deleteMessage(String id);
 }

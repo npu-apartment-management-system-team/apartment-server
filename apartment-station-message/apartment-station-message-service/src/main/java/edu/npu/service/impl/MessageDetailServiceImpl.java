@@ -6,7 +6,6 @@ import edu.npu.dto.SendMessageDto;
 import edu.npu.entity.MessageDetail;
 import edu.npu.entity.MessageReceiving;
 import edu.npu.exception.ApartmentException;
-import edu.npu.feignClient.UserServiceClient;
 import edu.npu.mapper.MessageDetailMapper;
 import edu.npu.mapper.MessageReceivingMapper;
 import edu.npu.service.MessageDetailService;
@@ -35,8 +34,6 @@ public class MessageDetailServiceImpl extends ServiceImpl<MessageDetailMapper, M
     @Resource
     private MessageReceivingMapper messageReceivingMapper;
 
-    @Resource
-    private UserServiceClient userServiceClient;
 
     @Override
     public R sendMessage(SendMessageDto sendMessageDto) {
@@ -51,7 +48,7 @@ public class MessageDetailServiceImpl extends ServiceImpl<MessageDetailMapper, M
         try {
             date = sdf.parse(String.valueOf(new Date()));
         } catch (ParseException e) {
-            throw new ApartmentException("存储信息时时间转换异常");
+            throw new ApartmentException("存储MessageDetail信息时时间转换异常");
         }
         messageDetail.setCreateTime(date);
 
@@ -61,23 +58,29 @@ public class MessageDetailServiceImpl extends ServiceImpl<MessageDetailMapper, M
                 .eq(MessageDetail::getCreateTime, date)
         ).getId();
 
-        if (success&&messageDetailID!=null) {
+        if (success && messageDetailID != null) {
             for (String receiverAdminId : sendMessageDto.receiverAdminIds()) {
                 MessageReceiving messageReceiving = new MessageReceiving();
                 messageReceiving.setMessageDetailId(messageDetailID);
                 messageReceiving.setReceiverAdminId(Long.valueOf(receiverAdminId));
-                messageReceivingMapper.insert(messageReceiving);
+                int s1 = messageReceivingMapper.insert(messageReceiving);
+                if (0 == s1) {
+                    throw new ApartmentException("senderId[" + sendMessageDto.senderAdminId() + "]的messageReceiving关联数据存储失败");
+                }
             }
             for (String receiverUserId : sendMessageDto.receiverUserIds()) {
                 MessageReceiving messageReceiving = new MessageReceiving();
                 messageReceiving.setMessageDetailId(messageDetailID);
                 messageReceiving.setReceiverUserId(Long.valueOf(receiverUserId));
-                messageReceivingMapper.insert(messageReceiving);
+                int s2 = messageReceivingMapper.insert(messageReceiving);
+                if (0 == s2) {
+                    throw new ApartmentException("senderId[" + sendMessageDto.senderAdminId() + "]的messageReceiving关联数据存储失败");
+                }
             }
-            return R.ok("message存储成功");
+            return R.ok("senderId["+sendMessageDto.senderAdminId()+"]message存储成功");
         } else {
-            log.error("messageDetail存储失败");
-            return R.error("messageDetail存储失败");
+            log.error("senderId["+sendMessageDto.senderAdminId()+"]的messageDetail存储失败");
+            return R.error("senderId["+sendMessageDto.senderAdminId()+"]的messageDetail存储失败");
         }
 
     }
@@ -86,17 +89,17 @@ public class MessageDetailServiceImpl extends ServiceImpl<MessageDetailMapper, M
     public R getMessageDetail(String id) {
         MessageDetail messageDetail = this.baseMapper.selectOne(new LambdaQueryWrapper<MessageDetail>()
                 .eq(MessageDetail::getId, id)
-                .eq(MessageDetail::getIsWithdrawn,0)
+                .eq(MessageDetail::getIsWithdrawn, 0)
                 .eq(MessageDetail::getIsDeleted, 0));
-        if(messageDetail==null){
-            log.error("id[{}]的信息不存在",id);
-            return R.error("id["+id+"]的信息不存在");
+        if (messageDetail == null) {
+            log.error("id[{}]的信息不存在或已删除", id);
+            return R.error("id[" + id + "]的信息不存在或已删除");
         }
         List<MessageReceiving> messageReceivingList = messageReceivingMapper.selectList(new LambdaQueryWrapper<MessageReceiving>()
                 .eq(MessageReceiving::getMessageDetailId, id));
-        GetMessageDetailVo getMessageDetailVo = new GetMessageDetailVo(messageDetail,messageReceivingList);
+        GetMessageDetailVo getMessageDetailVo = new GetMessageDetailVo(messageDetail, messageReceivingList);
 
-        return R.ok().put("result",getMessageDetailVo);
+        return R.ok().put("result", getMessageDetailVo);
     }
 
     @Override
@@ -105,13 +108,13 @@ public class MessageDetailServiceImpl extends ServiceImpl<MessageDetailMapper, M
                 .eq(MessageDetail::getId, id)
                 .eq(MessageDetail::getIsDeleted, 0));
 
-        if(messageDetail==null){
-            log.error("id[{}]的信息不存在",id);
-            return R.error("id["+id+"]的信息不存在");
+        if (messageDetail == null) {
+            log.error("id[{}]的信息不存在或已删除", id);
+            return R.error("id[" + id + "]的信息不存在或已删除");
         }
-        if(messageDetail.getIsWithdrawn()==1){
-            log.error("id[{}]的信息已经撤回",id);
-            return R.error("id["+id+"]的信息已经撤回");
+        if (messageDetail.getIsWithdrawn() == 1) {
+            log.error("id[{}]的信息已经撤回", id);
+            return R.error("id[" + id + "]的信息已经撤回");
         }
 
         List<Long> deleteList = messageReceivingMapper.selectList(new LambdaQueryWrapper<MessageReceiving>()
@@ -120,37 +123,38 @@ public class MessageDetailServiceImpl extends ServiceImpl<MessageDetailMapper, M
         ).stream().map(MessageReceiving::getId).toList();
 
         int delete = messageReceivingMapper.deleteBatchIds(deleteList);
-        if(0==delete){
-            log.error("id[{}]的信息与message_receiving表关联的信息删除失败",id);
-            return R.error("id["+id+"]的信息与message_receiving表关联的信息删除失败");
+        if (0 == delete) {
+            log.error("id[{}]的信息与message_receiving表关联的信息删除失败", id);
+            return R.error("id[" + id + "]的信息与message_receiving表关联的信息删除失败");
         }
 
         messageDetail.setIsWithdrawn(1);
         boolean success = updateById(messageDetail);
 
-        if(success){
-            return R.ok("id["+id+"]的信息撤回成功");
+        if (success) {
+            return R.ok("id[" + id + "]的信息撤回成功");
         }
-        throw new ApartmentException("id["+id+"]的信息撤回失败");
+        throw new ApartmentException("id[" + id + "]的信息撤回失败");
     }
 
     @Override
     public R deleteMessage(String id) {
         MessageDetail messageDetail = this.baseMapper.selectOne(new LambdaQueryWrapper<MessageDetail>()
                 .eq(MessageDetail::getId, id)
+                .eq(MessageDetail::getIsWithdrawn, 0)
                 .eq(MessageDetail::getIsDeleted, 0));
-        if(messageDetail==null){
-            log.error("id[{}]的信息不存在",id);
-            return R.error("id["+id+"]的信息不存在");
+        if (messageDetail == null) {
+            log.error("id[{}]的信息不存在或已删除", id);
+            return R.error("id[" + id + "]的信息不存在或已删除");
         }
 
         messageDetail.setIsDeleted(1);
         boolean success = updateById(messageDetail);
 
-        if(success){
-            return R.ok("id["+id+"]的信息删除成功");
+        if (success) {
+            return R.ok("id[" + id + "]的信息删除成功");
         }
-        return R.error("id["+id+"]的信息删除失败");
+        return R.error("id[" + id + "]的信息删除失败");
 
     }
 
