@@ -34,6 +34,9 @@ spring:
           - data-id: schedulerx2-config-${spring.profiles.active}.properties
             group: apartment-system
             refresh: true
+          - data-id: aliyun-oss-config-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
 
 # 设置日志打印级别
 logging:
