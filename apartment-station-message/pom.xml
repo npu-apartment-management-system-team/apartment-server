@@ -11,6 +11,12 @@
     </parent>
 
     <artifactId>apartment-station-message</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>apartment-station-message-api</module>
+        <module>apartment-station-message-model</module>
+        <module>apartment-station-message-service</module>
+    </modules>
 
 
 </project>

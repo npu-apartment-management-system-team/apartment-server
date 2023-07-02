@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: station-message-api
+  profiles:
+    active: aptmtdev
