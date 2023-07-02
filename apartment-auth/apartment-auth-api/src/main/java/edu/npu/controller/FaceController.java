@@ -13,8 +13,6 @@ import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 /**
  * @author : [wangminan]
  * @description : [远程调用人脸服务]
