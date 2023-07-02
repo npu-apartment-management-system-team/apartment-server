@@ -1,6 +1,7 @@
 package edu.npu.listener;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,10 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static edu.npu.common.EsConstants.MESSAGE_INDEX;
 
 /**
  * @author : [wangminan]
@@ -77,10 +81,10 @@ public class MqMessageListener {
                 handleInsert(jsonNode);
             } else if (jsonNode.get("type").asText().equals("UPDATE")) {
                 log.info("开始处理更新Message的同步");
-                // handleUpdate(jsonNode);
+                handleUpdate(jsonNode);
             } else if (jsonNode.get("type").asText().equals("DELETE")) {
                 log.info("开始处理删除Message的同步");
-                // handleDelete(jsonNode);
+                handleDelete(jsonNode);
             } else {
                 log.info("接收到非常规业务类型,type:{}",
                         jsonNode.get("type").asText());
@@ -94,37 +98,128 @@ public class MqMessageListener {
 
     private void handleInsert(JsonNode jsonNode) {
         MessageDetail messageDetail = extractMessageFromJsonNode(jsonNode);
-        log.info("收到Message:{}的更新消息,开始同步消息到ES", messageDetail);
+        log.info("收到Message:{}的保存消息,开始同步消息到ES", messageDetail);
         cachedThreadPool.execute(() -> {
             log.info("开始保存Message:{}到ES", messageDetail);
 
-            List<MessageReceiving> messageReceiving =
-                messageReceivingMapper.selectList(
-                    new LambdaQueryWrapper<MessageReceiving>()
-                        .eq(MessageReceiving::getMessageDetailId,
-                            messageDetail.getId())
-                );
-            List<Long> receiverIds = new ArrayList<>();
-            for (MessageReceiving message : messageReceiving) {
-                if (message.getReceiverAdminId() != null) {
-                    receiverIds.add(message.getReceiverAdminId());
-                } else {
-                    receiverIds.add(message.getReceiverUserId());
-                }
-            }
-            Admin admin = userServiceClient
-                    .getAdminById(messageDetail.getSenderAdminId());
+            MessageDoc messageDoc = getMessageDocFromMessageDetail(messageDetail);
 
-            MessageDoc messageDoc = MessageDoc.builder()
-                    .id(messageDetail.getId())
-                    .message(messageDetail.getMessage())
-                    .createTime(messageDetail.getCreateTime())
-                    .isWithdraw(messageDetail.getIsWithdrawn())
-                    .senderAdminId(messageDetail.getSenderAdminId())
-                    .senderAdminName(admin.getName())
-                    .receiverIds(receiverIds)
-                    .build();
+            IndexResponse indexResponse;
+            try {
+                indexResponse = elasticsearchClient.index(index ->
+                        index.index(MESSAGE_INDEX)
+                                .id(String.valueOf(messageDoc.getId()))
+                                .document(messageDoc)
+                );
+            } catch (IOException e) {
+                log.error("ES新增消息失败,message:{},请稍后重试", messageDoc);
+                throw new ApartmentException(ApartmentError.UNKNOWN_ERROR,
+                        "ES新增失败,请稍后重试");
+            }
+            if (indexResponse == null) {
+                log.error("新增消息失败,messageDoc:{}", messageDoc);
+                throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "ES新增失败");
+            }
+            log.info("新增消息成功");
         });
+    }
+
+    private void handleUpdate(JsonNode jsonNode) {
+        MessageDetail messageDetail = extractMessageFromJsonNode(jsonNode);
+        log.info("收到Message:{}的更新消息,开始同步消息到ES", messageDetail);
+        cachedThreadPool.execute(() -> {
+            log.info("开始更新Message:{}到ES", messageDetail);
+            if (messageDetail.getIsDeleted() == 1) {
+                // 其实这是一条删除消息
+                handleDelete(jsonNode);
+                return;
+            }
+
+            MessageDoc messageDoc = getMessageDocFromMessageDetail(messageDetail);
+
+            UpdateRequest<MessageDoc, MessageDoc> updateRequest =
+                    new UpdateRequest.Builder<MessageDoc, MessageDoc>()
+                            .index(MESSAGE_INDEX)
+                            .id(String.valueOf(messageDetail.getId()))
+                            .doc(messageDoc)
+                            .upsert(messageDoc)
+                            .build();
+            UpdateResponse<MessageDoc> updateResponse;
+            // 3.发送请求
+            try {
+                updateResponse =
+                        elasticsearchClient.update(updateRequest, MessageDoc.class);
+            } catch (IOException e) {
+                log.error("更新消息失败,messageDoc:{}, error:{}", messageDoc, e.getMessage());
+                throw new ApartmentException(
+                        ApartmentError.UNKNOWN_ERROR, "ES更新消息失败");
+            }
+            if (updateResponse == null) {
+                log.error("更新消息失败,messageDoc:{}", messageDoc);
+                throw new ApartmentException(
+                        ApartmentError.UNKNOWN_ERROR, "ES更新消息失败");
+            }
+
+        });
+        log.info("更新消息成功");
+    }
+
+    private void handleDelete(JsonNode jsonNode) {
+        MessageDetail messageDetail = extractMessageFromJsonNode(jsonNode);
+        log.info("收到Message:{}的删除消息,开始同步消息到ES", messageDetail);
+        cachedThreadPool.execute(() -> {
+           log.info("开始从ES删除Message:{}", messageDetail);
+            DeleteRequest deleteRequest = new DeleteRequest.Builder()
+                    .index(MESSAGE_INDEX)
+                    .id(String.valueOf(messageDetail.getId()))
+                    .build();
+            DeleteResponse deleteResponse;
+            // 3.发送请求
+            try {
+                deleteResponse =
+                        elasticsearchClient.delete(deleteRequest);
+            } catch (IOException e) {
+                log.error("删除消息失败,messageDetail:{}, error:{}",
+                        messageDetail, e.getMessage());
+                throw new ApartmentException(
+                        ApartmentError.UNKNOWN_ERROR, "ES删除消息失败");
+            }
+            if (deleteResponse == null) {
+                log.error("删除消息失败,messageDetail:{}", messageDetail);
+                throw new ApartmentException(
+                        ApartmentError.UNKNOWN_ERROR, "ES删除消息失败");
+            }
+            log.info("删除消息成功");
+        });
+    }
+
+    private MessageDoc getMessageDocFromMessageDetail(MessageDetail messageDetail) {
+        List<MessageReceiving> messageReceiving =
+                messageReceivingMapper.selectList(
+                        new LambdaQueryWrapper<MessageReceiving>()
+                                .eq(MessageReceiving::getMessageDetailId,
+                                        messageDetail.getId())
+                );
+        List<Long> receiverIds = new ArrayList<>();
+        for (MessageReceiving message : messageReceiving) {
+            if (message.getReceiverAdminId() != null) {
+                receiverIds.add(message.getReceiverAdminId());
+            } else {
+                receiverIds.add(message.getReceiverUserId());
+            }
+        }
+        Admin admin = userServiceClient
+                .getAdminById(messageDetail.getSenderAdminId());
+
+        return MessageDoc.builder()
+                .id(messageDetail.getId())
+                .message(messageDetail.getMessage())
+                .createTime(messageDetail.getCreateTime())
+                .isWithdraw(messageDetail.getIsWithdrawn())
+                .senderAdminId(messageDetail.getSenderAdminId())
+                .senderAdminName(admin.getName())
+                .receiverIds(receiverIds)
+                .build();
     }
 
     private MessageDetail extractMessageFromJsonNode(JsonNode jsonNode) {

@@ -215,6 +215,7 @@ public class MqUserListener {
             if (user.getIsDeleted() == 1) {
                 // 实际上是一条删除消息 调用删除函数
                 handleDelete(jsonNode);
+                return;
             }
             UserDoc userDoc = new UserDoc(user);
             UpdateRequest<UserDoc, UserDoc> updateRequest =
