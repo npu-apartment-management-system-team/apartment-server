@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: finance-api
+  profiles:
+    active: aptmtdev

@@ -22,10 +22,16 @@ spring:
           - data-id: db-config-${spring.profiles.active}.yaml
             group: apartment-system
             refresh: true
+          - data-id: redis-config-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
           - data-id: security-sdk-${spring.profiles.active}.yaml
             group: apartment-system
             refresh: true
-          - data-id: rabbitmq-mysql-${spring.profiles.active}.yaml
+          - data-id: mail-config-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
+          - data-id: schedulerx2-config-${spring.profiles.active}.properties
             group: apartment-system
             refresh: true
 

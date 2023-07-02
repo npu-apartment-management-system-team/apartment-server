@@ -179,13 +179,15 @@ public class CenterApplicationServiceImpl extends ServiceImpl<ApplicationMapper,
         user.setBedId(bed.getId());
         boolean updateUser = userServiceClient.updateUser(user);
 
+        // TODO 如果首次入住则生成押金订单
+
         if (updateApplication && updateBed && updateUser) {
             SEND_MAIL_THREAD_POOL.execute(() -> {
                 String email = user.getEmail();
                 if (email != null) {
                     String subject = "杭房段宿舍管理申请进度提醒";
                     String content =
-                            "杭房段已为您分配宿舍，您现在可以登录平台查看。";
+                            "杭房段已为您分配宿舍，您现在可以登录平台查看。请及时缴纳押金。";
                     sendMailUtil.sendMail(
                             email, subject, content
                     );

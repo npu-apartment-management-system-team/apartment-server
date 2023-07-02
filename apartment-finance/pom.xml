@@ -11,6 +11,12 @@
     </parent>
 
     <artifactId>apartment-finance</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>apartment-finance-api</module>
+        <module>apartment-finance-model</module>
+        <module>apartment-finance-service</module>
+    </modules>
 
 
 </project>
