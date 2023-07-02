@@ -24,6 +24,11 @@ public class RemoteController {
     @Resource
     private UserService userService;
 
+    @GetMapping("/admin")
+    public Admin getAdminById(@RequestParam(value = "id") Long id) {
+        return adminService.getById(id);
+    }
+
     @GetMapping("/admin/list")
     public List<Admin> getAdminByDepartmentId(
             @RequestParam(value = "departmentId") Long departmentId) {

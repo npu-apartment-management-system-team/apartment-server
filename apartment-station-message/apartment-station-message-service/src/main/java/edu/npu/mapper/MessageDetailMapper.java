@@ -1,7 +1,7 @@
 package edu.npu.mapper;
 
-import edu.npu.entity.MessageDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import edu.npu.entity.MessageDetail;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

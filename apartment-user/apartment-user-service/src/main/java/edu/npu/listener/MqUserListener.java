@@ -212,6 +212,10 @@ public class MqUserListener {
         // ElasticSearch缓存更新 新线程
         cachedThreadPool.execute(() -> {
             log.info("开始更新user:{}到ES",user);
+            if (user.getIsDeleted() == 1) {
+                // 实际上是一条删除消息 调用删除函数
+                handleDelete(jsonNode);
+            }
             UserDoc userDoc = new UserDoc(user);
             UpdateRequest<UserDoc, UserDoc> updateRequest =
                     new UpdateRequest.Builder<UserDoc, UserDoc>()

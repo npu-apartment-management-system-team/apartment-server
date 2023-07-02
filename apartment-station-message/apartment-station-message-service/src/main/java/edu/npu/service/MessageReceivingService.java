@@ -1,7 +1,7 @@
 package edu.npu.service;
 
-import edu.npu.entity.MessageReceiving;
 import com.baomidou.mybatisplus.extension.service.IService;
+import edu.npu.entity.MessageReceiving;
 
 /**
 * @author wangminan
