@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.npu.mapper.PaymentDepartmentMapper">
+
+    <resultMap id="BaseResultMap" type="edu.npu.entity.PaymentDepartment">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="departmentId" column="department_id" jdbcType="BIGINT"/>
+            <result property="price" column="price" jdbcType="INTEGER"/>
+            <result property="hasPaid" column="has_paid" jdbcType="TINYINT"/>
+            <result property="chequeId" column="cheque_id" jdbcType="VARCHAR"/>
+            <result property="payTime" column="pay_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,department_id,price,
+        has_paid,cheque_id,pay_time
+    </sql>
+</mapper>

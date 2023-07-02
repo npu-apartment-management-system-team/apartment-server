@@ -11,6 +11,7 @@ import edu.npu.dto.AllocationDto;
 import edu.npu.dto.BasicPageQueryDto;
 import edu.npu.dto.BasicReviewDto;
 import edu.npu.entity.*;
+import edu.npu.feignClient.FinanceServiceClient;
 import edu.npu.feignClient.ManagementServiceClient;
 import edu.npu.feignClient.UserServiceClient;
 import edu.npu.mapper.ApplicationMapper;
@@ -50,6 +51,9 @@ public class CenterApplicationServiceImpl extends ServiceImpl<ApplicationMapper,
 
     @Resource
     private SendMailUtil sendMailUtil;
+
+    @Resource
+    private FinanceServiceClient financeServiceClient;
 
     private static final ExecutorService SEND_MAIL_THREAD_POOL =
             Executors.newFixedThreadPool(
@@ -179,9 +183,10 @@ public class CenterApplicationServiceImpl extends ServiceImpl<ApplicationMapper,
         user.setBedId(bed.getId());
         boolean updateUser = userServiceClient.updateUser(user);
 
-        // TODO 如果首次入住则生成押金订单
+        boolean addDepositCharge =
+                financeServiceClient.addDepositCharge(user.getId());
 
-        if (updateApplication && updateBed && updateUser) {
+        if (addDepositCharge && updateApplication && updateBed && updateUser) {
             SEND_MAIL_THREAD_POOL.execute(() -> {
                 String email = user.getEmail();
                 if (email != null) {
