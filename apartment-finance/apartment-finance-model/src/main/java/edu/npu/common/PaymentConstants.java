@@ -6,4 +6,7 @@ package edu.npu.common;
  */
 public class PaymentConstants {
     public static final int DEPOSIT_FEE = 1500;
+
+    // 延迟消息TTL 30分钟 转毫秒
+    public static final Long PAY_MESSAGE_TTL = 30 * 60 * 1000L;
 }

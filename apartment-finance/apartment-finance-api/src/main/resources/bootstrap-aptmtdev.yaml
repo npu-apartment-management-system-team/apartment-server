@@ -31,10 +31,16 @@ spring:
           - data-id: mail-config-${spring.profiles.active}.yaml
             group: apartment-system
             refresh: true
-          - data-id: schedulerx2-config-${spring.profiles.active}.properties
+          - data-id: schedulerx2-finance-${spring.profiles.active}.properties
             group: apartment-system
             refresh: true
           - data-id: aliyun-oss-config-${spring.profiles.active}.yaml
+            group: apartment-system
+            refresh: true
+          - data-id: alipay-config-${spring.profiles.active}.properties
+            group: apartment-system
+            refresh: true
+          - data-id: rabbitmq-apartment-${spring.profiles.active}.yaml
             group: apartment-system
             refresh: true
 

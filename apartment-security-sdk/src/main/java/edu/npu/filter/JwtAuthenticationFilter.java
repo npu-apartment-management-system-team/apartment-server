@@ -95,6 +95,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         "token已过期");
                 return;
             }
+            log.info("获取登录信息,username:{}", username);
             // 用户未登录 所携带token为空 需要验证用户名密码后签发token
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 // 网关走过redis了 其他服务都可以不走 验证用户名密码

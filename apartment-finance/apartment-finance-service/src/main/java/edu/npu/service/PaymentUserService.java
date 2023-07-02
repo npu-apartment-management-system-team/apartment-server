@@ -1,7 +1,10 @@
 package edu.npu.service;
 
+import edu.npu.dto.UserPayListQueryDto;
+import edu.npu.entity.AccountUserDetails;
 import edu.npu.entity.PaymentUser;
 import com.baomidou.mybatisplus.extension.service.IService;
+import edu.npu.vo.R;
 
 /**
 * @author wangminan
@@ -10,4 +13,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface PaymentUserService extends IService<PaymentUser> {
 
+    R getPayList(AccountUserDetails accountUserDetails, UserPayListQueryDto userPayListQueryDto);
+
+    R startPay(AccountUserDetails accountUserDetails, Long id);
 }
