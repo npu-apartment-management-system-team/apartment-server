@@ -16,7 +16,7 @@
         <module>../apartment-gateway</module>
         <module>../apartment-auth</module>
         <module>../apartment-management</module>
-        <module>../apartment-accommodation</module>
+        <module>../apartment-application</module>
         <module>../apartment-finance</module>
         <module>../apartment-station-message</module>
         <module>../apartment-user</module>

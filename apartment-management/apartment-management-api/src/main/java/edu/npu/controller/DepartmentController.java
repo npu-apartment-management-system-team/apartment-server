@@ -40,22 +40,39 @@ public class DepartmentController {
     @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public R updateDepartment(@PathVariable("id") Long id,
                               @RequestBody DepartmentDto departmentDto) {
+        if (departmentDto.positionLongitude() > 180 ||
+                departmentDto.positionLongitude() < -180 ||
+                departmentDto.positionLatitude() > 90 ||
+                departmentDto.positionLatitude() < -90) {
+            return R.error(
+                    ResponseCodeEnum.PRE_CHECK_FAILED,
+                    "经纬度范围不正确");
+        }
         return departmentService.updateDepartment(id, departmentDto);
 
     }
 
     @GetMapping
     public R getDepartmentList(DepartmentPageQueryDto departmentPageQueryDto) {
-        if (departmentPageQueryDto.latitude() > 90 ||
-                departmentPageQueryDto.latitude() < -90 ||
-                departmentPageQueryDto.longitude() > 180 ||
-                departmentPageQueryDto.longitude() < -180) {
+        if (preCheckPosition(
+                departmentPageQueryDto.latitude(),
+                departmentPageQueryDto.longitude()))
             return R.error(
                     ResponseCodeEnum.PRE_CHECK_FAILED,
                     "经纬度范围不正确");
-        }
         return departmentService.getDepartmentList(departmentPageQueryDto);
 
+    }
+
+    private static boolean preCheckPosition(Double latitude,
+                                    Double longitude) {
+        if (latitude != null && longitude != null) {
+            return latitude > 90 ||
+                    latitude < -90 ||
+                    longitude > 180 ||
+                    longitude < -180;
+        }
+        return false;
     }
 
     @GetMapping("/list")

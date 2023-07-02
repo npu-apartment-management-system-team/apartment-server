@@ -1,23 +1,23 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: apartment-accommodation-api
+  name: apartment-application-api
   namespace: apartment-system
   labels:
-    app: apartment-accommodation-api
+    app: apartment-application-api
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: apartment-accommodation-api
+      app: apartment-application-api
   template:
     metadata:
       labels:
-        app: apartment-accommodation-api
+        app: apartment-application-api
     spec:
       containers:
-        - name: apartment-accommodation-api
-          image: wangminan/apartment-accommodation-api:latest
+        - name: apartment-application-api
+          image: wangminan/apartment-application-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 63050
@@ -41,13 +41,13 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: apartment-accommodation-api
+  name: apartment-application-api
   namespace: apartment-system
   labels:
-      app: apartment-accommodation-api
+      app: apartment-application-api
 spec:
   selector:
-    app: apartment-accommodation-api
+    app: apartment-application-api
   ports:
     - protocol: TCP
       port: 63050

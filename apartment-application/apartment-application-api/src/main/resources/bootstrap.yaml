@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: application-api
+  profiles:
+    active: aptmtdev

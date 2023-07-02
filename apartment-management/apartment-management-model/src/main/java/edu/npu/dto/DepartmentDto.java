@@ -24,14 +24,10 @@ public record DepartmentDto(
 
         @NotNull(message = "经度不能为空")
         @JsonFormat(shape = JsonFormat.Shape.STRING)
-        @DecimalMax(value = "180", message = "经度最大值为180")
-        @DecimalMin(value = "-180", message = "经度最小值为-180")
         Double positionLongitude,
 
         @NotNull(message = "纬度不能为空")
         @JsonFormat(shape = JsonFormat.Shape.STRING)
-        @DecimalMax(value = "90", message = "纬度最大值为90")
-        @DecimalMin(value = "-90", message = "纬度最小值为-90")
         Double positionLatitude
 
 ) {

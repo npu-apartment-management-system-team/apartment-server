@@ -53,18 +53,24 @@ public class ApartmentController {
      */
     @GetMapping
     public R getApartmentList(@Validated ApartmentPageQueryDto apartmentPageQueryDto) {
-        if (apartmentPageQueryDto.latitude() != null &&
-                apartmentPageQueryDto.longitude() != null) {
-            if (apartmentPageQueryDto.latitude() > 90 ||
-                    apartmentPageQueryDto.latitude() < -90 ||
-                    apartmentPageQueryDto.longitude() > 180 ||
-                    apartmentPageQueryDto.longitude() < -180) {
-                return R.error(
-                        ResponseCodeEnum.PRE_CHECK_FAILED,
-                        "经纬度范围不正确");
-            }
-        }
+        if (preCheckPosition(
+                apartmentPageQueryDto.latitude(),
+                apartmentPageQueryDto.longitude()))
+            return R.error(
+                    ResponseCodeEnum.PRE_CHECK_FAILED,
+                    "经纬度范围不正确");
         return apartmentService.getApartmentList(apartmentPageQueryDto);
+    }
+
+    private static boolean preCheckPosition(Double latitude,
+                                    Double longitude) {
+        if (latitude != null && longitude != null) {
+            return latitude > 90 ||
+                    latitude < -90 ||
+                    longitude > 180 ||
+                    longitude < -180;
+        }
+        return false;
     }
 
     /**

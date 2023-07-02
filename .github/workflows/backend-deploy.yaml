@@ -85,16 +85,16 @@ jobs:
             ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-management-api:${{ steps.vars.outputs.tag }} 
             ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-management-api:latest
 
-      - name: Build and push Accommodation
-        id: docker_build_accommodation
+      - name: Build and push Application
+        id: docker_build_application
         uses: docker/build-push-action@v4
         with:
-          context: ./apartment-accommodation/apartment-accommodation-api
+          context: ./apartment-application/apartment-application-api
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-accommodation-api:${{ steps.vars.outputs.tag }} 
-            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-accommodation-api:latest
+            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-application-api:${{ steps.vars.outputs.tag }} 
+            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-application-api:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -129,4 +129,4 @@ jobs:
             wangminan/apartment-auth-api:${{ steps.vars.outputs.tag }}
             wangminan/apartment-user-api:${{ steps.vars.outputs.tag }}
             wangminan/apartment-management-api:${{ steps.vars.outputs.tag }}
-            wangminan/apartment-accommodation-api:${{ steps.vars.outputs.tag }}
+            wangminan/apartment-application-api:${{ steps.vars.outputs.tag }}
