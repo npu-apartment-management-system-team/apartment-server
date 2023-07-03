@@ -471,6 +471,27 @@ public class PaymentUserServiceImpl extends ServiceImpl<PaymentUserMapper, Payme
         return true;
     }
 
+    @Override
+    public R updatePay(AccountUserDetails accountUserDetails, Long paymentId) {
+        // 如果数据库该订单状态仍是待支付，则需要将支付状态修正到已支付-等待回调
+        User user = userServiceClient.getUserByLoginAccountId(
+                accountUserDetails.getId()
+        );
+        if (user == null) {
+            throw new ApartmentException(ApartmentError.OBJECT_NULL, "请求的用户不存在");
+        }
+        PaymentUser paymentUser = getById(paymentId);
+        if (!paymentUser.getUserId().equals(user.getId())) {
+            throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "无权操作");
+        }
+        if (paymentUser.getStatus().equals(UserPayStatusEnum.UNPAID.getValue())) {
+            paymentUser.setStatus(UserPayStatusEnum.PAYING.getValue());
+        } else {
+            return R.ok();
+        }
+        return updateById(paymentUser) ? R.ok() : R.error("更新订单状态失败");
+    }
+
     private boolean refundQuery(String orderId) {
         AlipayTradeFastpayRefundQueryRequest request =
                 new AlipayTradeFastpayRefundQueryRequest();

@@ -1,9 +1,9 @@
 package edu.npu.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import edu.npu.dto.DownloadQueryDto;
 import edu.npu.dto.UserPayListQueryDto;
 import edu.npu.entity.PaymentDepartment;
-import com.baomidou.mybatisplus.extension.service.IService;
 import edu.npu.vo.R;
 
 /**

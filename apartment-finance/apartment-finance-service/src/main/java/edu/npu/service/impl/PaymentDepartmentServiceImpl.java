@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.npu.dto.DownloadQueryDto;
 import edu.npu.dto.UserPayListQueryDto;
 import edu.npu.entity.PaymentDepartment;
-import edu.npu.service.PaymentDepartmentService;
 import edu.npu.mapper.PaymentDepartmentMapper;
+import edu.npu.service.PaymentDepartmentService;
 import edu.npu.vo.R;
 import org.springframework.stereotype.Service;
 

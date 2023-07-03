@@ -12,7 +12,6 @@ import edu.npu.service.MessageReceivingService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 /**

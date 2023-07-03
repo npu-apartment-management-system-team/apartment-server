@@ -49,4 +49,15 @@ public class UserController {
         return paymentUserService.checkSignAndConfirm(notifyParams);
     }
 
+    /**
+     * 用户完成支付后更新订单状态
+     * @param accountUserDetails 用户信息
+     * @param paymentId 订单号
+     * @return R
+     */
+    @PutMapping("/pay/{paymentId}")
+    public R updatePay(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+                       @PathVariable("paymentId") Long paymentId) {
+        return paymentUserService.updatePay(accountUserDetails, paymentId);
+    }
 }

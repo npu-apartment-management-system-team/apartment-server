@@ -24,4 +24,6 @@ public interface PaymentUserService extends IService<PaymentUser> {
     boolean refundDepositCharge(Long userId);
 
     boolean tradeQuery(String orderId);
+
+    R updatePay(AccountUserDetails accountUserDetails, Long paymentId);
 }

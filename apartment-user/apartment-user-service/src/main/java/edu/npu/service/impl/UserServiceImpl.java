@@ -110,11 +110,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             log.error("所需更新的用户不存在");
             return R.error(ResponseCodeEnum.NOT_FOUND, "所需更新的用户不存在");
         }
-        int updateById = 0;
         LoginAccount loginAccount = loginAccountMapper.selectById(user.getLoginAccountId());
         if (!loginAccount.getUsername().equals(userUpdateDto.username())) {
             loginAccount.setUsername(userUpdateDto.username());
-            updateById = loginAccountMapper.updateById(loginAccount);
+            int updateLoginAccount = loginAccountMapper.updateById(loginAccount);
+            if (updateLoginAccount != 1) {
+                throw new ApartmentException(ApartmentError.UNKNOWN_ERROR,
+                        "用户信息更新失败,登录基础表更新失败");
+            }
         }
 
         if (!userUpdateDto.faceUrl().equals(user.getFaceUrl())) {
@@ -129,7 +132,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         BeanUtils.copyProperties(userUpdateDto, user);
         boolean userUpdate = this.updateById(user);
-        if (userUpdate && updateById == 1) {
+        if (userUpdate) {
             return R.ok("用户信息更新成功");
         } else {
             throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "用户信息更新失败");

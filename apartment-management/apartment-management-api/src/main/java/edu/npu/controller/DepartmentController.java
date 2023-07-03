@@ -1,7 +1,6 @@
 package edu.npu.controller;
 
 import edu.npu.common.ResponseCodeEnum;
-import edu.npu.common.RoleEnum;
 import edu.npu.dto.DepartmentDto;
 import edu.npu.dto.DepartmentPageQueryDto;
 import edu.npu.service.DepartmentService;
@@ -9,7 +8,6 @@ import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 

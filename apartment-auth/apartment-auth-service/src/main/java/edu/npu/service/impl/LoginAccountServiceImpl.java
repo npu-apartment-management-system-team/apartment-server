@@ -260,7 +260,7 @@ public class LoginAccountServiceImpl extends ServiceImpl<LoginAccountMapper, Log
                         genTokenWithLoginAccount(loginAccount);
                 return R.ok(result);
             } else {
-                return R.error(ResponseCodeEnum.FORBIDDEN, "验证码错误");
+                return R.error(ResponseCodeEnum.PRE_CHECK_FAILED, "验证码错误");
             }
         }
     }
