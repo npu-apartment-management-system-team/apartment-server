@@ -1,8 +1,10 @@
 package edu.npu.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import edu.npu.entity.AccountUserDetails;
 import edu.npu.entity.MessageReceiving;
 import edu.npu.vo.R;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -12,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 */
 public interface MessageReceivingService extends IService<MessageReceiving> {
 
-    R getMessageDetail(String id);
+    R getMessageDetail(AccountUserDetails accountUserDetails,String id);
 
     @Transactional(rollbackFor = Exception.class)
-    R deleteMessage(String id);
+    R deleteMessage(AccountUserDetails accountUserDetails, String id);
 }
