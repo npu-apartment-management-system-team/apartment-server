@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.npu.common.RoleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
@@ -89,5 +91,14 @@ public class LoginAccount implements Serializable, UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public LoginAccount(String json) throws IOException {
+        LoginAccount loginAccount = new ObjectMapper().readValue(json, LoginAccount.class);
+        this.id = loginAccount.getId();
+        this.username = loginAccount.getUsername();
+        this.password = loginAccount.getPassword();
+        this.role = loginAccount.getRole();
+        this.isDeleted = loginAccount.getIsDeleted();
     }
 }

@@ -74,7 +74,7 @@ public class SmsAndMailServiceImpl implements SmsAndMailService {
             if (cachedCode.equals(code)){
                 return R.ok();
             } else {
-                return R.error(ResponseCodeEnum.FORBIDDEN, "验证码错误");
+                return R.error(ResponseCodeEnum.PRE_CHECK_FAILED, "验证码错误");
             }
         }
     }
@@ -90,7 +90,7 @@ public class SmsAndMailServiceImpl implements SmsAndMailService {
             if (cachedCode.equals(code)){
                 return R.ok();
             } else {
-                return R.error(ResponseCodeEnum.FORBIDDEN, "验证码错误");
+                return R.error(ResponseCodeEnum.PRE_CHECK_FAILED, "验证码错误");
             }
         }
     }
