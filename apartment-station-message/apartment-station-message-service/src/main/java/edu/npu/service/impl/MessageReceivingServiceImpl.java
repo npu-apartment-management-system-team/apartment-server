@@ -6,15 +6,11 @@ import edu.npu.entity.MessageDetail;
 import edu.npu.entity.MessageReceiving;
 import edu.npu.mapper.MessageDetailMapper;
 import edu.npu.mapper.MessageReceivingMapper;
-import edu.npu.service.MessageDetailService;
 import edu.npu.service.MessageReceivingService;
-import edu.npu.vo.GetMessageDetailVo;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * @author wangminan

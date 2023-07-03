@@ -37,4 +37,9 @@ public class RemoteController {
                 .build();
         return paymentUserService.save(paymentUser);
     }
+
+    @PostMapping("/deposit/refund/{userId}")
+    public boolean refundDepositCharge(@PathVariable(value = "userId") Long userId) {
+        return paymentUserService.refundDepositCharge(userId);
+    }
 }

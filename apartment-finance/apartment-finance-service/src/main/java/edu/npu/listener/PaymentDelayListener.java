@@ -28,5 +28,8 @@ public class PaymentDelayListener {
     public void listenDelayExchange(String msg) {
         log.info("消费者接收到了delay.queue的延迟消息,msg:{}",msg);
         // 查单业务逻辑
+        log.info("开始查询订单号:{}有关的支付业务",msg);
+        boolean paymentQuery = paymentUserService.tradeQuery(msg);
+        log.info("查询订单号:{}有关的支付业务结束,结果:{}",msg,paymentQuery);
     }
 }

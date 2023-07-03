@@ -34,7 +34,7 @@ public class ApplicationProcessor extends JavaProcessor {
         log.info("定时任务参数:shardIndex={},shardTotal={},taskId={}",
                 shardIndex,shardTotal,taskId);
         boolean handleExpireApplication =
-            processingApplicationService.handleExpireApplication(shardIndex, shardTotal, 100);
+            processingApplicationService.handleExpireApplication(shardIndex, shardTotal);
         return new ProcessResult(handleExpireApplication, String.valueOf(value));
     }
 }

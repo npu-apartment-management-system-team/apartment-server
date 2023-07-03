@@ -41,11 +41,11 @@ public class ProcessingApplicationServiceImpl extends ServiceImpl<ProcessingAppl
     private UserServiceClient userServiceClient;
 
     @Override
-    public boolean handleExpireApplication(Long shardIndex, int shardTotal, int count) {
+    public boolean handleExpireApplication(Long shardIndex, int shardTotal) {
         log.info("收到调度,开始执行定时任务,当前分片:{}", shardIndex);
         List<ProcessingApplication> processingApplications =
             processingApplicationMapper.getListByShardIndex(
-                shardIndex, shardTotal, count);
+                shardIndex, shardTotal);
         if (processingApplications.isEmpty()) {
             log.info("当前任务没有需要处理的Application,直接返回");
             return true;

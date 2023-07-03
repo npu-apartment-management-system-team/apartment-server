@@ -3,6 +3,10 @@ package edu.npu.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import edu.npu.entity.Department;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
 * @author wangminan
@@ -12,7 +16,11 @@ import org.apache.ibatis.annotations.Mapper;
 */
 @Mapper
 public interface DepartmentMapper extends BaseMapper<Department> {
-
+    @Select("SELECT * FROM department " +
+            "WHERE id % #{shardTotal} = #{shardIndex}")
+    List<Department> getListByShardIndex(
+            @Param("shardIndex") Long shardIndex,
+            @Param("shardTotal") int shardTotal);
 }
 
 

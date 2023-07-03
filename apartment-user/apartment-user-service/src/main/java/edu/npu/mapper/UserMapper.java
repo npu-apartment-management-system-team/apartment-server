@@ -3,6 +3,9 @@ package edu.npu.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import edu.npu.entity.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
 * @author wangminan
@@ -13,6 +16,9 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
 
+    @Select("SELECT * FROM user " +
+            "WHERE id % #{shardTotal} = #{shardIndex}")
+    List<User> getListByShardIndex(Long shardIndex, Integer shardTotal);
 }
 
 

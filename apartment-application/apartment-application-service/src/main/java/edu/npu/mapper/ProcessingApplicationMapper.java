@@ -18,11 +18,10 @@ import java.util.List;
 public interface ProcessingApplicationMapper extends BaseMapper<ProcessingApplication> {
 
     @Select("SELECT * FROM processing_application " +
-            "WHERE id % #{shardTotal} = #{shardIndex} limit #{count}")
+            "WHERE id % #{shardTotal} = #{shardIndex}")
     List<ProcessingApplication> getListByShardIndex(
             @Param("shardIndex") Long shardIndex,
-            @Param("shardTotal") int shardTotal,
-            @Param("count") int count);
+            @Param("shardTotal") int shardTotal);
 }
 
 

@@ -96,6 +96,28 @@ jobs:
             ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-application-api:${{ steps.vars.outputs.tag }} 
             ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-application-api:latest
 
+      - name: Build and push Station Message
+        id: docker_build_station_message
+        uses: docker/build-push-action@v4
+        with:
+          context: ./apartment-station-message/apartment-station-message-api
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-station-message-api:${{ steps.vars.outputs.tag }} 
+            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-station-message-api:latest
+
+      - name: Build and push Finance
+        id: docker_build_finance
+        uses: docker/build-push-action@v4
+        with:
+          context: ./apartment-finance/apartment-finance-api
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-finance-api:${{ steps.vars.outputs.tag }} 
+            ${{ secrets.DOCKER_HUB_USERNAME }}/apartment-finance-api:latest
+
   deploy:
     runs-on: ubuntu-latest
     needs: build

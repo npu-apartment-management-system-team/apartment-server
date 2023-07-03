@@ -11,6 +11,7 @@ import edu.npu.dto.BasicReviewDto;
 import edu.npu.entity.Application;
 import edu.npu.entity.ProcessingApplication;
 import edu.npu.entity.User;
+import edu.npu.feignClient.FinanceServiceClient;
 import edu.npu.feignClient.UserServiceClient;
 import edu.npu.mapper.ApplicationMapper;
 import edu.npu.mapper.ProcessingApplicationMapper;
@@ -18,6 +19,7 @@ import edu.npu.service.ApartmentApplicationService;
 import edu.npu.vo.R;
 import io.seata.spring.annotation.GlobalTransactional;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -30,6 +32,7 @@ import static edu.npu.common.ApplicationStatusEnum.*;
  * @description : [针对表【application(申请表)】的数据库操作Service实现]
  */
 @Service
+@Slf4j
 public class ApartmentApplicationServiceImpl extends ServiceImpl<ApplicationMapper, Application>
         implements ApartmentApplicationService {
 
@@ -38,6 +41,9 @@ public class ApartmentApplicationServiceImpl extends ServiceImpl<ApplicationMapp
 
     @Resource
     private ProcessingApplicationMapper processingApplicationMapper;
+
+    @Resource
+    private FinanceServiceClient financeServiceClient;
 
     @Override
     public R getApplicationList(BasicPageQueryDto basicPageQueryDto) {
@@ -92,6 +98,12 @@ public class ApartmentApplicationServiceImpl extends ServiceImpl<ApplicationMapp
             application.setApplicationStatus(CHECK_OUT_COMPLETE.getValue());
             user.setStatus(UserStatusEnum.NOT_CHECK_IN.getValue());
             updateUser = userServiceClient.updateUser(user);
+
+            boolean refund = financeServiceClient.refundDepositCharge(user.getId());
+            if (!refund) {
+                log.error("退宿退款失败,用户id:{}", user.getId().toString());
+            }
+
         } else {
             return R.error(ResponseCodeEnum.PRE_CHECK_FAILED, "申请状态错误");
         }

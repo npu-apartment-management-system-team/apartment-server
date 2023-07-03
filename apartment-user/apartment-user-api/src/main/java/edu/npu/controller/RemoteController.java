@@ -3,6 +3,7 @@ package edu.npu.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import edu.npu.entity.Admin;
 import edu.npu.entity.User;
+import edu.npu.mapper.UserMapper;
 import edu.npu.service.AdminService;
 import edu.npu.service.UserService;
 import jakarta.annotation.Resource;
@@ -22,7 +23,7 @@ public class RemoteController {
     private AdminService adminService;
 
     @Resource
-    private UserService userService;
+    private UserMapper userMapper;
 
     @GetMapping("/admin")
     public Admin getAdminById(@RequestParam(value = "id") Long id) {
@@ -40,14 +41,14 @@ public class RemoteController {
     @GetMapping("/user/loginAccountId")
     public User getUserByLoginAccountId(
             @RequestParam(value = "loginAccountId") Long loginAccountId) {
-        return userService.getOne(
+        return userMapper.selectOne(
             new LambdaQueryWrapper<User>()
                 .eq(User::getLoginAccountId, loginAccountId));
     }
 
     @GetMapping("/user")
     public User getUserById(@RequestParam(value = "id") Long id) {
-        return userService.getById(id);
+        return userMapper.selectById(id);
     }
 
     @GetMapping("/admin/loginAccountId")
@@ -61,20 +62,27 @@ public class RemoteController {
     @GetMapping("/user/department/list")
     public List<User> getUserListByDepartmentId(
             @RequestParam(value = "departmentId") Long departmentId) {
-        return userService.list(
+        return userMapper.selectList(
             new LambdaQueryWrapper<User>()
                 .eq(User::getDepartmentId, departmentId));
     }
 
     @PutMapping("/user")
     public boolean updateUser(@RequestBody User user) {
-        return userService.updateById(user);
+        return userMapper.updateById(user) == 1;
     }
 
     @GetMapping("/user/bed")
     public List<User> getUserByBedId(@RequestParam(value = "bedId") Long bedId) {
-        return userService.list(
+        return userMapper.selectList(
             new LambdaQueryWrapper<User>()
                 .eq(User::getBedId, bedId));
+    }
+
+    @GetMapping("/room/list/shard")
+    public List<User> getListByShardIndex(
+            @RequestParam(value = "shardIndex") Long shardIndex,
+            @RequestParam(value = "shardTotal") Integer shardTotal) {
+        return userMapper.getListByShardIndex(shardIndex, shardTotal);
     }
 }

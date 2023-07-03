@@ -1,8 +1,12 @@
 package edu.npu.mapper;
 
-import edu.npu.entity.PaymentDepartment;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import edu.npu.entity.PaymentDepartment;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
 * @author wangminan
@@ -12,7 +16,6 @@ import org.apache.ibatis.annotations.Mapper;
 */
 @Mapper
 public interface PaymentDepartmentMapper extends BaseMapper<PaymentDepartment> {
-
 }
 
 

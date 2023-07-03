@@ -43,4 +43,9 @@ public interface UserServiceClient {
 
     @GetMapping("/user/bed")
     List<User> getUserByBedId(@RequestParam(value = "bedId") Long bedId);
+
+    @GetMapping("/room/list/shard")
+    List<User> getListByShardIndex(
+            @RequestParam(value = "shardIndex") Long shardIndex,
+            @RequestParam(value = "shardTotal") Integer shardTotal);
 }

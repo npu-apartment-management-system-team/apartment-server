@@ -1,10 +1,12 @@
 package edu.npu.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import edu.npu.dto.UserPayListQueryDto;
 import edu.npu.entity.AccountUserDetails;
 import edu.npu.entity.PaymentUser;
-import com.baomidou.mybatisplus.extension.service.IService;
 import edu.npu.vo.R;
+
+import java.util.Map;
 
 /**
 * @author wangminan
@@ -16,4 +18,10 @@ public interface PaymentUserService extends IService<PaymentUser> {
     R getPayList(AccountUserDetails accountUserDetails, UserPayListQueryDto userPayListQueryDto);
 
     R startPay(AccountUserDetails accountUserDetails, Long id);
+
+    String checkSignAndConfirm(Map<String, String> notifyParams);
+
+    boolean refundDepositCharge(Long userId);
+
+    boolean tradeQuery(String orderId);
 }

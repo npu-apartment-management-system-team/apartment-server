@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import edu.npu.entity.Bed;
 import edu.npu.entity.Department;
 import edu.npu.entity.Room;
+import edu.npu.mapper.DepartmentMapper;
 import edu.npu.service.BedService;
 import edu.npu.service.DepartmentService;
 import edu.npu.service.RoomService;
@@ -21,7 +22,7 @@ import java.util.List;
 public class RemoteController {
 
     @Resource
-    private DepartmentService departmentService;
+    private DepartmentMapper departmentMapper;
 
     @Resource
     private BedService bedService;
@@ -31,7 +32,7 @@ public class RemoteController {
 
     @GetMapping("/department")
     public Department getDepartmentById(@RequestParam(value = "id") Long id) {
-        return departmentService.getById(id);
+        return departmentMapper.selectById(id);
     }
 
     @GetMapping("/room")
@@ -53,5 +54,18 @@ public class RemoteController {
     public List<Bed> getBedListByRoomId(@RequestParam(value = "roomId") Long roomId) {
         return bedService.list(new LambdaQueryWrapper<Bed>()
             .eq(Bed::getRoomId, roomId));
+    }
+
+    @GetMapping("/department/list/shard")
+    public List<Department> getListByShardIndex(
+            @RequestParam(value = "shardIndex") Long shardIndex,
+            @RequestParam(value = "shardTotal") Integer shardTotal) {
+        return departmentMapper.getListByShardIndex(shardIndex, shardTotal);
+    }
+
+    @GetMapping("/room/bedId")
+    public Room getRoomByBedId(@RequestParam(value = "bedId") Long bedId) {
+        Bed bed = bedService.getById(bedId);
+        return roomService.getById(bed.getRoomId());
     }
 }

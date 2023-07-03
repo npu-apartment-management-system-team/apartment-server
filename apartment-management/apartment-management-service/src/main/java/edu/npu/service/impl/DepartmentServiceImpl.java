@@ -157,7 +157,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
                         "(position_longitude - " +
                         departmentPageQueryDto.longitude() + ") * " +
                         "(position_longitude - " +
-                        departmentPageQueryDto.longitude() + ") desc");
+                        departmentPageQueryDto.longitude() + ") asc");
             }
             if (hasQuery) {
                 page = this.page(page, wrapper);

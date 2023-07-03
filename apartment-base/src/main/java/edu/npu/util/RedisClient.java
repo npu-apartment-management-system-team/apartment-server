@@ -34,14 +34,14 @@ public class RedisClient {
     @Resource
     private ObjectMapper objectMapper;
 
-    private boolean tryLock(String key) {
+    public boolean tryLock(String key) {
         Boolean flag =
                 stringRedisTemplate.opsForValue()
                         .setIfAbsent(key, "1", 10, TimeUnit.SECONDS);
         return BooleanUtil.isTrue(flag);
     }
 
-    private void unlock(String key) {
+    public void unlock(String key) {
         stringRedisTemplate.delete(key);
     }
 

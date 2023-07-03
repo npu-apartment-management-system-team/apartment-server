@@ -10,5 +10,5 @@ import edu.npu.entity.ProcessingApplication;
 */
 public interface ProcessingApplicationService extends IService<ProcessingApplication> {
 
-    boolean handleExpireApplication(Long shardIndex, int shardTotal, int i);
+    boolean handleExpireApplication(Long shardIndex, int shardTotal);
 }

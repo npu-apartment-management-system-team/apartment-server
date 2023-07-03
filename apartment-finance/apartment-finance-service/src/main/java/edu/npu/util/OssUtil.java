@@ -34,7 +34,7 @@ public class OssUtil {
 
     /**
      * 向Oss上传文件
-     * @param baseDir 文件夹名 以apartment/开头 外部单位相关department/sheet/
+     * @param baseDir 文件夹名 以apartment/开头 外部单位相关apartment/department/
      *                房建段相关apartment/center/
      * @param file 文件
      * @return 是否上传成功

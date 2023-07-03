@@ -2,8 +2,8 @@ package edu.npu.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.npu.entity.PaymentDepartment;
-import edu.npu.service.PaymentDepartmentService;
 import edu.npu.mapper.PaymentDepartmentMapper;
+import edu.npu.service.PaymentDepartmentService;
 import org.springframework.stereotype.Service;
 
 /**
