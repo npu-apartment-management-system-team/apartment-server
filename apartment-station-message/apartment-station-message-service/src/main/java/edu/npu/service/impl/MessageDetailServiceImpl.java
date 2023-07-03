@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.npu.dto.SendMessageDto;
 import edu.npu.entity.MessageDetail;
 import edu.npu.entity.MessageReceiving;
-import edu.npu.entity.User;
 import edu.npu.exception.ApartmentException;
 import edu.npu.feignClient.UserServiceClient;
 import edu.npu.mapper.MessageDetailMapper;
@@ -19,11 +18,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 /**
  * @author wangminan
