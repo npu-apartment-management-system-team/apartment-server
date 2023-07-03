@@ -26,7 +26,7 @@ public class SenderController {
         return messageDetailService.sendMessage(sendMessageDto);
     }
 
-    @GetMapping("/detail")
+    @GetMapping("/outbox/detail")
     @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public R getMessageDetail(@RequestParam String id) {
         return messageDetailService.getMessageDetail(id);
@@ -43,4 +43,6 @@ public class SenderController {
     public R deleteMessage(@PathVariable String id) {
         return messageDetailService.deleteMessage(id);
     }
+
+
 }

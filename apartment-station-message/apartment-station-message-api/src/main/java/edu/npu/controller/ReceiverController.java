@@ -1,10 +1,12 @@
 package edu.npu.controller;
 
+import edu.npu.entity.AccountUserDetails;
 import edu.npu.service.MessageReceivingService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -21,14 +23,16 @@ public class ReceiverController {
 
     @GetMapping("/inbox/detail")
     @PreAuthorize("hasAuthority('USER')")
-    public R getMessageDetail(@RequestParam String id) {
-        return messageReceivingService.getMessageDetail(id);
+    public R getMessageDetail(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+                                  @RequestParam String id) {
+        return messageReceivingService.getMessageDetail(accountUserDetails,id);
     }
 
     @DeleteMapping("/inbox/{id}")
     @PreAuthorize("hasAuthority('USER')")
-    public R DeleteMessage(@PathVariable String id) {
-        return messageReceivingService.deleteMessage(id);
+    public R DeleteMessage(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+                           @PathVariable String id) {
+        return messageReceivingService.deleteMessage(accountUserDetails,id);
     }
 
 
