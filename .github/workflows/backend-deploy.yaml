@@ -152,3 +152,5 @@ jobs:
             wangminan/apartment-user-api:${{ steps.vars.outputs.tag }}
             wangminan/apartment-management-api:${{ steps.vars.outputs.tag }}
             wangminan/apartment-application-api:${{ steps.vars.outputs.tag }}
+            wangminan/apartment-station-message-api:${{ steps.vars.outputs.tag }}
+            wangminan/apartment-finance-api:${{ steps.vars.outputs.tag }}

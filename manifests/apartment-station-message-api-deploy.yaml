@@ -1,0 +1,59 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: apartment-station-message-api
+  namespace: apartment-system
+  labels:
+    app: apartment-station-message-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: apartment-station-message-api
+  template:
+    metadata:
+      labels:
+        app: apartment-station-message-api
+    spec:
+      containers:
+        - name: apartment-station-message-api
+          image: wangminan/apartment-station-message-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 63060
+              protocol: TCP
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: aptmtprod
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 75%
+      maxSurge: 100%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 300
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: apartment-station-message-api
+  namespace: apartment-system
+  labels:
+      app: apartment-station-message-api
+spec:
+  selector:
+    app: apartment-station-message-api
+  ports:
+    - name: tcp-svc-63060
+      protocol: TCP
+      port: 63060
+      targetPort: 63060
+      # nodePort默认范围30000-32767
+      nodePort: 32060
+  type: NodePort
+  sessionAffinity: None
