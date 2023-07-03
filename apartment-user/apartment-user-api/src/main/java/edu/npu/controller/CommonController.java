@@ -1,12 +1,14 @@
 package edu.npu.controller;
 
 import edu.npu.dto.UpdatePasswordDto;
+import edu.npu.entity.AccountUserDetails;
 import edu.npu.service.CommonService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -19,8 +21,11 @@ public class CommonController {
     @Resource
     private CommonService commonService;
 
-    @PutMapping("/{id}")
-    public R UpdatePassword(@PathVariable("id")Long id, UpdatePasswordDto updatePasswordDto){
+    @PutMapping
+    public R UpdatePassword(
+            @AuthenticationPrincipal AccountUserDetails accountUserDetails,
+            @RequestBody UpdatePasswordDto updatePasswordDto){
+        Long id = accountUserDetails.getId();
         return commonService.updatePassword(id,updatePasswordDto);
     }
 }
