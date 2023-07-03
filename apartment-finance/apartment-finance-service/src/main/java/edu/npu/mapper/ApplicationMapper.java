@@ -11,5 +11,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @Description: 针对表【application】的数据库操作Mapper
  */
 @Mapper
-public interface PaymentApplicationMapper extends BaseMapper<Application> {
+public interface ApplicationMapper extends BaseMapper<Application> {
 }

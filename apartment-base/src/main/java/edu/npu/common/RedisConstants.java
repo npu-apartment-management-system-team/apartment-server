@@ -39,4 +39,6 @@ public class RedisConstants {
     public static final String LOCK_APARTMENT_KEY = "lock:apartment:";
 
     public static final String LOGIN_LOCK_KEY = "login:lock";
+
+    public static final String UPLOAD_FILE_KEY_PREFIX = "upload:file:list";
 }
