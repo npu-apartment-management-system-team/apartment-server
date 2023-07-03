@@ -31,12 +31,12 @@ public class Application implements Serializable {
     /**
      * 逻辑外键，与user表的id构成映射关系
      */
-    private Long user_id;
+    private Long userId;
 
     /**
      * 逻辑外键，押金订单号，与payment表的id构成映射关系。
      */
-    private Long payment_id;
+    private Long paymentId;
 
     /**
      * 申请类型。包括0入住、1调宿、2退宿
@@ -46,29 +46,29 @@ public class Application implements Serializable {
     /**
      * 申请文件在OSS的存档URL。不可删除，冷备。
      */
-    private String file_url;
+    private String fileUrl;
 
     /**
      * 申请进展，应该是一个两段式的结构。eg.1_1 入住本单位审批中 具体见常量类 考虑撤回
      */
-    private int application_status;
+    private int applicationStatus;
 
     /**
      * 押金缴纳状态 0未缴纳 1已缴纳 2已退回 结合payment_id default 0
      */
-    private int deposit_status;
+    private int depositStatus;
 
     /**
      * 创建申请的时间 yyyy-MM-dd HH:mm:ss
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date create_time;
+    private Date createTime;
 
     /**
      * 当前申请状态更新的时间 yyyy-MM-dd HH:mm:ss
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date update_time;
+    private Date updateTime;
 
     @TableField(exist = false)
     @Serial
