@@ -138,6 +138,7 @@ public class LoginAccountServiceImpl extends ServiceImpl<LoginAccountMapper, Log
         User user = new User();
         user.setFaceId(faceId);
         BeanUtils.copyProperties(userRegisterDto, user);
+        user.setLoginAccountId(loginAccount.getId());
         int insert = userMapper.insert(user);
         return insert == 1 ? R.ok("注册成功") :
                 R.error(ResponseCodeEnum.SERVER_ERROR, REGISTER_FAILED_MSG);

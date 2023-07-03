@@ -94,6 +94,7 @@ public class FaceServiceImpl implements FaceService {
             return addFaceResponse.getStatusCode().equals(OPERATION_SUCCESS) ?
                     addFaceResponse.getBody().getData().getFaceId() : null;
         } catch (Exception e) {
+            log.error("人脸新增服务异常", e);
             throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "人脸新增服务异常");
         }
     }
@@ -116,6 +117,7 @@ public class FaceServiceImpl implements FaceService {
             // 解析
             return deleteFaceEntityResponse.getStatusCode().equals(OPERATION_SUCCESS);
         } catch (Exception e) {
+            log.error("人脸实体删除服务异常", e);
             throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "人脸实体删除服务异常");
         }
     }
@@ -138,6 +140,7 @@ public class FaceServiceImpl implements FaceService {
             // 解析
             return deleteFaceResponse.getStatusCode().equals(OPERATION_SUCCESS);
         } catch (Exception e) {
+            log.error("人脸删除服务异常", e);
             throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "人脸删除服务异常");
         }
     }

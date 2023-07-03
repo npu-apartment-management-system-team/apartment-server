@@ -1,5 +1,6 @@
 package edu.npu.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import edu.npu.util.RegexPatterns;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -16,6 +17,8 @@ public record UserRegisterDto(
         @NotNull
         String password,
         String email,
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING)
         Long departmentId,
         @NotNull
         String name,

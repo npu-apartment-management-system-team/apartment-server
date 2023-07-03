@@ -6,7 +6,6 @@ import edu.npu.entity.Department;
 import edu.npu.entity.Room;
 import edu.npu.mapper.DepartmentMapper;
 import edu.npu.service.BedService;
-import edu.npu.service.DepartmentService;
 import edu.npu.service.RoomService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;

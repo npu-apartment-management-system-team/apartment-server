@@ -5,7 +5,6 @@ import edu.npu.entity.Admin;
 import edu.npu.entity.User;
 import edu.npu.mapper.UserMapper;
 import edu.npu.service.AdminService;
-import edu.npu.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 

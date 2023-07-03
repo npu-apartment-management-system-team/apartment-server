@@ -5,8 +5,6 @@ import com.alibaba.schedulerx.worker.processor.JavaProcessor;
 import com.alibaba.schedulerx.worker.processor.ProcessResult;
 import edu.npu.feignClient.ManagementServiceClient;
 import edu.npu.service.GeneratePaymentService;
-import edu.npu.service.PaymentDepartmentService;
-import edu.npu.service.PaymentUserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

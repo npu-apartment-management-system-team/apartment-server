@@ -11,8 +11,6 @@ import edu.npu.entity.User;
 import edu.npu.vo.R;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 /**
 * @author wangminan
 * @description 针对表【user(住宿职工表)】的数据库操作Service

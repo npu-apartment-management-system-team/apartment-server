@@ -77,10 +77,7 @@ public class DepartmentController {
 
     @GetMapping("/list")
     public R getDepartmentSimpleList(@AuthenticationPrincipal UserDetails userDetails){
-        if (userDetails.getAuthorities().contains(
-                new SimpleGrantedAuthority(RoleEnum.USER.name()))){
-            return R.error(ResponseCodeEnum.FORBIDDEN, "权限不足");
-        }
+        // 该接口允许用户访问
         return departmentService.getDepartmentSimpleList();
     }
 
