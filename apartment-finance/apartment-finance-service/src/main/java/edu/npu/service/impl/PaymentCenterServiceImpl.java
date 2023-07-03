@@ -1,7 +1,5 @@
 package edu.npu.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import edu.npu.common.ResponseCodeEnum;
 import edu.npu.dto.DownloadQueryDto;
@@ -11,17 +9,17 @@ import edu.npu.entity.Department;
 import edu.npu.entity.PaymentDepartment;
 import edu.npu.exception.ApartmentError;
 import edu.npu.exception.ApartmentException;
-import edu.npu.mapper.ApplicationMapper;
-import edu.npu.mapper.DepartmentMapper;
+import edu.npu.feignClient.ApplicationServiceClient;
+import edu.npu.feignClient.ManagementServiceClient;
 import edu.npu.mapper.PaymentDepartmentMapper;
 import edu.npu.service.PaymentCenterService;
 import edu.npu.util.OssUtil;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -30,13 +28,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import lombok.extern.slf4j.Slf4j;
 
 import static edu.npu.common.RedisConstants.UPLOAD_FILE_KEY_PREFIX;
+
 /**
  * @Author: Yu
  * @Date: 2023/7/3
@@ -46,16 +47,16 @@ import static edu.npu.common.RedisConstants.UPLOAD_FILE_KEY_PREFIX;
 public class PaymentCenterServiceImpl implements PaymentCenterService {
 
     @Resource
-    private ApplicationMapper applicationMapper;
-
-    @Resource
-    private DepartmentMapper departmentMapper;
-
-    @Resource
     private PaymentDepartmentMapper paymentDepartmentMapper;
 
     @Resource
     private OssUtil ossUtil;
+
+    @Resource
+    private ManagementServiceClient managementServiceClient;
+
+    @Resource
+    private ApplicationServiceClient applicationServiceClient;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -75,14 +76,14 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
     /**
      * 查看历史变动表
      *
-     * @param userPayListQueryDto
-     * @return
+     * @param userPayListQueryDto 用户检索支付Dto
+     * @return R
      */
     @Override
     public R getVariationList(UserPayListQueryDto userPayListQueryDto) {
 
-        IPage<Application> page = new Page<>(
-                userPayListQueryDto.pageNum(), userPayListQueryDto.pageSize());
+//        Page<Application> page = new Page<>(
+//                userPayListQueryDto.pageNum(), userPayListQueryDto.pageSize());
 
 //        LambdaQueryWrapper<Application> wrapper = new LambdaQueryWrapper<>();
 //        boolean hasQuery = false;
@@ -106,8 +107,13 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
 //            page = paymentApplicationMapper.selectPage(page, null);
 //        }
 
-        page = applicationMapper.selectPage(page, getApplicationLambdaQueryWrapper(
-                userPayListQueryDto.beginTime(), userPayListQueryDto.departmentId()));
+//        page = applicationMapper.selectPage(page, getApplicationLambdaQueryWrapper(
+//                userPayListQueryDto.beginTime(), userPayListQueryDto.departmentId()));
+
+        Page<Application> page = applicationServiceClient
+                .getApplicationPageForQuery(
+                        userPayListQueryDto
+                );
 
         Map<String, Object> result = Map.of(
                 "total", page.getTotal(),
@@ -119,16 +125,19 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
     /**
      * 下载历史变动表
      *
-     * @param downloadQueryDto
-     * @return
+     * @param downloadQueryDto 下载查询Dto
+     * @return R
      */
     @Override
     public R downloadVariationList(DownloadQueryDto downloadQueryDto) {
 
         // 根据条件查询历史变动表 生成EXCEL 存储到OSS
-        List<Application> variationList;
-        variationList = applicationMapper.selectList(
-                getApplicationLambdaQueryWrapper(downloadQueryDto.beginTime(), downloadQueryDto.departmentId()));
+        List<Application> variationList = applicationServiceClient
+                .getApplicationListForDownload(
+                        downloadQueryDto.beginTime(),
+                        downloadQueryDto.departmentId());
+//        variationList = applicationMapper.selectList(
+//                getApplicationLambdaQueryWrapper(downloadQueryDto.beginTime(), downloadQueryDto.departmentId()));
 
         try (
                 // 创建workbook SXSSFWorkbook默认100行缓存
@@ -175,8 +184,8 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
     /**
      * 查看外部单位代扣缴费情况
      *
-     * @param userPayListQueryDto
-     * @return
+     * @param userPayListQueryDto 用户缴费列表查询Dto
+     * @return R
      */
     @Override
     public R getWithholdList(UserPayListQueryDto userPayListQueryDto) {
@@ -186,8 +195,8 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
     /**
      * 查看某条代扣缴费具体情况
      *
-     * @param id
-     * @return
+     * @param id 外部单位id
+     * @return R
      */
     @Override
     public R getWithholdDetailById(Long id) {
@@ -199,7 +208,7 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
         获取外部单位
          */
         PaymentDepartment paymentDepartment = paymentDepartmentMapper.selectById(id);
-        Department department = departmentMapper.selectById(
+        Department department = managementServiceClient.getDepartmentById(
                 paymentDepartment.getDepartmentId());
 
 //        departmentMapper.selectOne(new LambdaQueryWrapper<Department>()
@@ -222,8 +231,8 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
     /**
      * 下载外部单位代扣表
      *
-     * @param downloadQueryDto
-     * @return
+     * @param downloadQueryDto 下载Dto
+     * @return R
      */
     @Override
     public R downloadWithholdList(DownloadQueryDto downloadQueryDto) {
@@ -233,8 +242,8 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
     /**
      * 查看自收缴费情况
      *
-     * @param userPayListQueryDto
-     * @return
+     * @param userPayListQueryDto 缴费列表查询Dto
+     * @return R
      */
     @Override
     public R getChargeList(UserPayListQueryDto userPayListQueryDto) {
@@ -244,8 +253,8 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
     /**
      * 查看每条自收缴费具体情况
      *
-     * @param id
-     * @return
+     * @param id 缴费记录ID
+     * @return R
      */
     @Override
     public R getChargeDetailById(Long id) {
@@ -255,8 +264,8 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
     /**
      * 下载自收表
      *
-     * @param downloadQueryDto
-     * @return
+     * @param downloadQueryDto 下载Dto
+     * @return R
      */
     @Override
     public R downloadChargeList(DownloadQueryDto downloadQueryDto) {
@@ -264,41 +273,42 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
     }
 
 
-    /**
+    /*
      * 设置wrapper
-     * @param beginTime
-     * @param departmentId
-     * @return
+     *
+     * @param beginTime    开始时间
+     * @param departmentId 部门ID
+     * @return R
      */
-    @Nullable
+    /*@Nullable
     private LambdaQueryWrapper<Application> getApplicationLambdaQueryWrapper(Date beginTime, Long departmentId) {
         LambdaQueryWrapper<Application> wrapper = new LambdaQueryWrapper<>();
         boolean hasQuery = false;
 
-        if(beginTime != null) {
+        if (beginTime != null) {
             hasQuery = true;
             wrapper.ge(Application::getCreateTime, beginTime);
         }
 
-        if(departmentId != null) {
+        if (departmentId != null) {
             hasQuery = true;
             wrapper.inSql(Application::getUserId, "select id from user where department_id = ${queryDto.departmentId()}");
         }
 
-        if(!hasQuery) {
+        if (!hasQuery) {
             return null;
         }
 
         wrapper.orderByDesc(Application::getCreateTime);
-
         return wrapper;
-    }
+    }*/
 
     /**
      * 向OSS上传文件
-     * @param workbook
-     * @param file
-     * @return
+     *
+     * @param workbook excel文件
+     * @param file     本地生成的文件
+     * @return 上传后回传地址
      */
     private String uploadFileToOss(Workbook workbook, File file) {
         try (
