@@ -1,9 +1,12 @@
 package edu.npu.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import edu.npu.dto.DownloadQueryDto;
+import edu.npu.dto.UserPayListQueryDto;
 import edu.npu.entity.PaymentDepartment;
-import edu.npu.mapper.PaymentDepartmentMapper;
 import edu.npu.service.PaymentDepartmentService;
+import edu.npu.mapper.PaymentDepartmentMapper;
+import edu.npu.vo.R;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +18,15 @@ import org.springframework.stereotype.Service;
 public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentMapper, PaymentDepartment>
     implements PaymentDepartmentService{
 
+    @Override
+    public R getVariationList(UserPayListQueryDto userPayListQueryDto) {
+        return null;
+    }
+
+    @Override
+    public R downloadVariationList(DownloadQueryDto downloadQueryDto) {
+        return null;
+    }
 }
 
 

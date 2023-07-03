@@ -1,0 +1,77 @@
+package edu.npu.entity;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
+import lombok.Data;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Date;
+
+
+/**
+ * @Author: Yu
+ * @Date: 2023/7/3
+ */
+@TableName(value ="application")
+@Data
+@Builder
+public class Application implements Serializable {
+
+    /**
+     * application唯一ID
+     */
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
+    /**
+     * 逻辑外键，与user表的id构成映射关系
+     */
+    private Long user_id;
+
+    /**
+     * 逻辑外键，押金订单号，与payment表的id构成映射关系。
+     */
+    private Long payment_id;
+
+    /**
+     * 申请类型。包括0入住、1调宿、2退宿
+     */
+    private int type;
+
+    /**
+     * 申请文件在OSS的存档URL。不可删除，冷备。
+     */
+    private String file_url;
+
+    /**
+     * 申请进展，应该是一个两段式的结构。eg.1_1 入住本单位审批中 具体见常量类 考虑撤回
+     */
+    private int application_status;
+
+    /**
+     * 押金缴纳状态 0未缴纳 1已缴纳 2已退回 结合payment_id default 0
+     */
+    private int deposit_status;
+
+    /**
+     * 创建申请的时间 yyyy-MM-dd HH:mm:ss
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date create_time;
+
+    /**
+     * 当前申请状态更新的时间 yyyy-MM-dd HH:mm:ss
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date update_time;
+
+    @TableField(exist = false)
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+}
