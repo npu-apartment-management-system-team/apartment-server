@@ -17,58 +17,66 @@ public interface PaymentDepartmentService extends IService<PaymentDepartment> {
     /**
      * 查看历史变动表
      * @param queryDto
-     * @return
+     * @return R
      */
     R getVariationList(AccountUserDetails accountUserDetails, QueryDto queryDto);
 
     /**
      * 下载历史变动表
      * @param downloadQueryDto
-     * @return
+     * @return R
      */
     R downloadVariationList(AccountUserDetails accountUserDetails, DownloadQueryDto downloadQueryDto);
 
     /**
      * 查看外部单位代扣缴费情况
      * @param queryDto
-     * @return
+     * @return R
      */
     R getWithholdList(AccountUserDetails accountUserDetails ,QueryDto queryDto);
 
     /**
      * 查看某条代扣缴费具体情况
      * @param id
-     * @return
+     * @return R
      */
-    R getWithholdDetailById(AccountUserDetails accountUserDetails, Long id);
+    R getWithholdDetailById(Long id);
 
     /**
      * 下载外部单位代扣表
      * @param downloadQueryDto
-     * @return
+     * @return R
      */
-    R downloadWithholdList(DownloadQueryDto downloadQueryDto);
+    R downloadWithholdList(AccountUserDetails accountUserDetails, DownloadQueryDto downloadQueryDto);
 
     /**
      * 查看自收缴费情况
      * @param queryDto
-     * @return
+     * @return R
      */
-    R getChargeList(QueryDto queryDto);
+    R getChargeList(AccountUserDetails accountUserDetails, QueryDto queryDto);
 
     /**
      * 查看每条自收缴费具体情况
      * @param id
-     * @return
+     * @return R
      */
     R getChargeDetailById(Long id);
 
     /**
      * 下载自收表
      * @param downloadQueryDto
-     * @return
+     * @return R
      */
-    R downloadChargeList(DownloadQueryDto downloadQueryDto);
+    R downloadChargeList(AccountUserDetails accountUserDetails, DownloadQueryDto downloadQueryDto);
+
+    /**
+     * 外部单位填写必要信息以确认住宿费用代扣
+     * @param id
+     * @param checkId
+     * @return R
+     */
+    R postChequeId(Long id, String checkId);
 
 
 

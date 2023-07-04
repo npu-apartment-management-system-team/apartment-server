@@ -1,7 +1,6 @@
 package edu.npu.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serial;
@@ -14,7 +13,6 @@ import java.util.Date;
  * @Date: 2023/7/3
  */
 @Data
-@Builder
 public class Application implements Serializable {
 
     /**

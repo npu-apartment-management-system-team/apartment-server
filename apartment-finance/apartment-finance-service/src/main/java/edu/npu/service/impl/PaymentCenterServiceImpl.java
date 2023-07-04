@@ -6,12 +6,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import edu.npu.common.ResponseCodeEnum;
 import edu.npu.dto.DownloadQueryDto;
 import edu.npu.dto.QueryDto;
-import edu.npu.entity.Application;
-import edu.npu.entity.Department;
-import edu.npu.entity.PaymentDepartment;
+import edu.npu.entity.*;
 import edu.npu.feignClient.ApplicationServiceClient;
 import edu.npu.feignClient.ManagementServiceClient;
+import edu.npu.feignClient.UserServiceClient;
 import edu.npu.mapper.PaymentDepartmentMapper;
+import edu.npu.mapper.PaymentUserMapper;
 import edu.npu.service.PaymentCenterService;
 import edu.npu.util.OssUtil;
 import edu.npu.vo.R;
@@ -41,6 +41,9 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
     private PaymentDepartmentMapper paymentDepartmentMapper;
 
     @Resource
+    private PaymentUserMapper paymentUserMapper;
+
+    @Resource
     private OssUtil ossUtil;
 
     @Resource
@@ -48,6 +51,9 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
 
     @Resource
     private ApplicationServiceClient applicationServiceClient;
+
+    @Resource
+    private UserServiceClient userServiceClient;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -75,7 +81,7 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
 
         Page<Application> page = applicationServiceClient
                 .getApplicationPageForQuery(
-                        queryDto, queryDto.departmentId()
+                        queryDto
                 );
 
         Map<String, Object> result = Map.of(
@@ -156,15 +162,12 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
                 queryDto.pageNum(), queryDto.pageSize());
 
         LambdaQueryWrapper<PaymentDepartment> wrapper = new LambdaQueryWrapper<>();
-        //boolean hasQuery = false;
 
         if (queryDto.beginTime() != null) {
-            //hasQuery = true;
             wrapper.ge(PaymentDepartment::getCreateTime, queryDto.beginTime());
         }
 
         if (queryDto.departmentId() != null) {
-            //hasQuery = true;
             wrapper.eq(PaymentDepartment::getDepartmentId, queryDto.departmentId());
         }
 
@@ -190,7 +193,7 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
     public R getWithholdDetailById(Long id) {
 
         Map<String, Object> resultMap = new HashMap<>();
-        Map<String, Object> payment = new HashMap<>();
+        //Map<String, Object> payment = new HashMap<>();
 
         /*
         获取外部单位
@@ -199,21 +202,18 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
         Department department = managementServiceClient.getDepartmentById(
                 paymentDepartment.getDepartmentId());
 
-//        departmentMapper.selectOne(new LambdaQueryWrapper<Department>()
-//                .eq(Department::getId, paymentDepartmentMapper.selectById(id).getDepartmentId()));
-
         if (department == null) {
             return R.error(ResponseCodeEnum.NOT_FOUND, "外部单位不存在");
         }
 
         //封装payment信息
-        payment.put("createTime", paymentDepartment.getCreateTime());
-        payment.put("price", paymentDepartment.getPrice());
-        payment.put("hasPaid", paymentDepartment.getHasPaid());
-        payment.put("payTime", paymentDepartment.getPayTime());
+//        payment.put("createTime", paymentDepartment.getCreateTime());
+//        payment.put("price", paymentDepartment.getPrice());
+//        payment.put("hasPaid", paymentDepartment.getHasPaid());
+//        payment.put("payTime", paymentDepartment.getPayTime());
 
         resultMap.put("department", department);
-        resultMap.put("payment", payment);
+        resultMap.put("payment", paymentDepartment);
         return R.ok().put("result", resultMap);
 
     }
@@ -226,12 +226,26 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
      */
     @Override
     public R downloadWithholdList(DownloadQueryDto downloadQueryDto) {
-        // 根据条件查询历史变动表 生成EXCEL 存储到OSS
-        List<PaymentDepartment> withholdList = paymentDepartmentMapper.selectList(null);
-//        variationList = applicationMapper.selectList(
-//                getApplicationLambdaQueryWrapper(downloadQueryDto.beginTime(), downloadQueryDto.departmentId()));
 
-        return null;
+        LambdaQueryWrapper<PaymentDepartment> wrapper = new LambdaQueryWrapper<>();
+
+        if(downloadQueryDto.beginTime() != null) {
+            wrapper.ge(PaymentDepartment::getCreateTime, downloadQueryDto.beginTime());
+        }
+        if(downloadQueryDto.departmentId() != null) {
+            wrapper.eq(PaymentDepartment::getDepartmentId, downloadQueryDto.departmentId());
+        }
+        wrapper.orderByDesc(PaymentDepartment::getDepartmentId);
+        wrapper.orderByDesc(PaymentDepartment::getCreateTime);
+
+        List<PaymentDepartment> withholdList = paymentDepartmentMapper.selectList(wrapper);
+
+        //调用ossUtil中的方法下载
+        String url = ossUtil.downloadWithholdList(withholdList, downloadQueryDto, BASE_DIR);
+
+        return StringUtils.hasText(url) ?
+                R.ok().put("result", url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
+
     }
 
     /**
@@ -242,7 +256,29 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
      */
     @Override
     public R getChargeList(QueryDto queryDto) {
-        return null;
+        IPage<PaymentUser> page = new Page<>(
+                queryDto.pageNum(), queryDto.pageSize());
+
+        LambdaQueryWrapper<PaymentUser> wrapper = new LambdaQueryWrapper<>();
+
+        if (queryDto.beginTime() != null) {
+            wrapper.ge(PaymentUser::getCreateTime, queryDto.beginTime());
+        }
+
+        if (queryDto.departmentId() != null) {
+            Long departmentId = queryDto.departmentId();
+            wrapper.inSql(PaymentUser::getUserId, "select id from user where department_id = '"+ departmentId +"'");
+        }
+
+        wrapper.orderByDesc(PaymentUser::getCreateTime);
+
+        page = paymentUserMapper.selectPage(page, wrapper);
+
+        Map<String, Object> result = Map.of(
+                "total", page.getTotal(),
+                "list", page.getRecords()
+        );
+        return R.ok(result);
     }
 
     /**
@@ -253,7 +289,29 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
      */
     @Override
     public R getChargeDetailById(Long id) {
-        return null;
+        Map<String, Object> resultMap = new HashMap<>();
+        //Map<String, Object> payment = new HashMap<>();
+
+        /*
+        获取自收缴费用户
+         */
+        PaymentUser paymentUser = paymentUserMapper.selectById(id);
+        User user = userServiceClient.getUserById(
+                paymentUser.getUserId());
+
+        if (user == null) {
+            return R.error(ResponseCodeEnum.NOT_FOUND, "缴费用户不存在");
+        }
+
+        //封装payment信息
+//        payment.put("createTime", paymentUser.getCreateTime());
+//        payment.put("price", paymentUser.getPrice());
+//        payment.put("status", paymentUser.getStatus());
+//        payment.put("type", paymentUser.getType());
+
+        resultMap.put("user", user);
+        resultMap.put("payment", paymentUser);
+        return R.ok().put("result", resultMap);
     }
 
     /**
@@ -264,7 +322,26 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
      */
     @Override
     public R downloadChargeList(DownloadQueryDto downloadQueryDto) {
-        return null;
+        LambdaQueryWrapper<PaymentUser> wrapper = new LambdaQueryWrapper<>();
+
+        //根据参数构建wrapper
+        if(downloadQueryDto.beginTime() != null) {
+            wrapper.ge(PaymentUser::getCreateTime, downloadQueryDto.beginTime());
+        }
+        if(downloadQueryDto.departmentId() != null) {
+            Long departmentId = downloadQueryDto.departmentId();
+            wrapper.inSql(PaymentUser::getUserId, "select id from user where department_id = '"+ departmentId +"'");
+        }
+
+        wrapper.orderByDesc(PaymentUser::getCreateTime);
+
+        List<PaymentUser> chargeList = paymentUserMapper.selectList(wrapper);
+
+        //调用ossUtil中的方法下载
+        String url = ossUtil.downloadChargeList(chargeList, downloadQueryDto, BASE_DIR);
+
+        return StringUtils.hasText(url) ?
+                R.ok().put("result", url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
     }
 
 

@@ -14,18 +14,16 @@ import edu.npu.feignClient.ApplicationServiceClient;
 import edu.npu.feignClient.ManagementServiceClient;
 import edu.npu.feignClient.UserServiceClient;
 import edu.npu.mapper.PaymentDepartmentMapper;
+import edu.npu.mapper.PaymentUserMapper;
 import edu.npu.service.PaymentDepartmentService;
 import edu.npu.util.OssUtil;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
-import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,11 +34,15 @@ import java.util.Map;
 * @createDate 2023-07-02 16:45:55
 */
 @Service
+@Slf4j
 public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentMapper, PaymentDepartment>
     implements PaymentDepartmentService{
 
     @Resource
     private PaymentDepartmentMapper paymentDepartmentMapper;
+
+    @Resource
+    private PaymentUserMapper paymentUserMapper;
 
     @Resource
     private ApplicationServiceClient applicationServiceClient;
@@ -61,7 +63,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
     /**
      * 查看历史变动表
      * @param queryDto
-     * @return
+     * @return R 历史变动表
      */
     @Override
     public R getVariationList(AccountUserDetails accountUserDetails,
@@ -71,7 +73,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
 
         Page<Application> page = applicationServiceClient
                 .getApplicationPageForQuery(
-                        queryDto, admin.getDepartmentId()
+                        queryDto
                 );
 
 
@@ -85,7 +87,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
     /**
      * 下载历史变动表
      * @param downloadQueryDto
-     * @return
+     * @return R
      */
     @Override
     public R downloadVariationList(AccountUserDetails accountUserDetails,
@@ -110,7 +112,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
      * 查看外部单位代扣缴费情况
      *
      * @param queryDto
-     * @return
+     * @return R
      */
     @Override
     public R getWithholdList(AccountUserDetails accountUserDetails, QueryDto queryDto) {
@@ -147,31 +149,26 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
      * 查看某条代扣缴费具体情况
      *
      * @param id
-     * @return
+     * @return R
      */
     @Override
-    public R getWithholdDetailById(AccountUserDetails accountUserDetails, Long id) {
-
-        Admin admin = extractAdmin(accountUserDetails);
+    public R getWithholdDetailById(Long id) {
 
         Map<String, Object> resultMap = new HashMap<>();
-        Map<String, Object> payment = new HashMap<>();
 
         /*
         获取外部单位
          */
         PaymentDepartment paymentDepartment = paymentDepartmentMapper.selectById(id);
         Department department = managementServiceClient.getDepartmentById(
-                admin.getDepartmentId());
+                paymentDepartment.getDepartmentId());
 
-        //封装payment信息
-        payment.put("createTime", paymentDepartment.getCreateTime());
-        payment.put("price", paymentDepartment.getPrice());
-        payment.put("hasPaid", paymentDepartment.getHasPaid());
-        payment.put("payTime", paymentDepartment.getPayTime());
+        if (department == null) {
+            return R.error(ResponseCodeEnum.NOT_FOUND, "外部单位不存在");
+        }
 
         resultMap.put("department", department);
-        resultMap.put("payment", payment);
+        resultMap.put("payment", paymentDepartment);
         return R.ok().put("result", resultMap);
     }
 
@@ -179,43 +176,138 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
      * 下载外部单位代扣表
      *
      * @param downloadQueryDto
-     * @return
+     * @return R
      */
     @Override
-    public R downloadWithholdList(DownloadQueryDto downloadQueryDto) {
-        return null;
+    public R downloadWithholdList(AccountUserDetails accountUserDetails, DownloadQueryDto downloadQueryDto) {
+
+        Admin admin = extractAdmin(accountUserDetails);
+        /*
+        按条件查询list
+         */
+        LambdaQueryWrapper<PaymentDepartment> wrapper = new LambdaQueryWrapper<>();
+
+        if(downloadQueryDto.beginTime() != null) {
+            wrapper.ge(PaymentDepartment::getCreateTime, downloadQueryDto.beginTime());
+        }
+
+        wrapper.eq(PaymentDepartment::getDepartmentId, admin.getDepartmentId());
+        wrapper.orderByDesc(PaymentDepartment::getCreateTime);
+
+        List<PaymentDepartment> withholdList = paymentDepartmentMapper.selectList(wrapper);
+
+        //调用ossUtil中的方法下载
+        String url = ossUtil.downloadWithholdList(withholdList, downloadQueryDto, BASE_DIR);
+
+        return StringUtils.hasText(url) ?
+                R.ok().put("result", url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
+
     }
 
     /**
      * 查看自收缴费情况
      *
      * @param queryDto
-     * @return
+     * @return R
      */
     @Override
-    public R getChargeList(QueryDto queryDto) {
-        return null;
+    public R getChargeList(AccountUserDetails accountUserDetails, QueryDto queryDto) {
+
+        Admin admin = extractAdmin(accountUserDetails);
+
+        IPage<PaymentUser> page = new Page<>(
+                queryDto.pageNum(), queryDto.pageSize());
+
+        LambdaQueryWrapper<PaymentUser> wrapper = new LambdaQueryWrapper<>();
+
+        if (queryDto.beginTime() != null) {
+            wrapper.ge(PaymentUser::getCreateTime, queryDto.beginTime());
+        }
+
+        Long departmentId = admin.getDepartmentId();
+        wrapper.inSql(PaymentUser::getUserId, "select id from user where department_id = '"+ departmentId +"'");
+
+        wrapper.orderByDesc(PaymentUser::getCreateTime);
+
+        page = paymentUserMapper.selectPage(page, wrapper);
+
+        Map<String, Object> result = Map.of(
+                "total", page.getTotal(),
+                "list", page.getRecords()
+        );
+        return R.ok(result);
     }
 
     /**
      * 查看每条自收缴费具体情况
      *
      * @param id
-     * @return
+     * @return R
      */
     @Override
     public R getChargeDetailById(Long id) {
-        return null;
+
+        Map<String, Object> resultMap = new HashMap<>();
+
+        /*
+        获取自收缴费用户
+         */
+        PaymentUser paymentUser = paymentUserMapper.selectById(id);
+        User user = userServiceClient.getUserById(
+                paymentUser.getUserId());
+
+        if (user == null) {
+            return R.error(ResponseCodeEnum.NOT_FOUND, "缴费用户不存在");
+        }
+
+        resultMap.put("user", user);
+        resultMap.put("payment", paymentUser);
+        return R.ok().put("result", resultMap);
     }
 
     /**
      * 下载自收表
      *
      * @param downloadQueryDto
-     * @return
+     * @return R
      */
     @Override
-    public R downloadChargeList(DownloadQueryDto downloadQueryDto) {
+    public R downloadChargeList(AccountUserDetails accountUserDetails, DownloadQueryDto downloadQueryDto) {
+
+        Admin admin = extractAdmin(accountUserDetails);
+
+        LambdaQueryWrapper<PaymentUser> wrapper = new LambdaQueryWrapper<>();
+
+        //根据参数构建wrapper
+        if(downloadQueryDto.beginTime() != null) {
+            wrapper.ge(PaymentUser::getCreateTime, downloadQueryDto.beginTime());
+        }
+
+        Long departmentId = admin.getDepartmentId();
+        wrapper.inSql(PaymentUser::getUserId, "select id from user where department_id = '"+ departmentId +"'");
+
+        wrapper.orderByDesc(PaymentUser::getCreateTime);
+
+        List<PaymentUser> chargeList = paymentUserMapper.selectList(wrapper);
+
+        //调用ossUtil中的方法下载
+        String url = ossUtil.downloadChargeList(chargeList, downloadQueryDto, BASE_DIR);
+
+        return StringUtils.hasText(url) ?
+                R.ok().put("result", url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
+    }
+
+    /**
+     * 外部单位填写必要信息以确认住宿费用代扣
+     *
+     * @param id
+     * @param checkId
+     * @return R
+     */
+    @Override
+    public R postChequeId(Long id, String checkId) {
+
+
         return null;
     }
 
@@ -228,7 +320,3 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
         return admin;
     }
 }
-
-
-
-

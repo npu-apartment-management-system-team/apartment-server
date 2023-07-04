@@ -5,6 +5,7 @@ import edu.npu.dto.QueryDto;
 import edu.npu.entity.Application;
 import edu.npu.feignClient.fallback.ManagementServiceClientFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,8 +24,7 @@ public interface ApplicationServiceClient {
 
     @GetMapping("/query/page")
     Page<Application> getApplicationPageForQuery(
-            @Validated QueryDto queryDto,
-            Long departmentId
+            @SpringQueryMap QueryDto queryDto
     );
 
     @GetMapping("/download/list")

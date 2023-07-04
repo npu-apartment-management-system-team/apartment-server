@@ -6,6 +6,7 @@ import com.aliyun.oss.model.CannedAccessControlList;
 import edu.npu.dto.DownloadQueryDto;
 import edu.npu.entity.Application;
 import edu.npu.entity.PaymentDepartment;
+import edu.npu.entity.PaymentUser;
 import edu.npu.exception.ApartmentError;
 import edu.npu.exception.ApartmentException;
 import edu.npu.service.impl.PaymentCenterServiceImpl;
@@ -22,6 +23,7 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -57,6 +59,7 @@ public class OssUtil {
     private StringRedisTemplate stringRedisTemplate;
 
     private static final String SIMPLE_DATE_FORMAT = "yyyy-MM-dd";
+
 
     private static final ExecutorService cachedThreadPool =
             Executors.newFixedThreadPool(
@@ -138,8 +141,8 @@ public class OssUtil {
                 sheet.getRow(lastRowNum + 1).createCell(1).setCellValue(tmpVariation.getUserId());
                 sheet.getRow(lastRowNum + 1).createCell(2).setCellValue(tmpVariation.getType());
                 sheet.getRow(lastRowNum + 1).createCell(3).setCellValue(tmpVariation.getFileUrl());
-                sheet.getRow(lastRowNum + 1).createCell(4).setCellValue(tmpVariation.getCreateTime());
-                sheet.getRow(lastRowNum + 1).createCell(5).setCellValue(tmpVariation.getUpdateTime());
+                sheet.getRow(lastRowNum + 1).createCell(4).setCellValue(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(tmpVariation.getCreateTime()));
+                sheet.getRow(lastRowNum + 1).createCell(5).setCellValue(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(tmpVariation.getUpdateTime()));
 
             }
             File file = File.createTempFile(
@@ -172,7 +175,7 @@ public class OssUtil {
             sheet.createRow(0).createCell(0).setCellValue("代扣缴费ID");
             sheet.getRow(0).createCell(1).setCellValue("单位ID");
             sheet.getRow(0).createCell(2).setCellValue("需缴纳金额");
-            sheet.getRow(0).createCell(3).setCellValue("缴费月份");
+            sheet.getRow(0).createCell(3).setCellValue("创建时间");
             sheet.getRow(0).createCell(4).setCellValue("支付进展");
             sheet.getRow(0).createCell(5).setCellValue("支付时间");
             sheet.getRow(0).createCell(6).setCellValue("铁路内部支票ID");
@@ -186,14 +189,55 @@ public class OssUtil {
                 sheet.getRow(lastRowNum + 1).createCell(0).setCellValue(tmpPaymentDepartment.getId());
                 sheet.getRow(lastRowNum + 1).createCell(1).setCellValue(tmpPaymentDepartment.getDepartmentId());
                 sheet.getRow(lastRowNum + 1).createCell(2).setCellValue(tmpPaymentDepartment.getPrice());
-                sheet.getRow(lastRowNum + 1).createCell(3).setCellValue(tmpPaymentDepartment.getCreateTime());
+                sheet.getRow(lastRowNum + 1).createCell(3).setCellValue(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(tmpPaymentDepartment.getCreateTime()));
                 sheet.getRow(lastRowNum + 1).createCell(4).setCellValue(tmpPaymentDepartment.getHasPaid());
-                sheet.getRow(lastRowNum + 1).createCell(5).setCellValue(tmpPaymentDepartment.getPayTime());
+                sheet.getRow(lastRowNum + 1).createCell(5).setCellValue(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(tmpPaymentDepartment.getPayTime()));
                 sheet.getRow(lastRowNum + 1).createCell(6).setCellValue(tmpPaymentDepartment.getChequeId());
 
             }
             File file = File.createTempFile(
                     "单位代扣表_" + downloadQueryDto.beginTime(),
+                    ".xlsx"
+            );
+            String url = uploadFileToOss(workbook, file, baseDir);
+
+            return url;
+        } catch (IOException e) {
+            throw new ApartmentException(FAILED_GENERATE_VARIATION_LIST_MSG);
+        }
+    }
+
+    public String downloadChargeList(List<PaymentUser> chargeList, DownloadQueryDto downloadQueryDto, String baseDir) {
+        try (
+                // 创建workbook SXSSFWorkbook默认100行缓存
+                Workbook workbook = new SXSSFWorkbook()
+        ) {
+            // 创建sheet
+            Sheet sheet = workbook.createSheet("职工缴费记录表");
+            // 创建表头
+            sheet.createRow(0).createCell(0).setCellValue("职工缴费ID");
+            sheet.getRow(0).createCell(1).setCellValue("职工ID");
+            sheet.getRow(0).createCell(2).setCellValue("需缴纳金额");
+            sheet.getRow(0).createCell(3).setCellValue("创建时间");
+            sheet.getRow(0).createCell(4).setCellValue("支付进展");
+            sheet.getRow(0).createCell(5).setCellValue("缴费类别");
+            // 开始插入数据
+            for (PaymentUser tmpPaymentUser : chargeList) {
+                // 获取当前行
+                int lastRowNum = sheet.getLastRowNum();
+                // 创建行
+                sheet.createRow(lastRowNum + 1);
+                // 创建列
+                sheet.getRow(lastRowNum + 1).createCell(0).setCellValue(tmpPaymentUser.getId());
+                sheet.getRow(lastRowNum + 1).createCell(1).setCellValue(tmpPaymentUser.getUserId());
+                sheet.getRow(lastRowNum + 1).createCell(2).setCellValue(tmpPaymentUser.getPrice());
+                sheet.getRow(lastRowNum + 1).createCell(3).setCellValue(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(tmpPaymentUser.getCreateTime()));
+                sheet.getRow(lastRowNum + 1).createCell(4).setCellValue(tmpPaymentUser.getStatus());
+                sheet.getRow(lastRowNum + 1).createCell(5).setCellValue(tmpPaymentUser.getType());
+
+            }
+            File file = File.createTempFile(
+                    "职工缴费表_" + downloadQueryDto.beginTime(),
                     ".xlsx"
             );
             String url = uploadFileToOss(workbook, file, baseDir);

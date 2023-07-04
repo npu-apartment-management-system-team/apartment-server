@@ -6,6 +6,7 @@ import edu.npu.entity.Application;
 import edu.npu.feignClient.ApplicationServiceClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -26,7 +27,7 @@ public class ApplicationServiceClientFallbackFactory
         return new ApplicationServiceClient() {
             @Override
             public Page<Application> getApplicationPageForQuery(
-                    QueryDto queryDto, Long departmentId) {
+                    @SpringQueryMap QueryDto queryDto) {
                 log.error("调用application-api服务失败，userPayListQueryDto:{},原因：{}",
                         queryDto,
                         cause.getMessage());
