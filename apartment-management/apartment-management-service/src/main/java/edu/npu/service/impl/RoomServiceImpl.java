@@ -70,14 +70,14 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
 
     @Override
     public R updateRoom(Long id, PutRoomDto putRoomDto) {
-        Room room = this.baseMapper.selectOne(new LambdaQueryWrapper<Room>()
+        Room room = getOne(new LambdaQueryWrapper<Room>()
                 .eq(Room::getName, putRoomDto.name()));
         if (room == null) {
             return R.error("房间名[" + putRoomDto.name() + "]不存在");
         }
         Room newRoom = new Room();
         BeanUtils.copyProperties(putRoomDto, newRoom);
-        newRoom.setApartmentId(Long.valueOf(putRoomDto.apartmentId()));
+        newRoom.setId(id);
         boolean success = updateById(newRoom);
         if (success) {
             log.info("房间[" + putRoomDto.name() + "]更新成功");
@@ -124,7 +124,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
 
     @Override
     public R getRoomDetail(Long id) {
-        Room room = this.baseMapper.selectOne(new LambdaQueryWrapper<Room>()
+        Room room = getOne(new LambdaQueryWrapper<Room>()
                 .eq(Room::getId, id));
         if (room != null) {
             List<Bed> beds = bedMapper.selectList(new LambdaQueryWrapper<Bed>()

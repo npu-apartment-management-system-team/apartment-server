@@ -33,7 +33,7 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 75%
-      maxSurge: 100%
+      maxSurge: 150%
   revisionHistoryLimit: 10
   progressDeadlineSeconds: 300
 
