@@ -41,7 +41,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
         }
         Room newRoom = new Room();
         BeanUtils.copyProperties(addRoomDto, newRoom);
-        newRoom.setApartmentId(Long.valueOf(addRoomDto.apartmentId()));
+
         boolean success = save(newRoom);
         if (success) {
             log.info("房间[" + addRoomDto.name() + "]添加成功");
