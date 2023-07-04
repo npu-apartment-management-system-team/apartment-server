@@ -204,6 +204,13 @@ public class UserApplicationServiceImpl extends ServiceImpl<ApplicationMapper, A
         );
     }
 
+    @Override
+    public R getApplicationById(AccountUserDetails accountUserDetails, Integer id) {
+        preCheckAccountForUser(accountUserDetails);
+        Application application = getById(id);
+        return R.ok().put("result", application);
+    }
+
     private User getUserFromAccountUserDetails(AccountUserDetails accountUserDetails) {
         User user = userServiceClient.getUserByLoginAccountId(
                 accountUserDetails.getId());
