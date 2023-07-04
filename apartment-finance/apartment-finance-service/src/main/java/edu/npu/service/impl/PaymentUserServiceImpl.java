@@ -21,7 +21,7 @@ import edu.npu.common.AlipayTradeState;
 import edu.npu.common.RedisConstants;
 import edu.npu.common.UserPayStatusEnum;
 import edu.npu.common.UserPayTypeEnum;
-import edu.npu.dto.UserPayListQueryDto;
+import edu.npu.dto.QueryDto;
 import edu.npu.entity.AccountUserDetails;
 import edu.npu.entity.PaymentUser;
 import edu.npu.entity.User;
@@ -91,19 +91,19 @@ public class PaymentUserServiceImpl extends ServiceImpl<PaymentUserMapper, Payme
 
     @Override
     public R getPayList(AccountUserDetails accountUserDetails,
-                        UserPayListQueryDto userPayListQueryDto) {
+                        QueryDto queryDto) {
         User user = extractUser(accountUserDetails);
         Page<PaymentUser> page = new Page<>(
-                userPayListQueryDto.pageNum(), userPayListQueryDto.pageSize());
+                queryDto.pageNum(), queryDto.pageSize());
         LambdaQueryWrapper<PaymentUser> wrapper = new LambdaQueryWrapper<>();
-        if (userPayListQueryDto.beginTime() != null) {
-            wrapper.ge(PaymentUser::getCreateTime, userPayListQueryDto.beginTime());
+        if (queryDto.beginTime() != null) {
+            wrapper.ge(PaymentUser::getCreateTime, queryDto.beginTime());
         }
-        if (userPayListQueryDto.type() != null) {
-            wrapper.eq(PaymentUser::getType, userPayListQueryDto.type());
+        if (queryDto.type() != null) {
+            wrapper.eq(PaymentUser::getType, queryDto.type());
         }
-        if (userPayListQueryDto.status() != null) {
-            wrapper.le(PaymentUser::getStatus, userPayListQueryDto.status());
+        if (queryDto.status() != null) {
+            wrapper.le(PaymentUser::getStatus, queryDto.status());
         }
         wrapper.eq(PaymentUser::getUserId, user.getId());
         wrapper.orderByDesc(PaymentUser::getCreateTime);

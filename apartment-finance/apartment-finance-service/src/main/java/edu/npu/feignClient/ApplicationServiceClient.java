@@ -1,7 +1,7 @@
 package edu.npu.feignClient;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import edu.npu.dto.UserPayListQueryDto;
+import edu.npu.dto.QueryDto;
 import edu.npu.entity.Application;
 import edu.npu.feignClient.fallback.ManagementServiceClientFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -23,7 +23,8 @@ public interface ApplicationServiceClient {
 
     @GetMapping("/query/page")
     Page<Application> getApplicationPageForQuery(
-            @Validated UserPayListQueryDto userPayListQueryDto
+            @Validated QueryDto queryDto,
+            Long departmentId
     );
 
     @GetMapping("/download/list")

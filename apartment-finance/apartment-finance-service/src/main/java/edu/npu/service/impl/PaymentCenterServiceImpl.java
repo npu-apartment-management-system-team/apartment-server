@@ -1,14 +1,14 @@
 package edu.npu.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import edu.npu.common.ResponseCodeEnum;
 import edu.npu.dto.DownloadQueryDto;
-import edu.npu.dto.UserPayListQueryDto;
+import edu.npu.dto.QueryDto;
 import edu.npu.entity.Application;
 import edu.npu.entity.Department;
 import edu.npu.entity.PaymentDepartment;
-import edu.npu.exception.ApartmentError;
-import edu.npu.exception.ApartmentException;
 import edu.npu.feignClient.ApplicationServiceClient;
 import edu.npu.feignClient.ManagementServiceClient;
 import edu.npu.mapper.PaymentDepartmentMapper;
@@ -17,26 +17,17 @@ import edu.npu.util.OssUtil;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-import static edu.npu.common.RedisConstants.UPLOAD_FILE_KEY_PREFIX;
 
 /**
  * @Author: Yu
@@ -76,43 +67,15 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
     /**
      * 查看历史变动表
      *
-     * @param userPayListQueryDto 用户检索支付Dto
+     * @param queryDto 分页查询Dto
      * @return R
      */
     @Override
-    public R getVariationList(UserPayListQueryDto userPayListQueryDto) {
-
-//        Page<Application> page = new Page<>(
-//                userPayListQueryDto.pageNum(), userPayListQueryDto.pageSize());
-
-//        LambdaQueryWrapper<Application> wrapper = new LambdaQueryWrapper<>();
-//        boolean hasQuery = false;
-//
-//        if(userPayListQueryDto.beginTime() != null) {
-//            hasQuery = true;
-//            wrapper.ge(Application::getCreateTime, userPayListQueryDto.beginTime());
-//        }
-//
-//        if(userPayListQueryDto.departmentId() != null) {
-//            hasQuery = true;
-//            wrapper.inSql(Application::getUser_id, "select id from user where department_id = ${queryDto.departmentId()}");
-//        }
-//
-//        wrapper.orderByDesc(Application::getCreateTime);
-//
-//        if (hasQuery) {
-//            page = paymentApplicationMapper.selectPage(page, wrapper);
-//
-//        } else {
-//            page = paymentApplicationMapper.selectPage(page, null);
-//        }
-
-//        page = applicationMapper.selectPage(page, getApplicationLambdaQueryWrapper(
-//                userPayListQueryDto.beginTime(), userPayListQueryDto.departmentId()));
+    public R getVariationList(QueryDto queryDto) {
 
         Page<Application> page = applicationServiceClient
                 .getApplicationPageForQuery(
-                        userPayListQueryDto
+                        queryDto, queryDto.departmentId()
                 );
 
         Map<String, Object> result = Map.of(
@@ -139,57 +102,82 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
 //        variationList = applicationMapper.selectList(
 //                getApplicationLambdaQueryWrapper(downloadQueryDto.beginTime(), downloadQueryDto.departmentId()));
 
-        try (
-                // 创建workbook SXSSFWorkbook默认100行缓存
-                Workbook workbook = new SXSSFWorkbook()
-        ) {
-            // 创建sheet
-            Sheet sheet = workbook.createSheet("职工住宿历史变动表");
-            // 创建表头
-            sheet.createRow(0).createCell(0).setCellValue("变动申请ID");
-            sheet.getRow(0).createCell(1).setCellValue("职工ID");
-            sheet.getRow(0).createCell(2).setCellValue("变动类型");
-            sheet.getRow(0).createCell(3).setCellValue("变动申请url");
-            sheet.getRow(0).createCell(4).setCellValue("变动申请时间");
-            sheet.getRow(0).createCell(5).setCellValue("变动完成时间");
-            // 开始插入数据
-            for (Application tmpVariation : variationList) {
-                // 获取当前行
-                int lastRowNum = sheet.getLastRowNum();
-                // 创建行
-                sheet.createRow(lastRowNum + 1);
-                // 创建列
-                sheet.getRow(lastRowNum + 1).createCell(0).setCellValue(tmpVariation.getId());
-                sheet.getRow(lastRowNum + 1).createCell(1).setCellValue(tmpVariation.getUserId());
-                sheet.getRow(lastRowNum + 1).createCell(2).setCellValue(tmpVariation.getType());
-                sheet.getRow(lastRowNum + 1).createCell(3).setCellValue(tmpVariation.getFileUrl());
-                sheet.getRow(lastRowNum + 1).createCell(4).setCellValue(tmpVariation.getCreateTime());
-                sheet.getRow(lastRowNum + 1).createCell(5).setCellValue(tmpVariation.getUpdateTime());
+//        try (
+//                // 创建workbook SXSSFWorkbook默认100行缓存
+//                Workbook workbook = new SXSSFWorkbook()
+//        ) {
+//            // 创建sheet
+//            Sheet sheet = workbook.createSheet("职工住宿历史变动表");
+//            // 创建表头
+//            sheet.createRow(0).createCell(0).setCellValue("变动申请ID");
+//            sheet.getRow(0).createCell(1).setCellValue("职工ID");
+//            sheet.getRow(0).createCell(2).setCellValue("变动类型");
+//            sheet.getRow(0).createCell(3).setCellValue("变动申请url");
+//            sheet.getRow(0).createCell(4).setCellValue("变动申请时间");
+//            sheet.getRow(0).createCell(5).setCellValue("变动完成时间");
+//            // 开始插入数据
+//            for (Application tmpVariation : variationList) {
+//                // 获取当前行
+//                int lastRowNum = sheet.getLastRowNum();
+//                // 创建行
+//                sheet.createRow(lastRowNum + 1);
+//                // 创建列
+//                sheet.getRow(lastRowNum + 1).createCell(0).setCellValue(tmpVariation.getId());
+//                sheet.getRow(lastRowNum + 1).createCell(1).setCellValue(tmpVariation.getUserId());
+//                sheet.getRow(lastRowNum + 1).createCell(2).setCellValue(tmpVariation.getType());
+//                sheet.getRow(lastRowNum + 1).createCell(3).setCellValue(tmpVariation.getFileUrl());
+//                sheet.getRow(lastRowNum + 1).createCell(4).setCellValue(tmpVariation.getCreateTime());
+//                sheet.getRow(lastRowNum + 1).createCell(5).setCellValue(tmpVariation.getUpdateTime());
+//
+//            }
+//            File file = File.createTempFile(
+//                    "职工住宿历史变动表_" + downloadQueryDto.beginTime(),
+//                    ".xlsx"
+//            );
+//            String url = uploadFileToOss(workbook, file);
 
-            }
-            File file = File.createTempFile(
-                    "职工住宿历史变动表_" + downloadQueryDto.beginTime(),
-                    ".xlsx"
-            );
-            String url = uploadFileToOss(workbook, file);
+        String url = ossUtil.downloadVariationList(variationList, downloadQueryDto, BASE_DIR);
 
-            return StringUtils.hasText(url) ?
-                    R.ok().put("result", url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
-        } catch (IOException e) {
-            throw new ApartmentException(FAILED_GENERATE_VARIATION_LIST_MSG);
-        }
+        return StringUtils.hasText(url) ?
+                R.ok().put("result", url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
 
     }
 
     /**
      * 查看外部单位代扣缴费情况
      *
-     * @param userPayListQueryDto 用户缴费列表查询Dto
+     * @param queryDto 外部单位代扣缴费列表查询Dto
      * @return R
      */
     @Override
-    public R getWithholdList(UserPayListQueryDto userPayListQueryDto) {
-        return null;
+    public R getWithholdList(QueryDto queryDto) {
+
+        IPage<PaymentDepartment> page = new Page<>(
+                queryDto.pageNum(), queryDto.pageSize());
+
+        LambdaQueryWrapper<PaymentDepartment> wrapper = new LambdaQueryWrapper<>();
+        //boolean hasQuery = false;
+
+        if (queryDto.beginTime() != null) {
+            //hasQuery = true;
+            wrapper.ge(PaymentDepartment::getCreateTime, queryDto.beginTime());
+        }
+
+        if (queryDto.departmentId() != null) {
+            //hasQuery = true;
+            wrapper.eq(PaymentDepartment::getDepartmentId, queryDto.departmentId());
+        }
+
+        wrapper.orderByDesc(PaymentDepartment::getDepartmentId);
+        wrapper.orderByDesc(PaymentDepartment::getCreateTime);
+
+        page = paymentDepartmentMapper.selectPage(page, wrapper);
+
+        Map<String, Object> result = Map.of(
+                "total", page.getTotal(),
+                "list", page.getRecords()
+        );
+        return R.ok(result);
     }
 
     /**
@@ -219,8 +207,10 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
         }
 
         //封装payment信息
+        payment.put("createTime", paymentDepartment.getCreateTime());
         payment.put("price", paymentDepartment.getPrice());
         payment.put("hasPaid", paymentDepartment.getHasPaid());
+        payment.put("payTime", paymentDepartment.getPayTime());
 
         resultMap.put("department", department);
         resultMap.put("payment", payment);
@@ -236,17 +226,22 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
      */
     @Override
     public R downloadWithholdList(DownloadQueryDto downloadQueryDto) {
+        // 根据条件查询历史变动表 生成EXCEL 存储到OSS
+        List<PaymentDepartment> withholdList = paymentDepartmentMapper.selectList(null);
+//        variationList = applicationMapper.selectList(
+//                getApplicationLambdaQueryWrapper(downloadQueryDto.beginTime(), downloadQueryDto.departmentId()));
+
         return null;
     }
 
     /**
      * 查看自收缴费情况
      *
-     * @param userPayListQueryDto 缴费列表查询Dto
+     * @param queryDto 缴费列表查询Dto
      * @return R
      */
     @Override
-    public R getChargeList(UserPayListQueryDto userPayListQueryDto) {
+    public R getChargeList(QueryDto queryDto) {
         return null;
     }
 
@@ -280,14 +275,13 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
      * @param departmentId 部门ID
      * @return R
      */
-    /*@Nullable
-    private LambdaQueryWrapper<Application> getApplicationLambdaQueryWrapper(Date beginTime, Long departmentId) {
-        LambdaQueryWrapper<Application> wrapper = new LambdaQueryWrapper<>();
+    /*private LambdaQueryWrapper<PaymentDepartment> getPaymentLambdaQueryWrapper(Date beginTime, Long departmentId) {
+        LambdaQueryWrapper<PaymentDepartment> wrapper = new LambdaQueryWrapper<>();
         boolean hasQuery = false;
 
         if (beginTime != null) {
             hasQuery = true;
-            wrapper.ge(Application::getCreateTime, beginTime);
+            wrapper.ge(PaymentDepartment::getCreateTime, beginTime);
         }
 
         if (departmentId != null) {
@@ -310,42 +304,42 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
      * @param file     本地生成的文件
      * @return 上传后回传地址
      */
-    private String uploadFileToOss(Workbook workbook, File file) {
-        try (
-                FileOutputStream fileOutputStream = new FileOutputStream(file)
-        ) {
-            // 保存到OSS 参数为一个File
-            workbook.write(fileOutputStream);
-            // 上传到OSS
-            String url = ossUtil.uploadFile(PaymentCenterServiceImpl.BASE_DIR, file);
-            if (StringUtils.hasText(url)) {
-                // 上传成功
-                log.info("上传到OSS成功,file:{}", file.getName());
-                cachedThreadPool.execute(() -> {
-                    String currentDate =
-                            new SimpleDateFormat(SIMPLE_DATE_FORMAT).format(new Date());
-                    stringRedisTemplate.opsForList()
-                            .leftPush(
-                                    UPLOAD_FILE_KEY_PREFIX + currentDate,
-                                    file.getName()
-                            );
-                    // 设置整个LIST的过期时间
-                    stringRedisTemplate.expire(
-                            UPLOAD_FILE_KEY_PREFIX + currentDate,
-                            2,
-                            TimeUnit.DAYS
-                    );
-                });
-                // 删除临时文件
-                file.deleteOnExit();
-                return url;
-
-            } else {
-                throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "上传到OSS失败");
-            }
-        } catch (IOException e) {
-            log.error("上传到OSS失败,file:{}", file.getName());
-            throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "上传到OSS失败");
-        }
-    }
+//    private String uploadFileToOss(Workbook workbook, File file) {
+//        try (
+//                FileOutputStream fileOutputStream = new FileOutputStream(file)
+//        ) {
+//            // 保存到OSS 参数为一个File
+//            workbook.write(fileOutputStream);
+//            // 上传到OSS
+//            String url = ossUtil.uploadFile(PaymentCenterServiceImpl.BASE_DIR, file);
+//            if (StringUtils.hasText(url)) {
+//                // 上传成功
+//                log.info("上传到OSS成功,file:{}", file.getName());
+//                cachedThreadPool.execute(() -> {
+//                    String currentDate =
+//                            new SimpleDateFormat(SIMPLE_DATE_FORMAT).format(new Date());
+//                    stringRedisTemplate.opsForList()
+//                            .leftPush(
+//                                    UPLOAD_FILE_KEY_PREFIX + currentDate,
+//                                    file.getName()
+//                            );
+//                    // 设置整个LIST的过期时间
+//                    stringRedisTemplate.expire(
+//                            UPLOAD_FILE_KEY_PREFIX + currentDate,
+//                            2,
+//                            TimeUnit.DAYS
+//                    );
+//                });
+//                // 删除临时文件
+//                file.deleteOnExit();
+//                return url;
+//
+//            } else {
+//                throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "上传到OSS失败");
+//            }
+//        } catch (IOException e) {
+//            log.error("上传到OSS失败,file:{}", file.getName());
+//            throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "上传到OSS失败");
+//        }
+//    }
 }

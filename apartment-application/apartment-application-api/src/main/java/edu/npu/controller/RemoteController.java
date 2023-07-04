@@ -3,6 +3,7 @@ package edu.npu.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import edu.npu.dto.UserPayListQueryDto;
+import edu.npu.entity.Admin;
 import edu.npu.entity.Application;
 import edu.npu.mapper.ApplicationMapper;
 import jakarta.annotation.Nullable;
@@ -29,12 +30,13 @@ public class RemoteController {
 
     @GetMapping("/query/page")
     public Page<Application> getApplicationPageForQuery(
-            @Validated UserPayListQueryDto userPayListQueryDto
+            @Validated UserPayListQueryDto userPayListQueryDto,
+            Long departmentId
     ) {
         Page<Application> page = new Page<>(
                 userPayListQueryDto.pageNum(), userPayListQueryDto.pageSize());
        return applicationMapper.selectPage(page, getApplicationLambdaQueryWrapper(
-                userPayListQueryDto.beginTime(), userPayListQueryDto.departmentId()));
+                userPayListQueryDto.beginTime(), departmentId));
     }
 
     @GetMapping("/download/list")

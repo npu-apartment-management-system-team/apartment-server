@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 
 //UserPayListQueryDto
-public record UserPayListQueryDto (
+public record QueryDto(
         @NotNull(message = "pageNum不能为空")
         Integer pageNum,
 
