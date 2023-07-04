@@ -7,6 +7,7 @@ import edu.npu.entity.Application;
 import edu.npu.mapper.ApplicationMapper;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,8 +30,8 @@ public class RemoteController {
 
     @GetMapping("/query/page")
     public Page<Application> getApplicationPageForQuery(
-            @Validated UserPayListQueryDto userPayListQueryDto,
-            Long departmentId
+            @Validated @SpringQueryMap UserPayListQueryDto userPayListQueryDto,
+            @RequestParam(value = "departmentId") Long departmentId
     ) {
         Page<Application> page = new Page<>(
                 userPayListQueryDto.pageNum(), userPayListQueryDto.pageSize());

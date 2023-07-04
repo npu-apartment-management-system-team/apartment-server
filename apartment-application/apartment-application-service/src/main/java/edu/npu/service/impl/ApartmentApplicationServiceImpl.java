@@ -97,6 +97,7 @@ public class ApartmentApplicationServiceImpl extends ServiceImpl<ApplicationMapp
         } else if(application.getApplicationStatus().equals(CHECK_OUT_SUBMIT.getValue())) {
             application.setApplicationStatus(CHECK_OUT_COMPLETE.getValue());
             user.setStatus(UserStatusEnum.NOT_CHECK_IN.getValue());
+            user.setBedId(null);
             updateUser = userServiceClient.updateUser(user);
 
             boolean refund = financeServiceClient.refundDepositCharge(user.getId());
