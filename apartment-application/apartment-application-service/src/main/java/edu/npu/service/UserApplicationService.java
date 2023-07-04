@@ -20,4 +20,6 @@ public interface UserApplicationService extends IService<Application> {
     R handleSaveUserApplication(AccountUserDetails accountUserDetails, UserApplicationDto userApplicationDto);
 
     R handleWithdrawApplication(AccountUserDetails accountUserDetails, Integer id);
+
+    R getApplicationStatusById(AccountUserDetails accountUserDetails, Integer id);
 }

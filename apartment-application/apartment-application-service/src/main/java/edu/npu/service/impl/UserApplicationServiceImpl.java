@@ -204,6 +204,17 @@ public class UserApplicationServiceImpl extends ServiceImpl<ApplicationMapper, A
         );
     }
 
+    @Override
+    public R getApplicationStatusById(AccountUserDetails accountUserDetails, Integer id) {
+        preCheckAccountForUser(accountUserDetails);
+        User user = getUserFromAccountUserDetails(accountUserDetails);
+        Application application = getById(id);
+        if (!application.getUserId().equals(user.getId())) {
+            throw new ApartmentException(ApartmentError.OBJECT_NULL, "该申请不属于该用户");
+        }
+        return R.ok().put("result", application.getApplicationStatus());
+    }
+
     private User getUserFromAccountUserDetails(AccountUserDetails accountUserDetails) {
         User user = userServiceClient.getUserByLoginAccountId(
                 accountUserDetails.getId());

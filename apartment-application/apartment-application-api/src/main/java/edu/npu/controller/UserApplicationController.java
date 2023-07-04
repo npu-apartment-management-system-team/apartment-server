@@ -40,10 +40,20 @@ public class UserApplicationController {
     }
 
     @PutMapping("/apply/{id}")
+    @PreAuthorize("hasAuthority('USER')")
     public R handleWithdrawApplication(
             @AuthenticationPrincipal AccountUserDetails accountUserDetails,
             @PathVariable(value = "id") Integer id) {
         return userApplicationService.handleWithdrawApplication(
+                accountUserDetails, id);
+    }
+
+    @GetMapping("/apply/status/{id}")
+    @PreAuthorize("hasAuthority('USER')")
+    public R getApplicationStatusById(
+            @AuthenticationPrincipal AccountUserDetails accountUserDetails,
+            @PathVariable(value = "id") Integer id) {
+        return userApplicationService.getApplicationStatusById(
                 accountUserDetails, id);
     }
 }
