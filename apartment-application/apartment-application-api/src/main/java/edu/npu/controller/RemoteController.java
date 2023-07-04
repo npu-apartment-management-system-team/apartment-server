@@ -3,7 +3,6 @@ package edu.npu.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import edu.npu.dto.UserPayListQueryDto;
-import edu.npu.entity.Admin;
 import edu.npu.entity.Application;
 import edu.npu.mapper.ApplicationMapper;
 import jakarta.annotation.Nullable;
