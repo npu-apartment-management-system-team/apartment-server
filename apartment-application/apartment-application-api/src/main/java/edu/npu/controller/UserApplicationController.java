@@ -50,10 +50,10 @@ public class UserApplicationController {
 
     @GetMapping("/apply/status/{id}")
     @PreAuthorize("hasAuthority('USER')")
-    public R getApplicationStatusById(
+    public R getApplicationById(
             @AuthenticationPrincipal AccountUserDetails accountUserDetails,
             @PathVariable(value = "id") Integer id) {
-        return userApplicationService.getApplicationStatusById(
+        return userApplicationService.getApplicationById(
                 accountUserDetails, id);
     }
 }

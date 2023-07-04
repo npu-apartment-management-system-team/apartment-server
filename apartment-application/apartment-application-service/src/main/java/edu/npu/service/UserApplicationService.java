@@ -21,5 +21,5 @@ public interface UserApplicationService extends IService<Application> {
 
     R handleWithdrawApplication(AccountUserDetails accountUserDetails, Integer id);
 
-    R getApplicationStatusById(AccountUserDetails accountUserDetails, Integer id);
+    R getApplicationById(AccountUserDetails accountUserDetails, Integer id);
 }
