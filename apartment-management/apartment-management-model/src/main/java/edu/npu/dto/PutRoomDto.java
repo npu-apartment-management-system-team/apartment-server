@@ -4,15 +4,15 @@ import jakarta.validation.constraints.NotNull;
 
 public record PutRoomDto(
         @NotNull
-        String apartmentId,
+        Long apartmentId,
         @NotNull
         String name,
         @NotNull
         String usage,
         @NotNull
-        Boolean isForCadre,
+        Integer isForCadre,
         @NotNull
-        Boolean isReserved,
+        Integer isReserved,
         @NotNull
         Integer sex,
         @NotNull

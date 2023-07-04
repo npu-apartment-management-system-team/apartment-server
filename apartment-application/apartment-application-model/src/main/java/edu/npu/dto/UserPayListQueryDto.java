@@ -2,6 +2,7 @@ package edu.npu.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -14,6 +15,7 @@ public record UserPayListQueryDto(
         Integer pageSize,
 
         @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
         Date beginTime,
 
         Integer type,

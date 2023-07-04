@@ -94,7 +94,8 @@ public class BedServiceImpl extends ServiceImpl<BedMapper, Bed>
     @Override
     public R getBedById(BedQueryDto bedQueryDto) {
         return bedMapper.selectById(bedQueryDto.id()) == null ?
-                R.error("查询失败！") : R.ok().put("result", bedMapper.selectById(bedQueryDto.id()));
+                R.error("查询失败！") :
+                R.ok().put("result", bedMapper.selectById(bedQueryDto.id()));
     }
 
     @Override
@@ -109,6 +110,7 @@ public class BedServiceImpl extends ServiceImpl<BedMapper, Bed>
     public R updateBed(Long id, UpdateBedDto updateBedDto) {
         Bed bed = bedMapper.selectById(id);
         BeanUtils.copyProperties(updateBedDto,bed);
+        bed.setId(id);
         return bedMapper.updateById(bed) == 1 ?
                 R.ok("修改成功!") : R.error("修改失败!");
     }
