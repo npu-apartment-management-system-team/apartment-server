@@ -30,12 +30,13 @@ public class BedController {
     }
 
     @PostMapping
-    public R addBed(AddBedDto addBedDto){
+    public R addBed(@RequestBody AddBedDto addBedDto){
         return bedService.addBed(addBedDto);
     }
 
     @PutMapping("{id}")
-    public R updateBed(@PathVariable("id") Long id, UpdateBedDto updateBedDto){
+    public R updateBed(@PathVariable("id") Long id,
+                       @RequestBody UpdateBedDto updateBedDto){
         return bedService.updateBed(id, updateBedDto);
     }
 
