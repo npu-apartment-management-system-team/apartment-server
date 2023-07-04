@@ -52,6 +52,12 @@ public class PaymentDepartment implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private Date payTime;
 
+    /**
+     * 缴费月份
+     */
+    @JsonFormat(pattern = "yyyy-MM", timezone = "GMT+8")
+    private Date createTime;
+
     @TableField(exist = false)
     @Serial
     private static final long serialVersionUID = 1L;

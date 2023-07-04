@@ -11,10 +11,11 @@
             <result property="hasPaid" column="has_paid" jdbcType="TINYINT"/>
             <result property="chequeId" column="cheque_id" jdbcType="VARCHAR"/>
             <result property="payTime" column="pay_time" jdbcType="TIMESTAMP"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,department_id,price,
-        has_paid,cheque_id,pay_time
+        has_paid,cheque_id,pay_time,create_time
     </sql>
 </mapper>

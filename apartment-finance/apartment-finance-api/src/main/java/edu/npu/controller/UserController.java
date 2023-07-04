@@ -1,6 +1,6 @@
 package edu.npu.controller;
 
-import edu.npu.dto.UserPayListQueryDto;
+import edu.npu.dto.QueryDto;
 import edu.npu.entity.AccountUserDetails;
 import edu.npu.service.PaymentUserService;
 import edu.npu.vo.R;
@@ -26,8 +26,8 @@ public class UserController {
 
     @GetMapping("/pay/list")
     public R getPayList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
-                        @Validated UserPayListQueryDto userPayListQueryDto) {
-        return paymentUserService.getPayList(accountUserDetails, userPayListQueryDto);
+                        @Validated QueryDto queryDto) {
+        return paymentUserService.getPayList(accountUserDetails, queryDto);
     }
 
     @PostMapping("/pay/{id}")

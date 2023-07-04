@@ -1,7 +1,7 @@
 package edu.npu.service;
 
 import edu.npu.dto.DownloadQueryDto;
-import edu.npu.dto.UserPayListQueryDto;
+import edu.npu.dto.QueryDto;
 import edu.npu.vo.R;
 
 /**
@@ -12,10 +12,10 @@ public interface PaymentCenterService {
 
     /**
      * 查看历史变动表
-     * @param userPayListQueryDto
+     * @param queryDto
      * @return
      */
-    R getVariationList(UserPayListQueryDto userPayListQueryDto);
+    R getVariationList(QueryDto queryDto);
 
     /**
      * 下载历史变动表
@@ -26,10 +26,10 @@ public interface PaymentCenterService {
 
     /**
      * 查看外部单位代扣缴费情况
-     * @param userPayListQueryDto
+     * @param queryDto
      * @return
      */
-    R getWithholdList(UserPayListQueryDto userPayListQueryDto);
+    R getWithholdList(QueryDto queryDto);
 
     /**
      * 查看某条代扣缴费具体情况
@@ -47,10 +47,10 @@ public interface PaymentCenterService {
 
     /**
      * 查看自收缴费情况
-     * @param userPayListQueryDto
+     * @param queryDto
      * @return
      */
-    R getChargeList(UserPayListQueryDto userPayListQueryDto);
+    R getChargeList(QueryDto queryDto);
 
     /**
      * 查看每条自收缴费具体情况

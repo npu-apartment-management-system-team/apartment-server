@@ -1,7 +1,7 @@
 package edu.npu.feignClient.fallback;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import edu.npu.dto.UserPayListQueryDto;
+import edu.npu.dto.QueryDto;
 import edu.npu.entity.Application;
 import edu.npu.feignClient.ApplicationServiceClient;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +26,9 @@ public class ApplicationServiceClientFallbackFactory
         return new ApplicationServiceClient() {
             @Override
             public Page<Application> getApplicationPageForQuery(
-                    UserPayListQueryDto userPayListQueryDto) {
+                    QueryDto queryDto, Long departmentId) {
                 log.error("调用application-api服务失败，userPayListQueryDto:{},原因：{}",
-                        userPayListQueryDto,
+                        queryDto,
                         cause.getMessage());
                 return null;
             }
