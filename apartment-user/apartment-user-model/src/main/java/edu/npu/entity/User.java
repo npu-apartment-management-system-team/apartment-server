@@ -1,6 +1,7 @@
 package edu.npu.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
 import java.io.Serial;
@@ -22,16 +23,19 @@ public class User implements Serializable {
     /**
      * 逻辑外键，与login_account表中id字段构成一一对应关系。也是用户的手机号
      */
+    @JsonAlias(value = "login_account_id")
     private Long loginAccountId;
 
     /**
      * 逻辑外键。用户所在外部单位ID。
      */
+    @JsonAlias(value = "department_id")
     private Long departmentId;
 
     /**
      * 逻辑外键。与bed表对应的床ID。
      */
+    @JsonAlias(value = "bed_id")
     private Long bedId;
 
     /**
@@ -42,26 +46,31 @@ public class User implements Serializable {
     /**
      * 身份证号
      */
+    @JsonAlias(value = "personal_id")
     private String personalId;
 
     /**
      * 身份证正面照片存储URL
      */
+    @JsonAlias(value = "personal_card_url")
     private String personalCardUrl;
 
     /**
      * 人脸在阿里云人脸库中的ID
      */
+    @JsonAlias(value = "face_id")
     private String faceId;
 
     /**
      * 职工人脸照片URL
      */
+    @JsonAlias(value = "face_url")
     private String faceUrl;
 
     /**
      * 职工支付宝uuid
      */
+    @JsonAlias(value = "alipay_id")
     private String alipayId;
 
     /**
@@ -77,6 +86,7 @@ public class User implements Serializable {
     /**
      * 是否处级干部 0非 1是
      */
+    @JsonAlias(value = "is_cadre")
     private Integer isCadre;
 
     /**
@@ -87,17 +97,20 @@ public class User implements Serializable {
     /**
      * 缴费类型 0代扣 1自收
      */
+    @JsonAlias(value = "pay_type")
     private Integer payType;
 
     /**
      * 是否需要缴纳网费 0非 1是
      */
+    @JsonAlias(value = "network_enabled")
     private Integer networkEnabled;
 
     /**
      * 账号是否已删除 0未删除 1已删除
      */
     @TableLogic(value = "0", delval = "1")
+    @JsonAlias(value = "is_deleted")
     private Integer isDeleted;
 
     @Serial

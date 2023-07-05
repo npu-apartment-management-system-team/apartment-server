@@ -7,14 +7,9 @@ import edu.npu.service.PaymentDepartmentService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * @author : [wangminan]
@@ -28,25 +23,23 @@ public class DepartmentController {
     @Resource
     private PaymentDepartmentService paymentDepartmentService;
 
-    @InitBinder  //解决前段传过来时间的字符串解析成时间报错问题
-    public void initBinder(WebDataBinder webDataBinder){
-        webDataBinder.registerCustomEditor(Date.class,new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"),true));
-    }
-
     @GetMapping("/variation")
-    public R getVariationList(@AuthenticationPrincipal AccountUserDetails accountUserDetails, @Validated QueryDto queryDto)  {
+    public R getVariationList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+                              @Validated QueryDto queryDto)  {
         return paymentDepartmentService.getVariationList(accountUserDetails, queryDto);
     }
 
 
     @GetMapping("/variation/download")
-    R downloadVariationList(@AuthenticationPrincipal AccountUserDetails accountUserDetails, DownloadQueryDto downloadQueryDto) {
+    R downloadVariationList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+                            DownloadQueryDto downloadQueryDto) {
         return paymentDepartmentService.downloadVariationList(accountUserDetails, downloadQueryDto);
     }
 
 
     @GetMapping("/withhold")
-    R getWithholdList(@AuthenticationPrincipal AccountUserDetails accountUserDetails, QueryDto queryDto) {
+    R getWithholdList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+                      QueryDto queryDto) {
         return paymentDepartmentService.getWithholdList(accountUserDetails, queryDto);
     }
 
@@ -58,13 +51,15 @@ public class DepartmentController {
 
 
     @GetMapping("/withhold/download")
-    R downloadWithholdList(@AuthenticationPrincipal AccountUserDetails accountUserDetails, DownloadQueryDto downloadQueryDto) {
+    R downloadWithholdList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+                           DownloadQueryDto downloadQueryDto) {
         return paymentDepartmentService.downloadWithholdList(accountUserDetails, downloadQueryDto);
     }
 
 
     @GetMapping("/charge")
-    R getChargeList(@AuthenticationPrincipal AccountUserDetails accountUserDetails, QueryDto queryDto) {
+    R getChargeList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+                    QueryDto queryDto) {
         return paymentDepartmentService.getChargeList(accountUserDetails, queryDto);
     }
 
@@ -76,12 +71,14 @@ public class DepartmentController {
 
 
     @GetMapping("/charge/download")
-    R downloadChargeList(@AuthenticationPrincipal AccountUserDetails accountUserDetails, DownloadQueryDto downloadQueryDto) {
+    R downloadChargeList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+                         DownloadQueryDto downloadQueryDto) {
         return paymentDepartmentService.downloadChargeList(accountUserDetails, downloadQueryDto);
     }
 
     @PostMapping("/pay/{id}")
-    R postChequeId(@AuthenticationPrincipal AccountUserDetails accountUserDetails, @PathVariable("id") Long id, @RequestParam String chequeId) {
+    R postChequeId(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+                   @PathVariable("id") Long id, @RequestParam String chequeId) {
         return paymentDepartmentService.postChequeId(accountUserDetails, id, chequeId);
     }
 }
