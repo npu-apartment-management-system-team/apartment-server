@@ -32,7 +32,8 @@ public class ApplicationServiceClientFallbackFactory
                     @RequestParam(value = "pageSize", required = true) Integer pageSize,
                     @RequestParam(value = "beginTime", required = false) Date beginTime,
                     @RequestParam(value = "departmentId", required = false) Long departmentId) {
-                log.error("调用application-api服务失败，userPayListQueryDto:{},原因：{}",
+                log.error("调用application-api服务失败，pageNum:{},pageSize:{}," +
+                                "beginTime:{},departmentId:{},原因：{}",
                         pageNum,
                         pageSize,
                         beginTime,

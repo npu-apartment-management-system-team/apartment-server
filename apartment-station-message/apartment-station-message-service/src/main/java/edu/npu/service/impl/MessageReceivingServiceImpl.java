@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.npu.common.RoleEnum;
 import edu.npu.entity.AccountUserDetails;
+import edu.npu.entity.Admin;
 import edu.npu.entity.MessageDetail;
 import edu.npu.entity.MessageReceiving;
 import edu.npu.feignClient.UserServiceClient;
@@ -14,6 +15,8 @@ import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 /**
  * @author wangminan
@@ -33,7 +36,8 @@ public class MessageReceivingServiceImpl extends ServiceImpl<MessageReceivingMap
 
     @Override
     public R getMessageDetail(AccountUserDetails accountUserDetails, String id) {
-        MessageDetail messageDetail = messageDetailMapper.selectOne(new LambdaQueryWrapper<MessageDetail>()
+        MessageDetail messageDetail = messageDetailMapper.selectOne(
+                new LambdaQueryWrapper<MessageDetail>()
                 .eq(MessageDetail::getId, id)
                 .eq(MessageDetail::getIsWithdrawn, 0));
         if (messageDetail == null) {
@@ -41,7 +45,8 @@ public class MessageReceivingServiceImpl extends ServiceImpl<MessageReceivingMap
             return R.error("id[" + id + "]的信息不存在或被撤回");
         }
 
-        MessageReceiving messageReceiving = ownWaytoGetMessageReceiving(accountUserDetails, id);
+        MessageReceiving messageReceiving =
+                ownWaytoGetMessageReceiving(accountUserDetails, id);
 
         if (messageReceiving == null) {
             log.error("id[{}]的信息与message_receiving表关联的信息不存在或已删除", id);
@@ -49,8 +54,12 @@ public class MessageReceivingServiceImpl extends ServiceImpl<MessageReceivingMap
         }
         messageReceiving.setIsAcked(1);
         this.updateById(messageReceiving);
-        return R.ok().put("result", messageDetail);
-
+        Admin sender = userServiceClient.getAdminById(messageDetail.getSenderAdminId());
+        Map<String,Object> result = Map.of(
+                "messageDetail", messageDetail,
+                "senderAdmin", sender
+        );
+        return R.ok(result);
     }
 
 
@@ -75,14 +84,18 @@ public class MessageReceivingServiceImpl extends ServiceImpl<MessageReceivingMap
 
         MessageReceiving messageReceiving;
         if (accountUserDetails.getRole() == RoleEnum.USER.getValue()) {
-            Long userId = userServiceClient.getUserByLoginAccountId(accountUserDetails.getId()).getId();
-            messageReceiving = this.baseMapper.selectOne(new LambdaQueryWrapper<MessageReceiving>()
+            Long userId =
+                    userServiceClient.getUserByLoginAccountId(accountUserDetails.getId()).getId();
+            messageReceiving =
+                    this.baseMapper.selectOne(new LambdaQueryWrapper<MessageReceiving>()
                     .eq(MessageReceiving::getMessageDetailId, id)
                     .eq(MessageReceiving::getIsDeleted, 0)
                     .eq(MessageReceiving::getReceiverUserId, userId));
         } else {
-            Long adminId = userServiceClient.getAdminByLoginAccountId(accountUserDetails.getId()).getId();
-            messageReceiving = this.baseMapper.selectOne(new LambdaQueryWrapper<MessageReceiving>()
+            Long adminId =
+                    userServiceClient.getAdminByLoginAccountId(accountUserDetails.getId()).getId();
+            messageReceiving =
+                    this.baseMapper.selectOne(new LambdaQueryWrapper<MessageReceiving>()
                     .eq(MessageReceiving::getMessageDetailId, id)
                     .eq(MessageReceiving::getIsDeleted, 0)
                     .eq(MessageReceiving::getReceiverAdminId, adminId));

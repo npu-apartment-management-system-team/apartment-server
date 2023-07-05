@@ -22,14 +22,13 @@ public class ReceiverController {
     private MessageReceivingService messageReceivingService;
 
     @GetMapping("/inbox/detail")
-    @PreAuthorize("hasAuthority('USER')")
     public R getMessageDetail(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                                   @RequestParam String id) {
         return messageReceivingService.getMessageDetail(accountUserDetails,id);
     }
 
     @DeleteMapping("/inbox/{id}")
-    @PreAuthorize("hasAuthority('USER')")
+    @Deprecated
     public R DeleteMessage(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                            @PathVariable String id) {
         return messageReceivingService.deleteMessage(accountUserDetails,id);
