@@ -49,8 +49,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static edu.npu.common.AlipayRequestConstants.OUT_TRADE_NUMBER;
 import static edu.npu.common.PaymentConstants.PAY_MESSAGE_TTL;
