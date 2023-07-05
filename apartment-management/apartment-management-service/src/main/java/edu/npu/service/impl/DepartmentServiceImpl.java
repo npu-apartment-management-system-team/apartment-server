@@ -194,7 +194,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
         try {
             /*
-            查询
+            查询所有department
              */
             List<Department> departmentSimpleList = departmentMapper.selectList(
                     new LambdaQueryWrapper<Department>()

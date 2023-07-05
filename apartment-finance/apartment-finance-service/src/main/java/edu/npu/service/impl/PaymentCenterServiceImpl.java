@@ -26,8 +26,9 @@ import java.util.Map;
 
 
 /**
- * @Author: Yu
- * @Date: 2023/7/3
+ * @Author : Yu
+ * @Date : 2023/7/3
+ * @description : 房间公寓段财务人员service实现类
  */
 @Slf4j
 @Service
@@ -66,7 +67,7 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
      * 查看历史变动表
      *
      * @param queryDto 分页查询Dto
-     * @return R
+     * @return R 历史变动表
      */
     @Override
     public R getVariationList(QueryDto queryDto) {
@@ -88,17 +89,18 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
      * 下载历史变动表
      *
      * @param downloadQueryDto 下载查询Dto
-     * @return R
+     * @return R 下载地址url
      */
     @Override
     public R downloadVariationList(DownloadQueryDto downloadQueryDto) {
 
-        // 根据条件查询历史变动表 生成EXCEL 存储到OSS
+        // 根据条件查询历史变动表
         List<Application> variationList = applicationServiceClient
                 .getApplicationListForDownload(
                         downloadQueryDto.beginTime(),
                         downloadQueryDto.departmentId());
 
+        // 生成EXCEL 存储到OSS
         String url = ossUtil.downloadVariationList(variationList, downloadQueryDto.beginTime(), downloadQueryDto.departmentId(), BASE_DIR);
 
         return StringUtils.hasText(url) ?
@@ -110,7 +112,7 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
      * 查看外部单位代扣缴费情况
      *
      * @param queryDto 外部单位代扣缴费列表查询Dto
-     * @return R
+     * @return R 单位代扣缴费情况表
      */
     @Override
     public R getWithholdList(QueryDto queryDto) {
@@ -120,6 +122,9 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
 
         LambdaQueryWrapper<PaymentDepartment> wrapper = new LambdaQueryWrapper<>();
 
+        /*
+        构建wrapper
+         */
         if (queryDto.beginTime() != null) {
             wrapper.ge(PaymentDepartment::getCreateTime, queryDto.beginTime());
         }
@@ -128,7 +133,6 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
             wrapper.eq(PaymentDepartment::getDepartmentId, queryDto.departmentId());
         }
 
-        wrapper.orderByDesc(PaymentDepartment::getDepartmentId);
         wrapper.orderByDesc(PaymentDepartment::getCreateTime);
 
         page = paymentDepartmentMapper.selectPage(page, wrapper);
@@ -143,14 +147,13 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
     /**
      * 查看某条代扣缴费具体情况
      *
-     * @param id 外部单位id
-     * @return R
+     * @param id 该条代扣缴费id
+     * @return R 该条代扣缴费具体情况
      */
     @Override
     public R getWithholdDetailById(Long id) {
 
         Map<String, Object> resultMap = new HashMap<>();
-
 
         /*
         获取外部单位
@@ -176,20 +179,23 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
      * 下载外部单位代扣表
      *
      * @param downloadQueryDto 下载Dto
-     * @return R
+     * @return R 代扣表url
      */
     @Override
     public R downloadWithholdList(DownloadQueryDto downloadQueryDto) {
 
         LambdaQueryWrapper<PaymentDepartment> wrapper = new LambdaQueryWrapper<>();
 
+        /*
+        构建wrapper
+         */
         if(downloadQueryDto.beginTime() != null) {
             wrapper.ge(PaymentDepartment::getCreateTime, downloadQueryDto.beginTime());
         }
         if(downloadQueryDto.departmentId() != null) {
             wrapper.eq(PaymentDepartment::getDepartmentId, downloadQueryDto.departmentId());
         }
-        wrapper.orderByDesc(PaymentDepartment::getDepartmentId);
+
         wrapper.orderByDesc(PaymentDepartment::getCreateTime);
 
         List<PaymentDepartment> withholdList = paymentDepartmentMapper.selectList(wrapper);
@@ -206,7 +212,7 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
      * 查看自收缴费情况
      *
      * @param queryDto 缴费列表查询Dto
-     * @return R
+     * @return R 自收缴费列表
      */
     @Override
     public R getChargeList(QueryDto queryDto) {
@@ -215,6 +221,9 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
 
         LambdaQueryWrapper<PaymentUser> wrapper = new LambdaQueryWrapper<>();
 
+        /*
+        构建wrapper
+         */
         if (queryDto.beginTime() != null) {
             wrapper.ge(PaymentUser::getCreateTime, queryDto.beginTime());
         }
@@ -239,7 +248,7 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
      * 查看每条自收缴费具体情况
      *
      * @param id 缴费记录ID
-     * @return R
+     * @return R 该条自收缴费具体内容
      */
     @Override
     public R getChargeDetailById(Long id) {
@@ -267,7 +276,7 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
      * 下载自收表
      *
      * @param downloadQueryDto 下载Dto
-     * @return R
+     * @return R 自收表url
      */
     @Override
     public R downloadChargeList(DownloadQueryDto downloadQueryDto) {

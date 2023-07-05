@@ -10,8 +10,8 @@ import java.util.Date;
 
 
 /**
- * @Author: Yu
- * @Date: 2023/7/3
+ * @Author : Yu
+ * @Date : 2023/7/3
  */
 @Data
 public class Application implements Serializable {

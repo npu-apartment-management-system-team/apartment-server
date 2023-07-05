@@ -60,7 +60,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
     /**
      * 新增管理员账号
      * @param adminDto admin账号信息
-     * @return R
+     * @return R 新增结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -97,7 +97,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
     /**
      * 删除管理员账号
      * @param id 管理员id
-     * @return R
+     * @return R 删除结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)

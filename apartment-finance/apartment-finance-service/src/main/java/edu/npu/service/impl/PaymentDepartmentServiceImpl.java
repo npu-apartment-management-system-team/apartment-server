@@ -26,10 +26,11 @@ import org.springframework.util.StringUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
 * @author wangminan
-* @description 针对表【payment_department(代扣外部单位缴费表)】的数据库操作Service实现
+* @description 外部单位财务人员Service实现
 * @createDate 2023-07-02 16:45:55
 */
 @Service
@@ -67,7 +68,8 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
 
     /**
      * 查看历史变动表
-     * @param queryDto
+     * @param accountUserDetails 获取登录用户所有权限
+     * @param queryDto 分页查询Dto
      * @return R 历史变动表
      */
     @Override
@@ -93,20 +95,23 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
 
     /**
      * 下载历史变动表
-     * @param downloadQueryDto
-     * @return R
+     * @param accountUserDetails 获取登录用户所有权限
+     * @param downloadQueryDto 下载查询Dto
+     * @return R 下载地址url
      */
     @Override
     public R downloadVariationList(AccountUserDetails accountUserDetails,
                                    DownloadQueryDto downloadQueryDto) {
 
+        //获取admin
         Admin admin = extractAdmin(accountUserDetails);
-        // 根据条件查询历史变动表 生成EXCEL 存储到OSS
+        // 根据条件查询历史变动表
         List<Application> variationList = applicationServiceClient
                 .getApplicationListForDownload(
                         downloadQueryDto.beginTime(),
                         admin.getDepartmentId());
 
+        // 调用ossUtil方法生成EXCEL 存储到OSS
         String url = ossUtil.downloadVariationList(variationList, downloadQueryDto.beginTime(), admin.getDepartmentId(), BASE_DIR);
 
         return StringUtils.hasText(url) ?
@@ -116,22 +121,24 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
     /**
      * 查看外部单位代扣缴费情况
      *
-     * @param queryDto
-     * @return R
+     * @param accountUserDetails 获取登录用户所有权限
+     * @param queryDto 单位代扣缴费列表查询Dto
+     * @return R 单位代扣缴费情况表
      */
     @Override
     public R getWithholdList(AccountUserDetails accountUserDetails, QueryDto queryDto) {
 
+        //获取admin
         Admin admin = extractAdmin(accountUserDetails);
 
         IPage<PaymentDepartment> page = new Page<>(
                 queryDto.pageNum(), queryDto.pageSize());
 
         LambdaQueryWrapper<PaymentDepartment> wrapper = new LambdaQueryWrapper<>();
-        //boolean hasQuery = false;
+
+        //构建wrapper
         wrapper.eq(PaymentDepartment::getDepartmentId, admin.getDepartmentId());
         if (queryDto.beginTime() != null) {
-            //hasQuery = true;
             wrapper.ge(PaymentDepartment::getCreateTime, queryDto.beginTime());
         }
 
@@ -153,8 +160,8 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
     /**
      * 查看某条代扣缴费具体情况
      *
-     * @param id
-     * @return R
+     * @param id 该条代扣缴费id
+     * @return R 该条代扣缴费具体情况
      */
     @Override
     public R getWithholdDetailById(Long id) {
@@ -180,12 +187,14 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
     /**
      * 下载外部单位代扣表
      *
-     * @param downloadQueryDto
-     * @return R
+     * @param accountUserDetails 获取登录用户所有权限
+     * @param downloadQueryDto 下载Dto
+     * @return R 代扣表url
      */
     @Override
     public R downloadWithholdList(AccountUserDetails accountUserDetails, DownloadQueryDto downloadQueryDto) {
 
+        //获取admin
         Admin admin = extractAdmin(accountUserDetails);
         /*
         按条件查询list
@@ -212,12 +221,14 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
     /**
      * 查看自收缴费情况
      *
-     * @param queryDto
-     * @return R
+     * @param accountUserDetails 获取登录用户所有权限
+     * @param queryDto 缴费列表查询Dto
+     * @return R 自收缴费列表
      */
     @Override
     public R getChargeList(AccountUserDetails accountUserDetails, QueryDto queryDto) {
 
+        //获取admin
         Admin admin = extractAdmin(accountUserDetails);
 
         IPage<PaymentUser> page = new Page<>(
@@ -225,6 +236,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
 
         LambdaQueryWrapper<PaymentUser> wrapper = new LambdaQueryWrapper<>();
 
+        //构建wrapper
         if (queryDto.beginTime() != null) {
             wrapper.ge(PaymentUser::getCreateTime, queryDto.beginTime());
         }
@@ -234,6 +246,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
 
         wrapper.orderByDesc(PaymentUser::getCreateTime);
 
+        //查询
         page = paymentUserMapper.selectPage(page, wrapper);
 
         Map<String, Object> result = Map.of(
@@ -246,8 +259,8 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
     /**
      * 查看每条自收缴费具体情况
      *
-     * @param id
-     * @return R
+     * @param id 缴费记录ID
+     * @return R 该条自收缴费具体内容
      */
     @Override
     public R getChargeDetailById(Long id) {
@@ -273,8 +286,9 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
     /**
      * 下载自收表
      *
-     * @param downloadQueryDto
-     * @return R
+     * @param accountUserDetails 获取登录用户所有权限
+     * @param downloadQueryDto 下载Dto
+     * @return R 自收表url
      */
     @Override
     public R downloadChargeList(AccountUserDetails accountUserDetails, DownloadQueryDto downloadQueryDto) {
@@ -305,9 +319,10 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
     /**
      * 外部单位填写必要信息以确认住宿费用代扣
      *
-     * @param id
-     * @param chequeId
-     * @return R
+     * @param accountUserDetails 获取登录用户所有权限
+     * @param id 外部单位缴费表id
+     * @param chequeId 支票id
+     * @return R 设置结果
      */
     @Override
     public R postChequeId(AccountUserDetails accountUserDetails, Long id, String chequeId) {
@@ -322,19 +337,25 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
             return R.error(ResponseCodeEnum.NOT_FOUND, "外部单位缴费表不存在");
         }
 
-        if (admin.getDepartmentId() != paymentDepartment.getDepartmentId()) {
+        if (!Objects.equals(admin.getDepartmentId(), paymentDepartment.getDepartmentId())) {
             log.error("外部单位管理员只有本单位相关权限！");
             return R.error(ResponseCodeEnum.FORBIDDEN, "权限不足");
         }
 
+        //设置chequeId
         paymentDepartment.setChequeId(chequeId);
 
         int isUpdate = paymentDepartmentMapper.updateById(paymentDepartment);
-        return isUpdate == 1 ? R.ok("外部缴费表支票ID设置成功") :
+        return isUpdate == 1 ? R.ok("外部单位缴费表支票ID设置成功") :
                 R.error(ResponseCodeEnum.SERVER_ERROR, "支票ID设置失败");
     }
 
-
+    /**
+     * 获取登录的admin
+     *
+     * @param accountUserDetails 获取登录用户所有权限
+     * @return admin 登录的admin
+     */
     private Admin extractAdmin(AccountUserDetails accountUserDetails) {
         Admin admin = userServiceClient.getAdminByLoginAccountId(accountUserDetails.getId());
         if (admin == null) {
