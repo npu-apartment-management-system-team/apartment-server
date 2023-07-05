@@ -89,7 +89,6 @@ public class BedServiceImpl extends ServiceImpl<BedMapper, Bed>
 
     @Override
     public R deleteBed(Long id) {
-        bedMapper.deleteById(id);
         return bedMapper.deleteById(id) == 1 ?
                 R.ok("删除成功!") : R.error("删除失败!");
     }
