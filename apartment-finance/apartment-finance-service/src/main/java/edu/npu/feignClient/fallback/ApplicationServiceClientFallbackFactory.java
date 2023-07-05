@@ -1,14 +1,11 @@
 package edu.npu.feignClient.fallback;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import edu.npu.dto.QueryDto;
 import edu.npu.entity.Application;
 import edu.npu.feignClient.ApplicationServiceClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
-import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;

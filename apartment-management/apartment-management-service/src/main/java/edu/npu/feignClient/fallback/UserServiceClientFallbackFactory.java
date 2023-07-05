@@ -30,6 +30,12 @@ public class UserServiceClientFallbackFactory implements FallbackFactory<UserSer
                 log.error("调用user-api服务获取User失败，原因：{}", cause.getMessage());
                 return null;
             }
+
+            @Override
+            public User getUserByLoginAccountId(Long loginAccountId) {
+                log.error("调用user-api服务获取User失败，原因：{}", cause.getMessage());
+                return null;
+            }
         };
     }
 }

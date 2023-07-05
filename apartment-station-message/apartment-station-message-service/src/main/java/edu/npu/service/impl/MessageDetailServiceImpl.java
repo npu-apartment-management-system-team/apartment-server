@@ -2,7 +2,6 @@ package edu.npu.service.impl;
 
 import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.npu.dto.SendMessageDto;
 import edu.npu.entity.MessageDetail;
@@ -52,20 +51,17 @@ public class MessageDetailServiceImpl extends ServiceImpl<MessageDetailMapper, M
         messageDetail.setCreateTime(dateTime);
 
         boolean success = save(messageDetail);
-        //不知道为什么但是这里用不了Lambda表达式
-        Long messageDetailID = this.baseMapper.selectOne(new QueryWrapper<MessageDetail>()
-                .eq("sender_admin_id", Long.valueOf(sendMessageDto.senderAdminId()))
-                .eq("create_time", dateTime.toString())
-        ).getId();
+
+        Long messageDetailId = messageDetail.getId();
 
 
-        if (success && messageDetailID != null) {
+        if (success && messageDetailId != null) {
             for (String receiverAdminId : sendMessageDto.receiverAdminIds()) {
                 if (userServiceClient.getAdminById(Long.valueOf(receiverAdminId)) == null) {
                     throw new ApartmentException("receiverAdminId[" + receiverAdminId + "]不存在");
                 }
                 MessageReceiving messageReceiving = new MessageReceiving();
-                messageReceiving.setMessageDetailId(messageDetailID);
+                messageReceiving.setMessageDetailId(messageDetailId);
                 messageReceiving.setReceiverAdminId(Long.valueOf(receiverAdminId));
                 int s1 = messageReceivingMapper.insert(messageReceiving);
                 if (0 == s1) {
@@ -77,7 +73,7 @@ public class MessageDetailServiceImpl extends ServiceImpl<MessageDetailMapper, M
                     throw new ApartmentException("receiverUserId[" + receiverUserId + "]不存在");
                 }
                 MessageReceiving messageReceiving = new MessageReceiving();
-                messageReceiving.setMessageDetailId(messageDetailID);
+                messageReceiving.setMessageDetailId(messageDetailId);
                 messageReceiving.setReceiverUserId(Long.valueOf(receiverUserId));
                 int s2 = messageReceivingMapper.insert(messageReceiving);
                 if (0 == s2) {

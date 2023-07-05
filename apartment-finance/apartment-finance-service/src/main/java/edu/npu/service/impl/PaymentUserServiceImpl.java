@@ -147,7 +147,7 @@ public class PaymentUserServiceImpl extends ServiceImpl<PaymentUserMapper, Payme
         bizContent.put(OUT_TRADE_NUMBER.getType(), orderId.toString());
 
         bizContent.put("total_amount", paymentUser.getPrice());
-        bizContent.put("subject", "西工大拼车平台订单支付");
+        bizContent.put("subject", "杭房段公寓管理系统订单支付");
         // 手机端场景使用QUICK_WAP_WAY
         // 电脑FAST_INSTANT_TRADE_PAY
         // 注意和req res统一

@@ -36,10 +36,10 @@ public class UserLivingMessageServiceImpl implements UserLivingMessageService {
 
     @Override
     public R getUserLivingMessage(AccountUserDetails accountUserDetails) {
-        User user = userServiceClient.getUserById(accountUserDetails.getId());
+        User user = userServiceClient.getUserByLoginAccountId(accountUserDetails.getId());
         if (user == null) {
-            log.error("id[" + accountUserDetails.getId() + "]的用户不存在");
-            return R.error("id[" + accountUserDetails.getId() + "]的用户不存在");
+            log.error("accountId[" + accountUserDetails.getId() + "]的用户不存在");
+            return R.error("accountId[" + accountUserDetails.getId() + "]的用户不存在");
         }
 
         Map<String, Object> map = new HashMap<>();

@@ -5,7 +5,6 @@ import edu.npu.service.MessageDetailService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -21,28 +20,22 @@ public class SenderController {
     private MessageDetailService messageDetailService;
 
     @PostMapping("/send")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public R sendMessage(@RequestBody SendMessageDto sendMessageDto) {
         return messageDetailService.sendMessage(sendMessageDto);
     }
 
     @GetMapping("/outbox/detail")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public R getMessageDetail(@RequestParam String id) {
         return messageDetailService.getMessageDetail(id);
     }
 
     @PutMapping("/outbox/{id}")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public R withdrawMessage(@PathVariable String id) {
         return messageDetailService.withdrawMessage(id);
     }
 
     @DeleteMapping("/outbox/{id}")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public R deleteMessage(@PathVariable String id) {
         return messageDetailService.deleteMessage(id);
     }
-
-
 }
