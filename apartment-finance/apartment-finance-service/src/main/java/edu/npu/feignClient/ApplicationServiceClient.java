@@ -24,7 +24,11 @@ public interface ApplicationServiceClient {
 
     @GetMapping("/query/page")
     Page<Application> getApplicationPageForQuery(
-            @SpringQueryMap QueryDto queryDto
+            //@Validated @SpringQueryMap QueryDto queryDto
+            @RequestParam(value = "pageNum", required = true) Integer pageNum,
+            @RequestParam(value = "pageSize", required = true) Integer pageSize,
+            @RequestParam(value = "beginTime", required = false) Date beginTime,
+            @RequestParam(value = "departmentId", required = false) Long departmentId
     );
 
     @GetMapping("/download/list")

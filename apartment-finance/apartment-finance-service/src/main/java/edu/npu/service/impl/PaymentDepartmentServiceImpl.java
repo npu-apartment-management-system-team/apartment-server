@@ -73,7 +73,9 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
 
         Page<Application> page = applicationServiceClient
                 .getApplicationPageForQuery(
-                        queryDto
+                        queryDto.pageNum(), queryDto.pageSize(),
+                        queryDto.beginTime(), admin.getDepartmentId()
+
                 );
 
 
@@ -124,7 +126,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
 
         LambdaQueryWrapper<PaymentDepartment> wrapper = new LambdaQueryWrapper<>();
         //boolean hasQuery = false;
-        wrapper.eq(PaymentDepartment::getDepartmentId, queryDto.departmentId());
+        wrapper.eq(PaymentDepartment::getDepartmentId, admin.getDepartmentId());
         if (queryDto.beginTime() != null) {
             //hasQuery = true;
             wrapper.ge(PaymentDepartment::getCreateTime, queryDto.beginTime());

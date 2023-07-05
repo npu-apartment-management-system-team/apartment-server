@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
 import java.util.List;
@@ -27,9 +29,16 @@ public class ApplicationServiceClientFallbackFactory
         return new ApplicationServiceClient() {
             @Override
             public Page<Application> getApplicationPageForQuery(
-                    @SpringQueryMap QueryDto queryDto) {
+                    //@Validated @SpringQueryMap QueryDto queryDto
+                    @RequestParam(value = "pageNum", required = true) Integer pageNum,
+                    @RequestParam(value = "pageSize", required = true) Integer pageSize,
+                    @RequestParam(value = "beginTime", required = false) Date beginTime,
+                    @RequestParam(value = "departmentId", required = false) Long departmentId) {
                 log.error("调用application-api服务失败，userPayListQueryDto:{},原因：{}",
-                        queryDto,
+                        pageNum,
+                        pageSize,
+                        beginTime,
+                        departmentId,
                         cause.getMessage());
                 return null;
             }

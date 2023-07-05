@@ -80,7 +80,8 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
 
         Page<Application> page = applicationServiceClient
                 .getApplicationPageForQuery(
-                        queryDto
+                        queryDto.pageNum(), queryDto.pageSize(),
+                        queryDto.beginTime(), queryDto.departmentId()
                 );
 
         Map<String, Object> result = Map.of(
@@ -198,8 +199,10 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
         获取外部单位
          */
         PaymentDepartment paymentDepartment = paymentDepartmentMapper.selectById(id);
+        //System.out.printf(paymentDepartment.toString());
         Department department = managementServiceClient.getDepartmentById(
                 paymentDepartment.getDepartmentId());
+        //System.out.printf(department.toString());
 
         if (department == null) {
             return R.error(ResponseCodeEnum.NOT_FOUND, "外部单位不存在");
