@@ -31,53 +31,53 @@ public class DepartmentController {
 
 
     @GetMapping("/variation/download")
-    R downloadVariationList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+    public R downloadVariationList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                             DownloadQueryDto downloadQueryDto) {
         return paymentDepartmentService.downloadVariationList(accountUserDetails, downloadQueryDto);
     }
 
 
     @GetMapping("/withhold")
-    R getWithholdList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+    public R getWithholdList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                       QueryDto queryDto) {
         return paymentDepartmentService.getWithholdList(accountUserDetails, queryDto);
     }
 
 
     @GetMapping("/withhold/detail")
-    R getWithholdDetailById(Long id) {
+    public R getWithholdDetailById(Long id) {
         return paymentDepartmentService.getWithholdDetailById(id);
     }
 
 
     @GetMapping("/withhold/download")
-    R downloadWithholdList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+    public R downloadWithholdList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                            DownloadQueryDto downloadQueryDto) {
         return paymentDepartmentService.downloadWithholdList(accountUserDetails, downloadQueryDto);
     }
 
 
     @GetMapping("/charge")
-    R getChargeList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+    public R getChargeList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                     QueryDto queryDto) {
         return paymentDepartmentService.getChargeList(accountUserDetails, queryDto);
     }
 
 
     @GetMapping("/charge/detail")
-    R getChargeDetailById(Long id) {
+    public R getChargeDetailById(Long id) {
         return paymentDepartmentService.getChargeDetailById(id);
     }
 
 
     @GetMapping("/charge/download")
-    R downloadChargeList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+    public R downloadChargeList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                          DownloadQueryDto downloadQueryDto) {
         return paymentDepartmentService.downloadChargeList(accountUserDetails, downloadQueryDto);
     }
 
     @PostMapping("/pay/{id}")
-    R postChequeId(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
+    public R postChequeId(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                    @PathVariable("id") Long id, @RequestParam String chequeId) {
         return paymentDepartmentService.postChequeId(accountUserDetails, id, chequeId);
     }
