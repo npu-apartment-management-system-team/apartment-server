@@ -42,14 +42,14 @@ public class RoomController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('SUPER_ADMIN')")
-    public R getAllRoom(@RequestParam Integer pageNum, @RequestParam Integer pageSize, @RequestParam String apartmentId,
+    public R getAllRoom(@RequestParam Integer pageNum, @RequestParam Integer pageSize, @RequestParam Long apartmentId,
                         @RequestParam(required = false) String query, @RequestParam(required = false) String isForCadre, @RequestParam(required = false) Integer type) {
         return roomService.getAllRoom(pageNum, pageSize, apartmentId, query, isForCadre, type);
     }
 
     @GetMapping("/unreserved")
     @PreAuthorize("hasAuthority('SUPER_ADMIN')")
-    public R getUnreservedRoom(@RequestParam Integer pageNum, @RequestParam Integer pageSize, @RequestParam String apartmentId,
+    public R getUnreservedRoom(@RequestParam Integer pageNum, @RequestParam Integer pageSize, @RequestParam Long apartmentId,
                          @RequestParam(required = false) String query, @RequestParam(required = false)  String isForCadre, @RequestParam(required = false)  Integer type){
         return roomService.getUnreservedRoom(pageNum, pageSize, apartmentId, query, isForCadre, type);
     }

@@ -51,7 +51,7 @@ public interface RoomService extends IService<Room> {
      * @return R
      */
     @Transactional(rollbackFor = Exception.class)
-    R getAllRoom(Integer pageNum, Integer pageSize, String apartmentId, String query, String isForCadre, Integer type);
+    R getAllRoom(Integer pageNum, Integer pageSize, Long apartmentId, String query, String isForCadre, Integer type);
 
     /**
      * 获取未保留的房间
@@ -64,7 +64,7 @@ public interface RoomService extends IService<Room> {
      * @return R
      */
     @Transactional(rollbackFor = Exception.class)
-    R getUnreservedRoom(Integer pageNum, Integer pageSize, String apartmentId, String query, String isForCadre, Integer type);
+    R getUnreservedRoom(Integer pageNum, Integer pageSize, Long apartmentId, String query, String isForCadre, Integer type);
 
     /**
      * 获取房间详情
