@@ -81,7 +81,7 @@ public class MessageReceivingServiceImpl extends ServiceImpl<MessageReceivingMap
                     .eq(MessageReceiving::getIsDeleted, 0)
                     .eq(MessageReceiving::getReceiverUserId, userId));
         } else {
-            Long adminId = userServiceClient.getAdminById(accountUserDetails.getId()).getId();
+            Long adminId = userServiceClient.getAdminByLoginAccountId(accountUserDetails.getId()).getId();
             messageReceiving = this.baseMapper.selectOne(new LambdaQueryWrapper<MessageReceiving>()
                     .eq(MessageReceiving::getMessageDetailId, id)
                     .eq(MessageReceiving::getIsDeleted, 0)
