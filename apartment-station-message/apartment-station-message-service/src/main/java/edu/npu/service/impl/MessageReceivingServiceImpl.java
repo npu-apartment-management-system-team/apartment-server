@@ -6,6 +6,7 @@ import edu.npu.common.RoleEnum;
 import edu.npu.entity.AccountUserDetails;
 import edu.npu.entity.MessageDetail;
 import edu.npu.entity.MessageReceiving;
+import edu.npu.feignClient.UserServiceClient;
 import edu.npu.mapper.MessageDetailMapper;
 import edu.npu.mapper.MessageReceivingMapper;
 import edu.npu.service.MessageReceivingService;
@@ -26,6 +27,9 @@ public class MessageReceivingServiceImpl extends ServiceImpl<MessageReceivingMap
 
     @Resource
     private MessageDetailMapper messageDetailMapper;
+
+    @Resource
+    private UserServiceClient userServiceClient;
 
     @Override
     public R getMessageDetail(AccountUserDetails accountUserDetails, String id) {
@@ -71,13 +75,13 @@ public class MessageReceivingServiceImpl extends ServiceImpl<MessageReceivingMap
 
         MessageReceiving messageReceiving;
         if (accountUserDetails.getRole() == RoleEnum.USER.getValue()) {
-            Long userId = accountUserDetails.getId();
+            Long userId = userServiceClient.getUserByLoginAccountId(accountUserDetails.getId()).getId();
             messageReceiving = this.baseMapper.selectOne(new LambdaQueryWrapper<MessageReceiving>()
                     .eq(MessageReceiving::getMessageDetailId, id)
                     .eq(MessageReceiving::getIsDeleted, 0)
                     .eq(MessageReceiving::getReceiverUserId, userId));
         } else {
-            Long adminId = accountUserDetails.getId();
+            Long adminId = userServiceClient.getAdminById(accountUserDetails.getId()).getId();
             messageReceiving = this.baseMapper.selectOne(new LambdaQueryWrapper<MessageReceiving>()
                     .eq(MessageReceiving::getMessageDetailId, id)
                     .eq(MessageReceiving::getIsDeleted, 0)
