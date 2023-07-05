@@ -30,43 +30,43 @@ public class CenterController {
 
 
     @GetMapping("/variation/download")
-    R downloadVariationList(DownloadQueryDto downloadQueryDto) {
+    public R downloadVariationList(DownloadQueryDto downloadQueryDto) {
         return paymentCenterService.downloadVariationList(downloadQueryDto);
     }
 
 
     @GetMapping("/withhold")
-    R getWithholdList(QueryDto queryDto) {
+    public R getWithholdList(QueryDto queryDto) {
         return paymentCenterService.getWithholdList(queryDto);
     }
 
 
     @GetMapping("/withhold/detail")
-    R getWithholdDetailById(Long id) {
+    public R getWithholdDetailById(Long id) {
         return paymentCenterService.getWithholdDetailById(id);
     }
 
 
     @GetMapping("/withhold/download")
-    R downloadWithholdList(DownloadQueryDto downloadQueryDto) {
+    public R downloadWithholdList(DownloadQueryDto downloadQueryDto) {
         return paymentCenterService.downloadWithholdList(downloadQueryDto);
     }
 
 
     @GetMapping("/charge")
-    R getChargeList(QueryDto queryDto) {
+    public R getChargeList(QueryDto queryDto) {
         return paymentCenterService.getChargeList(queryDto);
     }
 
 
     @GetMapping("/charge/detail")
-    R getChargeDetailById(Long id) {
+    public R getChargeDetailById(Long id) {
         return paymentCenterService.getChargeDetailById(id);
     }
 
 
     @GetMapping("/charge/download")
-    R downloadChargeList(DownloadQueryDto downloadQueryDto) {
+    public R downloadChargeList(DownloadQueryDto downloadQueryDto) {
         return paymentCenterService.downloadChargeList(downloadQueryDto);
     }
 }

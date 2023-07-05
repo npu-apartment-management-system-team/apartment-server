@@ -14,18 +14,42 @@ import org.springframework.transaction.annotation.Transactional;
 */
 public interface AdminService extends IService<Admin> {
 
+    /**
+     * 新增管理员账号
+     * @param adminDto admin账号信息
+     * @return R 新增结果
+     */
     @Transactional(rollbackFor = Exception.class)
     R addAdmin(AdminDto adminDto);
 
+    /**
+     * 删除管理员账号
+     * @param id 管理员id
+     * @return R 删除结果
+     */
     @Transactional(rollbackFor = Exception.class)
     R deleteAdmin(Long id);
 
+    /**
+     * 修改管理员账号
+     * @param id 管理员id
+     * @return 修改结果
+     */
     @Transactional(rollbackFor = Exception.class)
     R updateAdmin(Long id, AdminDto adminDto);
 
+    /**
+     * 查询管理员账号列表
+     * @param adminPageQueryDto 查询条件
+     * @return 列表
+     */
     @Transactional(rollbackFor = Exception.class)
     R getAdminList(AdminPageQueryDto adminPageQueryDto);
 
+    /**
+     * 查询班组长列表
+     * @return 班组长列表
+     */
     @Transactional(rollbackFor = Exception.class)
     R getForemanList();
 }

@@ -7,8 +7,6 @@ import edu.npu.service.DepartmentService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -74,7 +72,7 @@ public class DepartmentController {
     }
 
     @GetMapping("/list")
-    public R getDepartmentSimpleList(@AuthenticationPrincipal UserDetails userDetails){
+    public R getDepartmentSimpleList(){
         // 该接口允许用户访问
         return departmentService.getDepartmentSimpleList();
     }

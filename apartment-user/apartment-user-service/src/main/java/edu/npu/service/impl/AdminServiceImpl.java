@@ -60,7 +60,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
     /**
      * 新增管理员账号
      * @param adminDto admin账号信息
-     * @return R
+     * @return R 新增结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -97,7 +97,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
     /**
      * 删除管理员账号
      * @param id 管理员id
-     * @return R
+     * @return R 删除结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -225,10 +225,13 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
         List<Map<String, Object>> list = new ArrayList<>();
 
         try {
+            //查询未被分配的班组长
             List<Admin> adminList = adminMapper.selectList(
-                    new LambdaQueryWrapper<Admin>().
-                            select(Admin::getId, Admin::getName).
-                            eq(Admin::getDepartmentId, 0L));
+                    new LambdaQueryWrapper<Admin>()
+                            .select(Admin::getId, Admin::getName)
+                            .inSql(Admin::getLoginAccountId, "SELECT id FROM login_account WHERE role = 5")
+                            .isNull(Admin::getDepartmentId));
+
             for (Admin admin : adminList) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("id", admin.getId());

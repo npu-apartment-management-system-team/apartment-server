@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * @Author: Yu
- * @Date: 2023/6/29
+ * @Author : Yu
+ * @Date : 2023/6/29
+ * @description : department的dto
  */
 public record DepartmentDto(
         @NotNull(message = "公寓名称不能为空")

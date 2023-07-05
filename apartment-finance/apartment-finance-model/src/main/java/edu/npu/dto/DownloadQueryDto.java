@@ -6,8 +6,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Date;
 
 /**
- * @Author: Yu
- * @Date: 2023/7/3
+ * @Author : Yu
+ * @Date : 2023/7/3
  */
 public record DownloadQueryDto(
 
