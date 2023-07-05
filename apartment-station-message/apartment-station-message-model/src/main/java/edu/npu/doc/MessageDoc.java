@@ -36,7 +36,7 @@ public class MessageDoc {
     // 一个消息的管理者数组 包括发送者和接收者 需要对应ES的数组类型
     private List<Long> receiverIds;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private Date createTime;
 }
