@@ -54,6 +54,10 @@ public class OssUtil {
 
     private static final String FAILED_GENERATE_VARIATION_LIST_MSG = "生成历史变动表失败";
 
+    private static final String FAILED_GENERATE_WITHHOLD_LIST_MSG = "生成部门代扣表失败";
+
+    private static final String FAILED_GENERATE_CHARGE_LIST_MSG = "生成职工自收表失败";
+
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
@@ -111,11 +115,12 @@ public class OssUtil {
     /**
      * 下载职工住宿历史变动表
      * @param variationList
-     * @param downloadQueryDto
+     * @param beginTime
+     * @param departmentId
      * @param baseDir
      * @return
      */
-    public String downloadVariationList(List<Application> variationList, DownloadQueryDto downloadQueryDto, String baseDir) {
+    public String downloadVariationList(List<Application> variationList, Date beginTime, Long departmentId, String baseDir) {
         try (
                 // 创建workbook SXSSFWorkbook默认100行缓存
                 Workbook workbook = new SXSSFWorkbook()
@@ -144,8 +149,13 @@ public class OssUtil {
                 sheet.getRow(lastRowNum + 1).createCell(5).setCellValue(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(tmpVariation.getUpdateTime()));
 
             }
+            String begintime = "all";
+            if (beginTime != null) {
+                begintime = new SimpleDateFormat("yyyy-MM").format(beginTime);
+            }
+
             File file = File.createTempFile(
-                    "职工住宿历史变动表_" + downloadQueryDto.beginTime(),
+                    "职工住宿历史变动表_" + begintime + "_" + departmentId,
                     ".xlsx"
             );
             String url = uploadFileToOss(workbook, file, baseDir);
@@ -159,11 +169,12 @@ public class OssUtil {
     /**
      * 下载单位代扣表
      * @param withholdList
-     * @param downloadQueryDto
+     * @param beginTime
+     * @param departmentId
      * @param baseDir
      * @return
      */
-    public String downloadWithholdList(List<PaymentDepartment> withholdList, DownloadQueryDto downloadQueryDto, String baseDir) {
+    public String downloadWithholdList(List<PaymentDepartment> withholdList, Date beginTime, Long departmentId, String baseDir) {
         try (
                 // 创建workbook SXSSFWorkbook默认100行缓存
                 Workbook workbook = new SXSSFWorkbook()
@@ -194,19 +205,33 @@ public class OssUtil {
                 sheet.getRow(lastRowNum + 1).createCell(6).setCellValue(tmpPaymentDepartment.getChequeId());
 
             }
+
+            String begintime = "all";
+            if (beginTime != null) {
+                begintime = new SimpleDateFormat("yyyy-MM").format(beginTime);
+            }
+
             File file = File.createTempFile(
-                    "单位代扣表_" + downloadQueryDto.beginTime(),
+                    "单位代扣表_" + begintime + "_" + departmentId,
                     ".xlsx"
             );
             String url = uploadFileToOss(workbook, file, baseDir);
 
             return url;
         } catch (IOException e) {
-            throw new ApartmentException(FAILED_GENERATE_VARIATION_LIST_MSG);
+            throw new ApartmentException(FAILED_GENERATE_WITHHOLD_LIST_MSG);
         }
     }
 
-    public String downloadChargeList(List<PaymentUser> chargeList, DownloadQueryDto downloadQueryDto, String baseDir) {
+    /**
+     * 下载自收表
+     * @param chargeList
+     * @param beginTime
+     * @param departmentId
+     * @param baseDir
+     * @return
+     */
+    public String downloadChargeList(List<PaymentUser> chargeList, Date beginTime, Long departmentId, String baseDir) {
         try (
                 // 创建workbook SXSSFWorkbook默认100行缓存
                 Workbook workbook = new SXSSFWorkbook()
@@ -235,15 +260,24 @@ public class OssUtil {
                 sheet.getRow(lastRowNum + 1).createCell(5).setCellValue(tmpPaymentUser.getType());
 
             }
+
+            String begintime = "all";
+            if (beginTime != null) {
+                begintime = new SimpleDateFormat("yyyy-MM").format(beginTime);
+            }
+
             File file = File.createTempFile(
-                    "职工缴费表_" + downloadQueryDto.beginTime(),
+                    "职工缴费表_" + begintime + "_" + departmentId,
                     ".xlsx"
             );
+//            System.out.printf("部门ID：" + departmentId);
+//            System.out.printf("开始时间：" + beginTime);
             String url = uploadFileToOss(workbook, file, baseDir);
 
             return url;
         } catch (IOException e) {
-            throw new ApartmentException(FAILED_GENERATE_VARIATION_LIST_MSG);
+            e.printStackTrace();
+            throw new ApartmentException(FAILED_GENERATE_CHARGE_LIST_MSG);
         }
     }
 

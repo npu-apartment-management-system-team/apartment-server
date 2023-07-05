@@ -104,7 +104,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
 //        variationList = applicationMapper.selectList(
 //                getApplicationLambdaQueryWrapper(downloadQueryDto.beginTime(), downloadQueryDto.departmentId()));
 
-        String url = ossUtil.downloadVariationList(variationList, downloadQueryDto, BASE_DIR);
+        String url = ossUtil.downloadVariationList(variationList, downloadQueryDto.beginTime(), admin.getDepartmentId(), BASE_DIR);
 
         return StringUtils.hasText(url) ?
                 R.ok().put("result", url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
@@ -199,7 +199,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
         List<PaymentDepartment> withholdList = paymentDepartmentMapper.selectList(wrapper);
 
         //调用ossUtil中的方法下载
-        String url = ossUtil.downloadWithholdList(withholdList, downloadQueryDto, BASE_DIR);
+        String url = ossUtil.downloadWithholdList(withholdList, downloadQueryDto.beginTime(), admin.getDepartmentId(), BASE_DIR);
 
         return StringUtils.hasText(url) ?
                 R.ok().put("result", url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
@@ -293,7 +293,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
         List<PaymentUser> chargeList = paymentUserMapper.selectList(wrapper);
 
         //调用ossUtil中的方法下载
-        String url = ossUtil.downloadChargeList(chargeList, downloadQueryDto, BASE_DIR);
+        String url = ossUtil.downloadChargeList(chargeList, downloadQueryDto.beginTime(), admin.getDepartmentId(), BASE_DIR);
 
         return StringUtils.hasText(url) ?
                 R.ok().put("result", url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
