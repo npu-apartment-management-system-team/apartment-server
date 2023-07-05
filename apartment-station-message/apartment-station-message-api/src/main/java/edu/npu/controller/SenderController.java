@@ -21,28 +21,22 @@ public class SenderController {
     private MessageDetailService messageDetailService;
 
     @PostMapping("/send")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public R sendMessage(@RequestBody SendMessageDto sendMessageDto) {
         return messageDetailService.sendMessage(sendMessageDto);
     }
 
     @GetMapping("/outbox/detail")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public R getMessageDetail(@RequestParam String id) {
         return messageDetailService.getMessageDetail(id);
     }
 
     @PutMapping("/outbox/{id}")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public R withdrawMessage(@PathVariable String id) {
         return messageDetailService.withdrawMessage(id);
     }
 
     @DeleteMapping("/outbox/{id}")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public R deleteMessage(@PathVariable String id) {
         return messageDetailService.deleteMessage(id);
     }
-
-
 }
