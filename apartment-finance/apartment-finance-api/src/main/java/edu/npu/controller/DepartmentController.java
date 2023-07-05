@@ -11,10 +11,7 @@ import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -81,5 +78,10 @@ public class DepartmentController {
     @GetMapping("/charge/download")
     R downloadChargeList(@AuthenticationPrincipal AccountUserDetails accountUserDetails, DownloadQueryDto downloadQueryDto) {
         return paymentDepartmentService.downloadChargeList(accountUserDetails, downloadQueryDto);
+    }
+
+    @PostMapping("/pay/{id}")
+    R postChequeId(@AuthenticationPrincipal AccountUserDetails accountUserDetails, @PathVariable("id") Long id, @RequestParam String chequeId) {
+        return paymentDepartmentService.postChequeId(accountUserDetails, id, chequeId);
     }
 }

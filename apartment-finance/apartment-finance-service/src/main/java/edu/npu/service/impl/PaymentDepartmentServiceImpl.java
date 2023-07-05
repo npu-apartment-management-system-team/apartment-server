@@ -101,8 +101,6 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
                 .getApplicationListForDownload(
                         downloadQueryDto.beginTime(),
                         admin.getDepartmentId());
-//        variationList = applicationMapper.selectList(
-//                getApplicationLambdaQueryWrapper(downloadQueryDto.beginTime(), downloadQueryDto.departmentId()));
 
         String url = ossUtil.downloadVariationList(variationList, downloadQueryDto.beginTime(), admin.getDepartmentId(), BASE_DIR);
 
@@ -303,14 +301,32 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
      * 外部单位填写必要信息以确认住宿费用代扣
      *
      * @param id
-     * @param checkId
+     * @param chequeId
      * @return R
      */
     @Override
-    public R postChequeId(Long id, String checkId) {
+    public R postChequeId(AccountUserDetails accountUserDetails, Long id, String chequeId) {
 
+        Admin admin = extractAdmin(accountUserDetails);
 
-        return null;
+        //根据id找paymentDepartment
+        PaymentDepartment paymentDepartment = paymentDepartmentMapper.selectById(id);
+
+        if (paymentDepartment == null) {
+            log.error("外部单位缴费表不存在");
+            return R.error(ResponseCodeEnum.NOT_FOUND, "外部单位缴费表不存在");
+        }
+
+        if (admin.getDepartmentId() != paymentDepartment.getDepartmentId()) {
+            log.error("外部单位管理员只有本单位相关权限！");
+            return R.error(ResponseCodeEnum.FORBIDDEN, "权限不足");
+        }
+
+        paymentDepartment.setChequeId(chequeId);
+
+        int isUpdate = paymentDepartmentMapper.updateById(paymentDepartment);
+        return isUpdate == 1 ? R.ok("外部缴费表支票ID设置成功") :
+                R.error(ResponseCodeEnum.SERVER_ERROR, "支票ID设置失败");
     }
 
 

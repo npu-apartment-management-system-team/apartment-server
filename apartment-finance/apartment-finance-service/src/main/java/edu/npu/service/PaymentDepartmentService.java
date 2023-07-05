@@ -73,10 +73,10 @@ public interface PaymentDepartmentService extends IService<PaymentDepartment> {
     /**
      * 外部单位填写必要信息以确认住宿费用代扣
      * @param id
-     * @param checkId
+     * @param chequeId
      * @return R
      */
-    R postChequeId(Long id, String checkId);
+    R postChequeId(AccountUserDetails accountUserDetails, Long id, String chequeId);
 
 
 
