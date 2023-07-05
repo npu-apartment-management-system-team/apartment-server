@@ -61,6 +61,12 @@ public class OssUtil {
 
     private static final String SIMPLE_DATE_FORMAT = "yyyy-MM-dd";
 
+    private static final String SIMPLE_DATE_FORMAT_2 = "yyyy-MM-dd HH:mm";
+
+    private static final String SIMPLE_DATE_FORMAT_3 = "yyyy-MM";
+
+    private static final String EXCEL_SUFFIX = ".xlsx";
+
 
     private static final ExecutorService cachedThreadPool =
             Executors.newFixedThreadPool(
@@ -143,22 +149,21 @@ public class OssUtil {
                 sheet.getRow(lastRowNum + 1).createCell(1).setCellValue(tmpVariation.getUserId());
                 sheet.getRow(lastRowNum + 1).createCell(2).setCellValue(tmpVariation.getType());
                 sheet.getRow(lastRowNum + 1).createCell(3).setCellValue(tmpVariation.getFileUrl());
-                sheet.getRow(lastRowNum + 1).createCell(4).setCellValue(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(tmpVariation.getCreateTime()));
-                sheet.getRow(lastRowNum + 1).createCell(5).setCellValue(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(tmpVariation.getUpdateTime()));
+                sheet.getRow(lastRowNum + 1).createCell(4).setCellValue(new SimpleDateFormat(SIMPLE_DATE_FORMAT_2).format(tmpVariation.getCreateTime()));
+                sheet.getRow(lastRowNum + 1).createCell(5).setCellValue(new SimpleDateFormat(SIMPLE_DATE_FORMAT_2).format(tmpVariation.getUpdateTime()));
 
             }
             String begintime = "all";
             if (beginTime != null) {
-                begintime = new SimpleDateFormat("yyyy-MM").format(beginTime);
+                begintime = new SimpleDateFormat(SIMPLE_DATE_FORMAT_3).format(beginTime);
             }
 
             File file = File.createTempFile(
                     "职工住宿历史变动表_" + begintime + "_" + departmentId,
-                    ".xlsx"
+                    EXCEL_SUFFIX
             );
-            String url = uploadFileToOss(workbook, file, baseDir);
 
-            return url;
+            return uploadFileToOss(workbook, file, baseDir);
         } catch (IOException e) {
             throw new ApartmentException(FAILED_GENERATE_VARIATION_LIST_MSG);
         }
@@ -197,25 +202,24 @@ public class OssUtil {
                 sheet.getRow(lastRowNum + 1).createCell(0).setCellValue(tmpPaymentDepartment.getId());
                 sheet.getRow(lastRowNum + 1).createCell(1).setCellValue(tmpPaymentDepartment.getDepartmentId());
                 sheet.getRow(lastRowNum + 1).createCell(2).setCellValue(tmpPaymentDepartment.getPrice());
-                sheet.getRow(lastRowNum + 1).createCell(3).setCellValue(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(tmpPaymentDepartment.getCreateTime()));
+                sheet.getRow(lastRowNum + 1).createCell(3).setCellValue(new SimpleDateFormat(SIMPLE_DATE_FORMAT_2).format(tmpPaymentDepartment.getCreateTime()));
                 sheet.getRow(lastRowNum + 1).createCell(4).setCellValue(tmpPaymentDepartment.getHasPaid());
-                sheet.getRow(lastRowNum + 1).createCell(5).setCellValue(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(tmpPaymentDepartment.getPayTime()));
+                sheet.getRow(lastRowNum + 1).createCell(5).setCellValue(new SimpleDateFormat(SIMPLE_DATE_FORMAT_2).format(tmpPaymentDepartment.getPayTime()));
                 sheet.getRow(lastRowNum + 1).createCell(6).setCellValue(tmpPaymentDepartment.getChequeId());
 
             }
 
             String begintime = "all";
             if (beginTime != null) {
-                begintime = new SimpleDateFormat("yyyy-MM").format(beginTime);
+                begintime = new SimpleDateFormat(SIMPLE_DATE_FORMAT_3).format(beginTime);
             }
 
             File file = File.createTempFile(
                     "单位代扣表_" + begintime + "_" + departmentId,
-                    ".xlsx"
+                    EXCEL_SUFFIX
             );
-            String url = uploadFileToOss(workbook, file, baseDir);
 
-            return url;
+            return uploadFileToOss(workbook, file, baseDir);
         } catch (IOException e) {
             throw new ApartmentException(FAILED_GENERATE_WITHHOLD_LIST_MSG);
         }
@@ -253,7 +257,7 @@ public class OssUtil {
                 sheet.getRow(lastRowNum + 1).createCell(0).setCellValue(tmpPaymentUser.getId());
                 sheet.getRow(lastRowNum + 1).createCell(1).setCellValue(tmpPaymentUser.getUserId());
                 sheet.getRow(lastRowNum + 1).createCell(2).setCellValue(tmpPaymentUser.getPrice());
-                sheet.getRow(lastRowNum + 1).createCell(3).setCellValue(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(tmpPaymentUser.getCreateTime()));
+                sheet.getRow(lastRowNum + 1).createCell(3).setCellValue(new SimpleDateFormat(SIMPLE_DATE_FORMAT_2).format(tmpPaymentUser.getCreateTime()));
                 sheet.getRow(lastRowNum + 1).createCell(4).setCellValue(tmpPaymentUser.getStatus());
                 sheet.getRow(lastRowNum + 1).createCell(5).setCellValue(tmpPaymentUser.getType());
 
@@ -261,18 +265,15 @@ public class OssUtil {
 
             String begintime = "all";
             if (beginTime != null) {
-                begintime = new SimpleDateFormat("yyyy-MM").format(beginTime);
+                begintime = new SimpleDateFormat(SIMPLE_DATE_FORMAT_3).format(beginTime);
             }
 
             File file = File.createTempFile(
                     "职工缴费表_" + begintime + "_" + departmentId,
-                    ".xlsx"
+                    EXCEL_SUFFIX
             );
-//            System.out.printf("部门ID：" + departmentId);
-//            System.out.printf("开始时间：" + beginTime);
-            String url = uploadFileToOss(workbook, file, baseDir);
 
-            return url;
+            return uploadFileToOss(workbook, file, baseDir);
         } catch (IOException e) {
             e.printStackTrace();
             throw new ApartmentException(FAILED_GENERATE_CHARGE_LIST_MSG);

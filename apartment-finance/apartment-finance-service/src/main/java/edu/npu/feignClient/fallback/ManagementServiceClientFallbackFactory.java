@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public class ManagementServiceClientFallbackFactory
             @Override
             public List<Department> getListByShardIndex(Long shardIndex, Integer shardTotal) {
                 log.error("调用management-api服务获取Department列表失败，原因：{}", cause.getMessage());
-                return null;
+                return Collections.emptyList();
             }
 
             @Override

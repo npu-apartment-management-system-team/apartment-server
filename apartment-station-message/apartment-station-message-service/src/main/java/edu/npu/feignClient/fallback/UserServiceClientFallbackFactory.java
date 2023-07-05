@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,7 +41,7 @@ public class UserServiceClientFallbackFactory implements FallbackFactory<UserSer
             @Override
             public List<User> getUserListByDepartmentId(Long departmentId) {
                 log.error("调用user-api服务获取UserList失败，原因：{}", cause.getMessage());
-                return null;
+                return Collections.emptyList();
             }
 
             @Override
@@ -58,7 +59,7 @@ public class UserServiceClientFallbackFactory implements FallbackFactory<UserSer
             @Override
             public List<User> getUserByBedId(Long bedId) {
                 log.error("调用user-api服务获取User列表失败，原因：{}", cause.getMessage());
-                return null;
+                return Collections.emptyList();
             }
         };
     }

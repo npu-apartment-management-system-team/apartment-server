@@ -18,12 +18,4 @@ public enum DepartmentPayTypeEnum {
         this.value = value;
     }
 
-    private static DepartmentPayTypeEnum fromValue(int value) {
-            for (DepartmentPayTypeEnum e : DepartmentPayTypeEnum.values()) {
-                if (value == e.getValue()) {
-                    return e;
-                }
-            }
-            return null;
-    }
 }

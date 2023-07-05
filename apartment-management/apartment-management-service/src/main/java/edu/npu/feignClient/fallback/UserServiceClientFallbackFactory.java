@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -22,7 +23,7 @@ public class UserServiceClientFallbackFactory implements FallbackFactory<UserSer
             @Override
             public List<Admin> getAdminByDepartmentId(Long departmentId) {
                 log.error("调用user-api服务获取Admin列表失败，原因：{}", cause.getMessage());
-                return null;
+                return Collections.emptyList();
             }
 
             @Override

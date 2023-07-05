@@ -86,9 +86,7 @@ public class CenterApplicationServiceImpl extends ServiceImpl<ApplicationMapper,
             application.setApplicationStatus(
                     application.getApplicationStatus() + 1
             );
-            SEND_MAIL_THREAD_POOL.execute(() -> {
-                sendNoticeMail(application, true);
-            });
+            SEND_MAIL_THREAD_POOL.execute(() -> sendNoticeMail(application, true));
         } else {
             if (application.getApplicationStatus() ==
                     DEPARTMENT_CHECK_IN_APPROVAL.getValue()) {
@@ -108,9 +106,7 @@ public class CenterApplicationServiceImpl extends ServiceImpl<ApplicationMapper,
                             .eq(ProcessingApplication::getApplicationId,
                                     application.getId())
             );
-            SEND_MAIL_THREAD_POOL.execute(() -> {
-                sendNoticeMail(application, false);
-            });
+            SEND_MAIL_THREAD_POOL.execute(() -> sendNoticeMail(application, false));
         }
         application.setUpdateTime(new Date(System.currentTimeMillis()));
         return updateById(application) ? R.ok() :
@@ -218,7 +214,7 @@ public class CenterApplicationServiceImpl extends ServiceImpl<ApplicationMapper,
                                         CHECK_IN_SUBMIT.getValue() ?
                                         "入住" : "调宿") +
                                 "申请在杭房段" +
-                                (pass ? "已通过审核" : "被驳回") +
+                                (Boolean.TRUE.equals(pass) ? "已通过审核" : "被驳回") +
                                 "，请及时查看";
                 sendMailUtil.sendMail(
                         email, subject, content

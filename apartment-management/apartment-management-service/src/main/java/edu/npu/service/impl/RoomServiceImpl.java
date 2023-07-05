@@ -32,6 +32,8 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
     @Resource
     private BedMapper bedMapper;
 
+    private static final String RESULT = "result";
+
     @Override
     public R addRoom(AddRoomDto addRoomDto) {
         Room room = this.baseMapper.selectOne(new LambdaQueryWrapper<Room>()
@@ -99,7 +101,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
 
         if (allRoomPage.getTotal() > 0) {
             Map<String, Object> result = Map.of("total", allRoomPage.getTotal(), "list", allRoomPage.getRecords());
-            return R.ok().put("result", result);
+            return R.ok().put(RESULT, result);
         }
         return R.error("查询的房间暂无数据");
     }
@@ -117,7 +119,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
 
         if (unreservedPage.getTotal() > 0) {
             Map<String, Object> result = Map.of("total", unreservedPage.getTotal(), "list", unreservedPage.getRecords());
-            return R.ok().put("result", result);
+            return R.ok().put(RESULT, result);
         }
         return R.error("查询的非保留房间暂无数据");
     }
@@ -130,7 +132,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
             List<Bed> beds = bedMapper.selectList(new LambdaQueryWrapper<Bed>()
                     .eq(Bed::getRoomId, id));
             Map<String, Object> result = Map.of("room", room, "beds", beds);
-            return R.ok().put("result", result);
+            return R.ok().put(RESULT, result);
         }
         return R.error("查询的房间[" + id + "]不存在");
     }

@@ -8,6 +8,7 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class ApplicationServiceClientFallbackFactory
                         beginTime,
                         departmentId,
                         cause.getMessage());
-                return null;
+                return Collections.emptyList();
             }
         };
     }

@@ -54,6 +54,8 @@ public class MqMessageListener {
     @Resource
     private MessageReceivingMapper messageReceivingMapper;
 
+    private static final String TABLE = "table";
+
     // 负责执行新线程上其他任务的线程池
     private static final ExecutorService cachedThreadPool =
             Executors.newFixedThreadPool(
@@ -72,24 +74,24 @@ public class MqMessageListener {
                 log.info("接收到非本项目数据库的消息,db:{}",
                         jsonNode.get("database").asText());
                 return;
-            } else if (!jsonNode.get("table").asText().equals("message_detail") &&
-                    !jsonNode.get("table").asText().equals("message_receiving")
+            } else if (!jsonNode.get(TABLE).asText().equals("message_detail") &&
+                    !jsonNode.get(TABLE).asText().equals("message_receiving")
             ) {
                 // 由于用的是fanout 所以确实存在这种可能 我们一个业务需要对应一个listener
                 log.info("接收到非本业务消息,table:{}",
-                        jsonNode.get("table").asText());
+                        jsonNode.get(TABLE).asText());
                 return;
             }
             // ok 是我们要处理的内容
-            if (jsonNode.get("table").asText().equals("message_receiving") &&
+            if (jsonNode.get(TABLE).asText().equals("message_receiving") &&
                     jsonNode.get("type").asText().equals("INSERT")) {
                 log.info("开始处理新增Message的同步");
                 handleInsert(jsonNode);
-            } else if (jsonNode.get("table").asText().equals("message_detail") &&
+            } else if (jsonNode.get(TABLE).asText().equals("message_detail") &&
                     jsonNode.get("type").asText().equals("UPDATE")) {
                 log.info("开始处理更新Message的同步");
                 handleUpdate(jsonNode);
-            } else if (jsonNode.get("table").asText().equals("message_detail") &&
+            } else if (jsonNode.get(TABLE).asText().equals("message_detail") &&
                     jsonNode.get("type").asText().equals("DELETE")) {
                 log.info("开始处理删除Message的同步");
                 handleDelete(jsonNode);

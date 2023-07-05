@@ -113,9 +113,7 @@ public class DepartmentApplicationServiceImpl extends ServiceImpl<ApplicationMap
             application.setApplicationStatus(
                 application.getApplicationStatus() + 1
             );
-            SEND_MAIL_THREAD_POOL.execute(() -> {
-                sendNoticeMail(application, true);
-            });
+            SEND_MAIL_THREAD_POOL.execute(() -> sendNoticeMail(application, true));
         } else {
             if (application.getApplicationStatus() == CHECK_IN_SUBMIT.getValue()) {
                 // 入住
@@ -134,9 +132,7 @@ public class DepartmentApplicationServiceImpl extends ServiceImpl<ApplicationMap
                         .eq(ProcessingApplication::getApplicationId,
                                 application.getId())
             );
-            SEND_MAIL_THREAD_POOL.execute(() -> {
-                sendNoticeMail(application, false);
-            });
+            SEND_MAIL_THREAD_POOL.execute(() -> sendNoticeMail(application, false));
         }
         application.setUpdateTime(new Date(System.currentTimeMillis()));
         return updateById(application) ? R.ok() :
@@ -158,7 +154,7 @@ public class DepartmentApplicationServiceImpl extends ServiceImpl<ApplicationMap
                         CHECK_IN_SUBMIT.getValue() ?
                         "入住" : "调宿") +
                     "申请在本单位" +
-                    (pass ? "已通过审核":"被驳回")+
+                    (Boolean.TRUE.equals(pass) ? "已通过审核":"被驳回")+
                     "，请及时查看";
                 sendMailUtil.sendMail(
                     email, subject, content

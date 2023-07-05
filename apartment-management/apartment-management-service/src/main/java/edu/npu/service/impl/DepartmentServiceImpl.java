@@ -26,13 +26,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
-* @author wangminan
-* @description 针对表【department(部门表)】的数据库操作Service实现
-* @createDate 2023-06-29 09:13:20
-*/
+ * @author wangminan
+ * @description 针对表【department(部门表)】的数据库操作Service实现
+ * @createDate 2023-06-29 09:13:20
+ */
 @Service
 public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Department>
-    implements DepartmentService {
+        implements DepartmentService {
 
     @Resource
     private DepartmentMapper departmentMapper;
@@ -40,9 +40,12 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     @Resource
     private UserServiceClient userServiceClient;
 
+    private static final String RESULT = "result";
+
 
     /**
-     *新增外部单位信息
+     * 新增外部单位信息
+     *
      * @param departmentDto 外部单位信息
      * @return R 成功或失败信息
      */
@@ -66,6 +69,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     /**
      * 删除外部单位
+     *
      * @param id 外部单位id
      * @return R 成功或失败信息
      */
@@ -95,7 +99,8 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     /**
      * 修改外部单位信息
-     * @param id 修改外部单位信息
+     *
+     * @param id            修改外部单位信息
      * @param departmentDto 外部单位信息
      * @return R 修改结果成功或失败信息
      */
@@ -125,6 +130,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     /**
      * 查询外部单位信息列表
+     *
      * @param departmentPageQueryDto 查询条件
      * @return R 外部单位列表
      */
@@ -139,25 +145,25 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
             boolean hasQuery = false;
             //query和经纬度查询
             //query查询
-            if(StringUtils.hasText(departmentPageQueryDto.query())) {
+            if (StringUtils.hasText(departmentPageQueryDto.query())) {
                 hasQuery = true;
                 wrapper.like(Department::getName, departmentPageQueryDto.query())
                         .or()
                         .like(Department::getPosition, departmentPageQueryDto.query());
             }
-            if(departmentPageQueryDto.latitude() != null
+            if (departmentPageQueryDto.latitude() != null
                     && departmentPageQueryDto.longitude() != null) {
                 hasQuery = true;
                 // 距离排序 经纬度差求平方和后排序
                 wrapper.last(
-                "order by (position_latitude - " +
-                        departmentPageQueryDto.latitude() + ") * " +
-                        "(position_latitude - " +
-                        departmentPageQueryDto.latitude() + ") + " +
-                        "(position_longitude - " +
-                        departmentPageQueryDto.longitude() + ") * " +
-                        "(position_longitude - " +
-                        departmentPageQueryDto.longitude() + ") asc");
+                        "order by (position_latitude - " +
+                                departmentPageQueryDto.latitude() + ") * " +
+                                "(position_latitude - " +
+                                departmentPageQueryDto.latitude() + ") + " +
+                                "(position_longitude - " +
+                                departmentPageQueryDto.longitude() + ") * " +
+                                "(position_longitude - " +
+                                departmentPageQueryDto.longitude() + ") asc");
             }
             if (hasQuery) {
                 page = this.page(page, wrapper);
@@ -169,7 +175,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
             resultMap.put("total", page.getTotal());
             resultMap.put("list", page.getRecords());
 
-            return R.ok().put("result", resultMap);
+            return R.ok().put(RESULT, resultMap);
         } catch (Exception e) {
             throw new ApartmentException("查询外部单位列表失败！");
         }
@@ -177,6 +183,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     /**
      * 查询外部单位信息简表
+     *
      * @return 简表
      */
     @Override
@@ -190,8 +197,8 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
             查询
              */
             List<Department> departmentSimpleList = departmentMapper.selectList(
-                new LambdaQueryWrapper<Department>()
-                    .select(Department::getId, Department::getName));
+                    new LambdaQueryWrapper<Department>()
+                            .select(Department::getId, Department::getName));
             /*
             遍历departmentSimpleList中的每个department并转换为map加入list
              */
@@ -202,7 +209,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
                 list.add(map);
             }
             resultMap.put("list", list);
-            return R.ok().put("result", resultMap);
+            return R.ok().put(RESULT, resultMap);
 
         } catch (Exception e) {
             throw new ApartmentException("查询外部单位简表失败！");
@@ -211,6 +218,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     /**
      * 查看外部单位详细信息
+     *
      * @param id 外部单位ID
      * @return R 外部单位和管理员列表
      */
@@ -237,6 +245,6 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         }
         resultMap.put("department", department);
         resultMap.put("admins", list);
-        return R.ok().put("result", resultMap);
+        return R.ok().put(RESULT, resultMap);
     }
 }

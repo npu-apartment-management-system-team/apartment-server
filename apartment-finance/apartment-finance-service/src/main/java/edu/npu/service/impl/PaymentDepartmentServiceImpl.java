@@ -59,6 +59,12 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
 
     private static final String BASE_DIR = "apartment/department/";
 
+    private static final String TOTAL = "total";
+
+    private static final String LIST = "list";
+
+    private static final  String RESULT = "result";
+
     /**
      * 查看历史变动表
      * @param queryDto
@@ -79,8 +85,8 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
 
 
         Map<String, Object> result = Map.of(
-                "total", page.getTotal(),
-                "list", page.getRecords()
+                TOTAL, page.getTotal(),
+                LIST, page.getRecords()
         );
         return R.ok(result);
     }
@@ -104,7 +110,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
         String url = ossUtil.downloadVariationList(variationList, downloadQueryDto.beginTime(), admin.getDepartmentId(), BASE_DIR);
 
         return StringUtils.hasText(url) ?
-                R.ok().put("result", url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
+                R.ok().put(RESULT, url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
     }
 
     /**
@@ -138,8 +144,8 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
         page = paymentDepartmentMapper.selectPage(page, wrapper);
 
         Map<String, Object> result = Map.of(
-                "total", page.getTotal(),
-                "list", page.getRecords()
+                TOTAL, page.getTotal(),
+                LIST, page.getRecords()
         );
         return R.ok(result);
     }
@@ -168,7 +174,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
 
         resultMap.put("department", department);
         resultMap.put("payment", paymentDepartment);
-        return R.ok().put("result", resultMap);
+        return R.ok().put(RESULT, resultMap);
     }
 
     /**
@@ -199,7 +205,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
         String url = ossUtil.downloadWithholdList(withholdList, downloadQueryDto.beginTime(), admin.getDepartmentId(), BASE_DIR);
 
         return StringUtils.hasText(url) ?
-                R.ok().put("result", url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
+                R.ok().put(RESULT, url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
 
     }
 
@@ -231,8 +237,8 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
         page = paymentUserMapper.selectPage(page, wrapper);
 
         Map<String, Object> result = Map.of(
-                "total", page.getTotal(),
-                "list", page.getRecords()
+                TOTAL, page.getTotal(),
+                LIST, page.getRecords()
         );
         return R.ok(result);
     }
@@ -261,7 +267,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
 
         resultMap.put("user", user);
         resultMap.put("payment", paymentUser);
-        return R.ok().put("result", resultMap);
+        return R.ok().put(RESULT, resultMap);
     }
 
     /**
@@ -293,7 +299,7 @@ public class PaymentDepartmentServiceImpl extends ServiceImpl<PaymentDepartmentM
         String url = ossUtil.downloadChargeList(chargeList, downloadQueryDto.beginTime(), admin.getDepartmentId(), BASE_DIR);
 
         return StringUtils.hasText(url) ?
-                R.ok().put("result", url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
+                R.ok().put(RESULT, url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
     }
 
     /**

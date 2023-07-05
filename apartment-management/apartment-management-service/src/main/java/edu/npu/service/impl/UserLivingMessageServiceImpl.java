@@ -34,6 +34,12 @@ public class UserLivingMessageServiceImpl implements UserLivingMessageService {
     @Resource
     ApartmentMapper apartmentMapper;
 
+    private static final String APARTMENT = "apartment";
+
+    private static final String RESULT = "result";
+
+    private static final String SUCCESS = "用户信息查询成功";
+
     @Override
     public R getUserLivingMessage(AccountUserDetails accountUserDetails) {
         User user = userServiceClient.getUserByLoginAccountId(accountUserDetails.getId());
@@ -53,26 +59,26 @@ public class UserLivingMessageServiceImpl implements UserLivingMessageService {
         if (bed == null) {
             map.put("bed", null);
             map.put("room", null);
-            map.put("apartment", null);
-            return R.ok("用户信息查询成功").put("result", map);
+            map.put(APARTMENT, null);
+            return R.ok(SUCCESS).put(RESULT, map);
         }
         map.put("bed", bed);
 
         Room room = roomMapper.selectById(bed.getRoomId());
         if (room == null) {
             map.put("room", null);
-            map.put("apartment", null);
-            return R.ok("用户信息查询成功").put("result", map);
+            map.put(APARTMENT, null);
+            return R.ok(SUCCESS).put(RESULT, map);
         }
         map.put("room", room);
 
         Apartment apartment = apartmentMapper.selectById(room.getApartmentId());
         if (apartment == null) {
-            map.put("apartment", null);
-            return R.ok("用户信息查询成功").put("result", map);
+            map.put(APARTMENT, null);
+            return R.ok(SUCCESS).put(RESULT, map);
         }
 
-        map.put("apartment", apartment);
-        return R.ok("用户信息查询成功").put("result", map);
+        map.put(APARTMENT, apartment);
+        return R.ok(SUCCESS).put(RESULT, map);
     }
 }

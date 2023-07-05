@@ -5,6 +5,10 @@ package edu.npu.common;
  * @description : [一句话描述该类的功能]
  */
 public class PaymentConstants {
+
+    private PaymentConstants() {
+        throw new IllegalStateException("Utility class");
+    }
     public static final int DEPOSIT_FEE = 1500;
 
     // 延迟消息TTL 30分钟 转毫秒

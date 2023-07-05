@@ -83,11 +83,7 @@ public class PaymentUserServiceImpl extends ServiceImpl<PaymentUserMapper, Payme
     @Resource
     private RedisClient redisClient;
 
-    private static final ExecutorService cachedThreadPool =
-            Executors.newFixedThreadPool(
-                    // 获取系统核数
-                    Runtime.getRuntime().availableProcessors()
-            );
+    private static final String USER_DONT_EXIST = "请求的用户不存在";
 
     @Override
     public R getPayList(AccountUserDetails accountUserDetails,
@@ -378,7 +374,7 @@ public class PaymentUserServiceImpl extends ServiceImpl<PaymentUserMapper, Payme
         // 退款
         User user = userServiceClient.getUserById(userId);
         if (user == null) {
-            throw new ApartmentException(ApartmentError.OBJECT_NULL, "请求的用户不存在");
+            throw new ApartmentException(ApartmentError.OBJECT_NULL, USER_DONT_EXIST);
         }
         // 查表
         List<PaymentUser> paymentUsers =
@@ -478,7 +474,7 @@ public class PaymentUserServiceImpl extends ServiceImpl<PaymentUserMapper, Payme
                 accountUserDetails.getId()
         );
         if (user == null) {
-            throw new ApartmentException(ApartmentError.OBJECT_NULL, "请求的用户不存在");
+            throw new ApartmentException(ApartmentError.OBJECT_NULL, USER_DONT_EXIST);
         }
         PaymentUser paymentUser = getById(paymentId);
         if (!paymentUser.getUserId().equals(user.getId())) {
@@ -518,7 +514,7 @@ public class PaymentUserServiceImpl extends ServiceImpl<PaymentUserMapper, Payme
     private User extractUser(AccountUserDetails accountUserDetails) {
         User user = userServiceClient.getUserByLoginAccountId(accountUserDetails.getId());
         if (user == null) {
-            throw new ApartmentException(ApartmentError.OBJECT_NULL, "请求的用户不存在");
+            throw new ApartmentException(ApartmentError.OBJECT_NULL, USER_DONT_EXIST);
         }
         return user;
     }

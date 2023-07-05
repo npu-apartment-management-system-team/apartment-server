@@ -3,6 +3,7 @@ package edu.npu.jobProcessor;
 import com.alibaba.schedulerx.worker.domain.JobContext;
 import com.alibaba.schedulerx.worker.processor.JavaProcessor;
 import com.alibaba.schedulerx.worker.processor.ProcessResult;
+import edu.npu.exception.ApartmentException;
 import edu.npu.service.ProcessingApplicationService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ public class ApplicationProcessor extends JavaProcessor {
         try {
             random = SecureRandom.getInstanceStrong();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new ApartmentException(e.getMessage());
         }
     }
 
