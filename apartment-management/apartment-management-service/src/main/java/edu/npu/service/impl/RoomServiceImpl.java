@@ -88,7 +88,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
     }
 
     @Override
-    public R getAllRoom(Integer pageNum, Integer pageSize, String apartmentId, String query, String
+    public R getAllRoom(Integer pageNum, Integer pageSize, Long apartmentId, String query, String
             isForCadre, Integer type) {
         Page<Room> allRoomPage = new Page<>(pageNum, pageSize);
         allRoomPage = this.baseMapper.selectPage(allRoomPage, new LambdaQueryWrapper<Room>()
@@ -105,7 +105,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room>
     }
 
     @Override
-    public R getUnreservedRoom(Integer pageNum, Integer pageSize, String apartmentId, String query, String
+    public R getUnreservedRoom(Integer pageNum, Integer pageSize, Long apartmentId, String query, String
             isForCadre, Integer type) {
         Page<Room> unreservedPage = new Page<>(pageNum, pageSize);
         unreservedPage = this.baseMapper.selectPage(unreservedPage, new LambdaQueryWrapper<Room>()
