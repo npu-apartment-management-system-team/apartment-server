@@ -2,7 +2,6 @@ package edu.npu.service.impl;
 
 import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.npu.dto.SendMessageDto;
 import edu.npu.entity.MessageDetail;
