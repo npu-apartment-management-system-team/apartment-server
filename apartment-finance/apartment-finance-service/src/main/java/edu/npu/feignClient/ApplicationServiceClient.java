@@ -5,6 +5,8 @@ import edu.npu.entity.Application;
 import edu.npu.feignClient.fallback.ManagementServiceClientFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
@@ -21,9 +23,8 @@ public interface ApplicationServiceClient {
 
     @GetMapping("/query/page")
     Page<Application> getApplicationPageForQuery(
-            //@Validated @SpringQueryMap QueryDto queryDto
-            @RequestParam(value = "pageNum", required = true) Integer pageNum,
-            @RequestParam(value = "pageSize", required = true) Integer pageSize,
+            @RequestParam(value = "pageNum") Integer pageNum,
+            @RequestParam(value = "pageSize") Integer pageSize,
             @RequestParam(value = "beginTime", required = false) Date beginTime,
             @RequestParam(value = "departmentId", required = false) Long departmentId
     );
@@ -33,4 +34,8 @@ public interface ApplicationServiceClient {
             @RequestParam(value = "beginTime", required = false) Date beginTime,
             @RequestParam(value = "departmentId", required = false) Long departmentId
     );
+
+    @PutMapping("/deposit/{userId}")
+    boolean updateDepositApplicationByUserId(
+            @PathVariable(value = "userId") Long userId);
 }

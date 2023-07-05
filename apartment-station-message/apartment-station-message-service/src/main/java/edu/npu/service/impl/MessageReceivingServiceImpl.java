@@ -15,6 +15,7 @@ import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -65,6 +66,7 @@ public class MessageReceivingServiceImpl extends ServiceImpl<MessageReceivingMap
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public R deleteMessage(AccountUserDetails accountUserDetails, String id) {
         MessageReceiving messageReceiving = ownWaytoGetMessageReceiving(accountUserDetails, id);
         if (messageReceiving == null) {

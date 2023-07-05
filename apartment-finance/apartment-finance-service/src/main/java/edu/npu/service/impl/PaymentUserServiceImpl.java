@@ -27,6 +27,7 @@ import edu.npu.entity.PaymentUser;
 import edu.npu.entity.User;
 import edu.npu.exception.ApartmentError;
 import edu.npu.exception.ApartmentException;
+import edu.npu.feignClient.ApplicationServiceClient;
 import edu.npu.feignClient.UserServiceClient;
 import edu.npu.mapper.PaymentUserMapper;
 import edu.npu.service.PaymentUserService;
@@ -80,6 +81,9 @@ public class PaymentUserServiceImpl extends ServiceImpl<PaymentUserMapper, Payme
 
     @Resource
     private RedisClient redisClient;
+
+    @Resource
+    private ApplicationServiceClient applicationServiceClient;
 
     private static final String USER_DONT_EXIST = "请求的用户不存在";
 
@@ -346,9 +350,20 @@ public class PaymentUserServiceImpl extends ServiceImpl<PaymentUserMapper, Payme
                     log.info("处理订单");
                     // 修改订单状态 订单正常结束
                     paymentUser.setStatus(UserPayStatusEnum.PAID.getValue());
+                    boolean updatePaymentUser = updateById(paymentUser);
+                    boolean updateApplicationStatus = true;
+                    if (paymentUser.getType().equals(UserPayTypeEnum.DEPOSIT.getValue())) {
+                        updateApplicationStatus =
+                                applicationServiceClient.updateDepositApplicationByUserId(
+                                        paymentUser.getUserId()
+                                );
+                    }
+                    if (!updatePaymentUser || !updateApplicationStatus) {
+                        log.error("订单号:{} 回调已收到，参数正常，状态更新失败", outTradeNo);
+                        return result;
+                    }
                     // 记录支付日志
                     log.info("订单号:{} 回调已收到，参数正常，状态已更新", outTradeNo);
-                    updateById(paymentUser);
                 } finally {
                     redisClient.unlock(
                     RedisConstants.LOCK_PAYMENT_USER_KEY + paymentUser.getId()
@@ -426,7 +441,7 @@ public class PaymentUserServiceImpl extends ServiceImpl<PaymentUserMapper, Payme
         ObjectNode bizContent = objectMapper.createObjectNode();
         bizContent.put("out_trade_no", orderId);
         request.setBizContent(bizContent.toString());
-        AlipayTradeQueryResponse response = null;
+        AlipayTradeQueryResponse response;
         try {
             response = alipayClient.execute(request);
         } catch (AlipayApiException e) {

@@ -2,14 +2,11 @@ package edu.npu.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import edu.npu.common.ApplicationStatusEnum;
 import edu.npu.entity.Application;
 import edu.npu.mapper.ApplicationMapper;
-import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
@@ -27,9 +24,8 @@ public class RemoteController {
 
     @GetMapping("/query/page")
     public Page<Application> getApplicationPageForQuery(
-            //@Validated @SpringQueryMap UserPayListQueryDto userPayListQueryDto
-            @RequestParam(value = "pageNum", required = true) Integer pageNum,
-            @RequestParam(value = "pageSize", required = true) Integer pageSize,
+            @RequestParam(value = "pageNum") Integer pageNum,
+            @RequestParam(value = "pageSize") Integer pageSize,
             @RequestParam(value = "beginTime", required = false) Date beginTime,
             @RequestParam(value = "departmentId", required = false) Long departmentId
     ) {
@@ -53,7 +49,6 @@ public class RemoteController {
      * @param departmentId 部门ID
      * @return R
      */
-    @Nullable
     private LambdaQueryWrapper<Application> getApplicationLambdaQueryWrapper(
             Date beginTime, Long departmentId) {
         LambdaQueryWrapper<Application> wrapper = new LambdaQueryWrapper<>();
@@ -69,5 +64,19 @@ public class RemoteController {
         wrapper.in(Application::getApplicationStatus, "10", "20", "30");
         wrapper.orderByDesc(Application::getCreateTime);
         return wrapper;
+    }
+
+    @PutMapping("/deposit/{userId}")
+    public boolean updateDepositApplicationByUserId(
+            @PathVariable(value = "userId") Long userId) {
+        Application application =  applicationMapper.selectOne(
+                new LambdaQueryWrapper<Application>()
+                        .eq(Application::getUserId, userId)
+                        .eq(Application::getApplicationStatus,
+                                ApplicationStatusEnum.CENTER_DORM_ALLOCATION.getValue()));
+        application.setApplicationStatus(
+                ApplicationStatusEnum.CHECK_IN_DEPOSIT.getValue()
+        );
+        return applicationMapper.updateById(application) > 0;
     }
 }

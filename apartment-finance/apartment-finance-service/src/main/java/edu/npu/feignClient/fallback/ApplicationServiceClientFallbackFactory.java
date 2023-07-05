@@ -51,6 +51,14 @@ public class ApplicationServiceClientFallbackFactory
                         cause.getMessage());
                 return Collections.emptyList();
             }
+
+            @Override
+            public boolean updateDepositApplicationByUserId(Long userId) {
+                log.error("调用application-api服务失败，userId:{},原因：{}",
+                        userId,
+                        cause.getMessage());
+                return false;
+            }
         };
     }
 }

@@ -231,9 +231,9 @@ public class CenterApplicationServiceImpl extends ServiceImpl<ApplicationMapper,
                 basicPageQueryDto.pageNum(), basicPageQueryDto.pageSize());
         LambdaQueryWrapper<Application> wrapper =
                 new LambdaQueryWrapper<Application>()
-                        .eq(Application::getApplicationStatus, statusEnum1)
+                        .eq(Application::getApplicationStatus, statusEnum1.getValue())
                         .or()
-                        .eq(Application::getApplicationStatus, statusEnum2)
+                        .eq(Application::getApplicationStatus, statusEnum2.getValue())
                         .orderByDesc(Application::getUpdateTime);
         page = page(page, wrapper);
         Map<String, Object> result = Map.of(
