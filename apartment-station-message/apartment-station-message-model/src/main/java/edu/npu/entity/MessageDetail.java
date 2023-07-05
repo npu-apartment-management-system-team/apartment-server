@@ -54,7 +54,6 @@ public class MessageDetail implements Serializable {
     /**
      * 是否已删除 0未删除 1已删除 default 0 不是传统逻辑删除字段
      */
-    @JsonAlias("is_deleted")
     private Integer isDeleted;
 
     @TableField(exist = false)

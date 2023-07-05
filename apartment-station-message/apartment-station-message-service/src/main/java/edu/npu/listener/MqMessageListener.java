@@ -69,20 +69,25 @@ public class MqMessageListener {
                 log.info("接收到非本项目数据库的消息,db:{}",
                         jsonNode.get("database").asText());
                 return;
-            } else if (!jsonNode.get("table").asText().equals("message_detail")) {
+            } else if (!jsonNode.get("table").asText().equals("message_detail") &&
+                    !jsonNode.get("table").asText().equals("message_receiving")
+            ) {
                 // 由于用的是fanout 所以确实存在这种可能 我们一个业务需要对应一个listener
                 log.info("接收到非本业务消息,table:{}",
                         jsonNode.get("table").asText());
                 return;
             }
             // ok 是我们要处理的内容
-            if (jsonNode.get("type").asText().equals("INSERT")) {
+            if (jsonNode.get("table").asText().equals("message_receiving") &&
+                    jsonNode.get("type").asText().equals("INSERT")) {
                 log.info("开始处理新增Message的同步");
                 handleInsert(jsonNode);
-            } else if (jsonNode.get("type").asText().equals("UPDATE")) {
+            } else if (jsonNode.get("table").asText().equals("message_detail") &&
+                    jsonNode.get("type").asText().equals("UPDATE")) {
                 log.info("开始处理更新Message的同步");
                 handleUpdate(jsonNode);
-            } else if (jsonNode.get("type").asText().equals("DELETE")) {
+            } else if (jsonNode.get("table").asText().equals("message_detail") &&
+                    jsonNode.get("type").asText().equals("DELETE")) {
                 log.info("开始处理删除Message的同步");
                 handleDelete(jsonNode);
             } else {
@@ -97,29 +102,17 @@ public class MqMessageListener {
     }
 
     private void handleInsert(JsonNode jsonNode) {
-        MessageDetail messageDetail = extractMessageFromJsonNode(jsonNode);
-        log.info("收到Message:{}的保存消息,开始同步消息到ES", messageDetail);
+        MessageReceiving messageReceiving = extractMessageReceivingFromJsonNode(jsonNode);
+        log.info("收到Message:{}的保存消息,开始同步消息到ES", messageReceiving);
         cachedThreadPool.execute(() -> {
-            log.info("开始保存Message:{}到ES", messageDetail);
+            log.info("开始保存Message:{}到ES", messageReceiving);
 
-            MessageDoc messageDoc = getMessageDocFromMessageDetail(messageDetail);
+            MessageDetail messageDetail = messageDetailMapper.selectById(
+                    messageReceiving.getMessageDetailId()
+            );
 
-            IndexResponse indexResponse;
-            try {
-                indexResponse = elasticsearchClient.index(index ->
-                        index.index(MESSAGE_INDEX)
-                                .id(String.valueOf(messageDoc.getId()))
-                                .document(messageDoc)
-                );
-            } catch (IOException e) {
-                log.error("ES新增消息失败,message:{},请稍后重试", messageDoc);
-                throw new ApartmentException(ApartmentError.UNKNOWN_ERROR,
-                        "ES新增失败,请稍后重试");
-            }
-            if (indexResponse == null) {
-                log.error("新增消息失败,messageDoc:{}", messageDoc);
-                throw new ApartmentException(ApartmentError.UNKNOWN_ERROR, "ES新增失败");
-            }
+            log.info("开始保存增量信息");
+            updateWithMessageDetail(messageDetail);
             log.info("新增消息成功");
         });
     }
@@ -127,41 +120,35 @@ public class MqMessageListener {
     private void handleUpdate(JsonNode jsonNode) {
         MessageDetail messageDetail = extractMessageFromJsonNode(jsonNode);
         log.info("收到Message:{}的更新消息,开始同步消息到ES", messageDetail);
-        cachedThreadPool.execute(() -> {
-            log.info("开始更新Message:{}到ES", messageDetail);
-            if (messageDetail.getIsDeleted() == 1) {
-                // 其实这是一条删除消息
-                handleDelete(jsonNode);
-                return;
-            }
-
-            MessageDoc messageDoc = getMessageDocFromMessageDetail(messageDetail);
-
-            UpdateRequest<MessageDoc, MessageDoc> updateRequest =
-                    new UpdateRequest.Builder<MessageDoc, MessageDoc>()
-                            .index(MESSAGE_INDEX)
-                            .id(String.valueOf(messageDetail.getId()))
-                            .doc(messageDoc)
-                            .upsert(messageDoc)
-                            .build();
-            UpdateResponse<MessageDoc> updateResponse;
-            // 3.发送请求
-            try {
-                updateResponse =
-                        elasticsearchClient.update(updateRequest, MessageDoc.class);
-            } catch (IOException e) {
-                log.error("更新消息失败,messageDoc:{}, error:{}", messageDoc, e.getMessage());
-                throw new ApartmentException(
-                        ApartmentError.UNKNOWN_ERROR, "ES更新消息失败");
-            }
-            if (updateResponse == null) {
-                log.error("更新消息失败,messageDoc:{}", messageDoc);
-                throw new ApartmentException(
-                        ApartmentError.UNKNOWN_ERROR, "ES更新消息失败");
-            }
-
-        });
+        // 不是传统的逻辑删除
         log.info("更新消息成功");
+    }
+
+    private void updateWithMessageDetail(MessageDetail messageDetail) {
+        MessageDoc messageDoc = getMessageDocFromMessageDetail(messageDetail);
+
+        UpdateRequest<MessageDoc, MessageDoc> updateRequest =
+                new UpdateRequest.Builder<MessageDoc, MessageDoc>()
+                        .index(MESSAGE_INDEX)
+                        .id(String.valueOf(messageDetail.getId()))
+                        .doc(messageDoc)
+                        .upsert(messageDoc)
+                        .build();
+        UpdateResponse<MessageDoc> updateResponse;
+        // 3.发送请求
+        try {
+            updateResponse =
+                    elasticsearchClient.update(updateRequest, MessageDoc.class);
+        } catch (IOException e) {
+            log.error("更新消息失败,messageDoc:{}, error:{}", messageDoc, e.getMessage());
+            throw new ApartmentException(
+                    ApartmentError.UNKNOWN_ERROR, "ES更新消息失败");
+        }
+        if (updateResponse == null) {
+            log.error("更新消息失败,messageDoc:{}", messageDoc);
+            throw new ApartmentException(
+                    ApartmentError.UNKNOWN_ERROR, "ES更新消息失败");
+        }
     }
 
     private void handleDelete(JsonNode jsonNode) {
@@ -220,6 +207,15 @@ public class MqMessageListener {
                 .senderAdminName(admin.getName())
                 .receiverIds(receiverIds)
                 .build();
+    }
+
+    private MessageReceiving extractMessageReceivingFromJsonNode(JsonNode jsonNode) {
+        try {
+            return objectMapper
+                    .treeToValue(jsonNode.get("data").get(0), MessageReceiving.class);
+        } catch (JsonProcessingException e) {
+            throw new ApartmentException(ApartmentError.PARAMS_ERROR, "JSON解析失败");
+        }
     }
 
     private MessageDetail extractMessageFromJsonNode(JsonNode jsonNode) {
