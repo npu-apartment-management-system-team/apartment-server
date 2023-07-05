@@ -24,10 +24,14 @@ public class ApplicationProcessor extends JavaProcessor {
     @Resource
     private ProcessingApplicationService processingApplicationService;
 
-    @Resource
-    private Random random =  SecureRandom.getInstanceStrong();
+    private static final Random random;
 
-    public ApplicationProcessor() throws NoSuchAlgorithmException {
+    static {
+        try {
+            random = SecureRandom.getInstanceStrong();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
