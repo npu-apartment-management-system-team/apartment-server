@@ -118,11 +118,11 @@ public class OssUtil {
 
     /**
      * 下载职工住宿历史变动表
-     * @param variationList
-     * @param beginTime
-     * @param departmentId
-     * @param baseDir
-     * @return
+     * @param variationList 历史变动表
+     * @param beginTime 开始时间
+     * @param departmentId 部门id
+     * @param baseDir 文件夹名
+     * @return 下载地址url
      */
     public String downloadVariationList(List<Application> variationList, Date beginTime, Long departmentId, String baseDir) {
         try (
@@ -171,11 +171,11 @@ public class OssUtil {
 
     /**
      * 下载单位代扣表
-     * @param withholdList
-     * @param beginTime
-     * @param departmentId
-     * @param baseDir
-     * @return
+     * @param withholdList 单位代扣表
+     * @param beginTime 开始时间
+     * @param departmentId 部门id
+     * @param baseDir 文件夹名
+     * @return 下载地址url
      */
     public String downloadWithholdList(List<PaymentDepartment> withholdList, Date beginTime, Long departmentId, String baseDir) {
         try (
@@ -227,11 +227,11 @@ public class OssUtil {
 
     /**
      * 下载自收表
-     * @param chargeList
-     * @param beginTime
-     * @param departmentId
-     * @param baseDir
-     * @return
+     * @param chargeList 自收表
+     * @param beginTime 开始时间
+     * @param departmentId 部门id
+     * @param baseDir 文件夹名
+     * @return 下载url
      */
     public String downloadChargeList(List<PaymentUser> chargeList, Date beginTime, Long departmentId, String baseDir) {
         try (
@@ -282,10 +282,10 @@ public class OssUtil {
 
     /**
      * 上传到Oss
-     * @param workbook
-     * @param file
-     * @param baseDir
-     * @return
+     * @param workbook 工作表
+     * @param file 文件名
+     * @param baseDir 文件夹名
+     * @return 下载url
      */
     private String uploadFileToOss(Workbook workbook, File file, String baseDir) {
         try (
