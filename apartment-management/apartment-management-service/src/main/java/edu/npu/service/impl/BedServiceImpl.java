@@ -43,52 +43,24 @@ public class BedServiceImpl extends ServiceImpl<BedMapper, Bed>
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R getBedList(BedPageQueryDto bedPageQueryDto) {
-        try {
-            List<Bed> bedList = new ArrayList<>();
-            boolean hasQuery = false;
-            if (bedPageQueryDto.apartmentId() != null) {
-                hasQuery = true;
-                List<Room> roomList =
-                        roomMapper.selectList(new LambdaQueryWrapper<Room>()
-                                .eq(Room::getApartmentId, bedPageQueryDto.apartmentId()));
-                bedList = list(new LambdaQueryWrapper<Bed>()
-                        .in(Bed::getRoomId, roomList.stream().map(Room::getId).toArray()));
-            } else if (bedPageQueryDto.roomId() != null) {
-                hasQuery = true;
-                bedList = list(new LambdaQueryWrapper<Bed>()
-                        .eq(Bed::getRoomId, bedPageQueryDto.roomId()));
-            }
 
-            IPage<Bed> page = new Page<>(
-                    bedPageQueryDto.pageNum(), bedPageQueryDto.pageSize());
-            LambdaQueryWrapper<Bed> queryWrapper = new LambdaQueryWrapper<>();
+        Page<Bed> bedPage = new Page<>(bedPageQueryDto.pageNum(), bedPageQueryDto.pageSize());
 
-            if (bedPageQueryDto.query() != null) {
-                hasQuery = true;
-                queryWrapper.like(Bed::getName, bedPageQueryDto.query());
-            }
-            if (bedPageQueryDto.apartmentId() != null ||
-                    bedPageQueryDto.roomId() != null) {
-                hasQuery = true;
-                queryWrapper.in(Bed::getId, bedList.stream().map(Bed::getId).toArray());
-            }
-            if (bedPageQueryDto.isInUse() != null) {
-                hasQuery = true;
-                queryWrapper.eq(Bed::getIsInUse, bedPageQueryDto.isInUse());
-            }
-            if (hasQuery) {
-                bedMapper.selectPage(page, queryWrapper);
-            } else {
-                bedMapper.selectPage(page, null);
-            }
-
-            Map<String, Object> resultMap = new HashMap<>();
-            resultMap.put("list", page.getRecords());
-            resultMap.put("total", page.getTotal());
-            return R.ok().put("result", resultMap);
-        } catch (Exception e) {
-            throw new ApartmentException("查询管理员列表失败！");
+        List<Long> roomIdList = null;
+        if (bedPageQueryDto.apartmentId() != null) {
+            roomIdList = roomMapper.selectList(new LambdaQueryWrapper<Room>()
+                            .eq(Room::getApartmentId, bedPageQueryDto.apartmentId()))
+                    .stream().map(Room::getId).toList();
         }
+
+        bedPage = this.baseMapper.selectPage(bedPage, new LambdaQueryWrapper<Bed>()
+                .eq(bedPageQueryDto.roomId() != null, Bed::getRoomId, bedPageQueryDto.roomId())
+                .eq(bedPageQueryDto.isInUse() != null, Bed::getIsInUse, bedPageQueryDto.isInUse())
+                .like(!bedPageQueryDto.query().isBlank(), Bed::getName, bedPageQueryDto.query())
+                .in(roomIdList != null, Bed::getRoomId, roomIdList));
+
+        Map<String, Object> resultMap = Map.of("list", bedPage.getRecords(), "total", bedPage.getTotal());
+        return R.ok().put("result", resultMap);
     }
 
     @Override
@@ -100,8 +72,8 @@ public class BedServiceImpl extends ServiceImpl<BedMapper, Bed>
 
     @Override
     public R addBed(AddBedDto addBedDto) {
-        Bed bed=new Bed();
-        BeanUtils.copyProperties(addBedDto,bed);
+        Bed bed = new Bed();
+        BeanUtils.copyProperties(addBedDto, bed);
         return bedMapper.insert(bed) == 1 ?
                 R.ok("添加成功!") : R.error("添加失败!");
     }
@@ -109,7 +81,7 @@ public class BedServiceImpl extends ServiceImpl<BedMapper, Bed>
     @Override
     public R updateBed(Long id, UpdateBedDto updateBedDto) {
         Bed bed = bedMapper.selectById(id);
-        BeanUtils.copyProperties(updateBedDto,bed);
+        BeanUtils.copyProperties(updateBedDto, bed);
         bed.setId(id);
         return bedMapper.updateById(bed) == 1 ?
                 R.ok("修改成功!") : R.error("修改失败!");
