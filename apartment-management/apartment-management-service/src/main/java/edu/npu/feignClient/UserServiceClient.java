@@ -24,4 +24,8 @@ public interface UserServiceClient {
 
     @GetMapping("/user")
     User getUserById(@RequestParam(value = "id") Long id);
+
+    @GetMapping("/user/loginAccountId")
+    User getUserByLoginAccountId(
+            @RequestParam(value = "loginAccountId") Long loginAccountId);
 }
