@@ -120,16 +120,7 @@ public class MqMessageListener {
     private void handleUpdate(JsonNode jsonNode) {
         MessageDetail messageDetail = extractMessageFromJsonNode(jsonNode);
         log.info("收到Message:{}的更新消息,开始同步消息到ES", messageDetail);
-        cachedThreadPool.execute(() -> {
-            log.info("开始更新Message:{}到ES", messageDetail);
-            if (messageDetail.getIsDeleted() == 1) {
-                // 其实这是一条删除消息
-                handleDelete(jsonNode);
-                return;
-            }
-
-            updateWithMessageDetail(messageDetail);
-        });
+        // 不是传统的逻辑删除
         log.info("更新消息成功");
     }
 
