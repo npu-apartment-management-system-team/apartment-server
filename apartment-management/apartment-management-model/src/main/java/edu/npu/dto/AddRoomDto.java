@@ -2,11 +2,9 @@ package edu.npu.dto;
 
 import jakarta.validation.constraints.NotNull;
 
-import java.lang.reflect.Type;
-
 public record AddRoomDto(
         @NotNull
-        String apartmentId,
+        Long apartmentId,
         @NotNull
         String name,
         @NotNull

@@ -8,13 +8,13 @@ import jakarta.validation.constraints.NotNull;
  * @Date: 2023/6/29
  */
 public record DepartmentDto(
-        @NotNull(message = "班组长id不能为空")
+        @NotNull(message = "公寓名称不能为空")
         String name,
 
         @NotNull(message = "单位类型不能为空")
         Integer isInterior,
 
-        @NotNull(message = "单位id不能为空")
+        @NotNull(message = "缴费类型不能为空")
         Integer payType,
 
         @NotNull(message = "位置不可为空")
