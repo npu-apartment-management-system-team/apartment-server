@@ -66,9 +66,6 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
     @Transactional(rollbackFor = Exception.class)
     public R addAdmin(AdminDto adminDto) {
 
-//        if (isAddAdminValid(addAdminDto)){
-//            return R.error(ResponseCodeEnum.PRE_CHECK_FAILED, "新增管理员账号参数不完整");
-//        }
 
         if (StringUtils.hasText(adminDto.email()) &&
                 !adminDto.email().matches(EMAIL_REGEX)){

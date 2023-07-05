@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * @description : [一句话描述该类的功能]
  */
 @SpringBootTest
-public class EsTest {
+class EsTest {
 
     @Test
     void syncUserInMySQLToEsAndRedis() {

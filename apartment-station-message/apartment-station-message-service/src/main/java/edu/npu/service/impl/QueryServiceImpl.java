@@ -123,7 +123,7 @@ public class QueryServiceImpl implements QueryService {
             Admin admin =
                     userServiceClient.getAdminByLoginAccountId(
                             accountUserDetails.getId());
-            if (isOutBox) {
+            if (Boolean.TRUE.equals(isOutBox)) {
                 loginAccountQuery = new BoolQuery.Builder()
                         .should(new MatchQuery.Builder()
                                 .field("receiverIds").query(admin.getId())

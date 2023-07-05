@@ -13,31 +13,31 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 
 @SpringBootTest
-public class AdminServiceTest {
+class AdminServiceTest {
 
     @Resource
     private AdminService adminService;
 
     @Test
-    public void addTest() {
+    void addTest() {
         AdminDto adminDto = new AdminDto("18888888888", "e0FqeTS/s+/kBrzF6jZg3yKQ/F25qnm+OPE4kAeqA0crzg119TqfX5NN0W6Givc2eLmO+b80E5VL/Ps+GSMlXCmRKUkGcNVZT9YZUA3vdzLuoHBJW7k+87VVs0uY3/Ye5d89blVW22bnPkCXwhzFqYSrHBbTv8GjYU0ybqmnv7kqRsxQTUbfqaiOZzc6WPAdLN//0IezSGEOs/tN6AovsZpO9p5ymC8YgQLacMD+23u+om1s47pdIMyKM5FOMwzV4OV80joVtCFtq0gawIm/4W9o7UikrCnN7XvJ+IdgBhF15k7Skeee4/RC7ehscLADskpXzb3sC9hcGxxeztvOpQ==", 0, "俞淑敏", 1L, "850778435@qq.com");
         adminService.addAdmin(adminDto);
     }
 
     @Test
-    public void deleteTest() {
+    void deleteTest() {
         System.out.printf(adminService.deleteAdmin(3L).toString());;
 
     }
 
     @Test
-    public void updateTest() {
+    void updateTest() {
         AdminDto adminDto = new AdminDto("18368847619", "e0FqeTS/s+/kBrzF6jZg3yKQ/F25qnm+OPE4kAeqA0crzg119TqfX5NN0W6Givc2eLmO+b80E5VL/Ps+GSMlXCmRKUkGcNVZT9YZUA3vdzLuoHBJW7k+87VVs0uY3/Ye5d89blVW22bnPkCXwhzFqYSrHBbTv8GjYU0ybqmnv7kqRsxQTUbfqaiOZzc6WPAdLN//0IezSGEOs/tN6AovsZpO9p5ymC8YgQLacMD+23u+om1s47pdIMyKM5FOMwzV4OV80joVtCFtq0gawIm/4W9o7UikrCnN7XvJ+IdgBhF15k7Skeee4/RC7ehscLADskpXzb3sC9hcGxxeztvOpQ==", 1, "Yu", 1L, "850778435@qq.com");
         adminService.updateAdmin(3L, adminDto);
     }
 
     @Test
-    public void getAdminListTest() {
+    void getAdminListTest() {
         AdminPageQueryDto adminPageQueryDto1 = new AdminPageQueryDto(1, 2, null, null);
         AdminPageQueryDto adminPageQueryDto2 = new AdminPageQueryDto(2, 2, null, null);
         AdminPageQueryDto adminPageQueryDto3 = new AdminPageQueryDto(1, 2, "L", null);
@@ -52,7 +52,7 @@ public class AdminServiceTest {
     }
 
     @Test
-    public void getForemanListTest() {
+    void getForemanListTest() {
         System.out.printf(adminService.getForemanList().toString());
     }
 

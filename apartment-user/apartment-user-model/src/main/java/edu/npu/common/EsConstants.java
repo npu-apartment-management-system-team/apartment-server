@@ -6,5 +6,9 @@ package edu.npu.common;
  */
 public class EsConstants {
 
+    private EsConstants(){
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String USER_INDEX = "apartment-user";
 }

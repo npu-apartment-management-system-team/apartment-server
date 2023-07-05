@@ -151,9 +151,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         // 删除人脸实体
         LoginAccount loginAccount = loginAccountMapper.selectById(user.getLoginAccountId());
-        FACE_EXECUTOR.execute(() -> {
-            authServiceClient.deleteFaceEntity(loginAccount.getUsername());
-        });
+        FACE_EXECUTOR.execute(() -> authServiceClient.deleteFaceEntity(loginAccount.getUsername()));
         boolean userDelete=this.removeById(id);
         int DeleteById = loginAccountMapper.deleteById(id);
         if(userDelete&&DeleteById==1){
