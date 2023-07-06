@@ -5,6 +5,7 @@ import edu.npu.dto.BasicReviewDto;
 import edu.npu.service.ApartmentApplicationService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +24,7 @@ public class ApartmentApplicationController {
     private ApartmentApplicationService applicationService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('CENTER_DORM_MANAGER')")
     public R getApplicationList(
             @Validated BasicPageQueryDto basicPageQueryDto
     ) {
@@ -30,6 +32,7 @@ public class ApartmentApplicationController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('CENTER_DORM_MANAGER')")
     public R statusChangeConfirm(
             @Validated BasicReviewDto reviewDto
     ) {

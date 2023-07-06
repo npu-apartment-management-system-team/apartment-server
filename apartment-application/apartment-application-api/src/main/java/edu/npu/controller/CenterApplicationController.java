@@ -7,10 +7,7 @@ import edu.npu.service.CenterApplicationService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author : [wangminan]
@@ -33,7 +30,7 @@ public class CenterApplicationController {
 
     @PostMapping("/checkin")
     public R reviewApplicationForCenter(
-            @Validated BasicReviewDto basicReviewDto) {
+            @RequestBody @Validated BasicReviewDto basicReviewDto) {
         return centerApplicationService.reviewApplicationForCenter(
                 basicReviewDto
         );
@@ -50,7 +47,7 @@ public class CenterApplicationController {
 
     @PostMapping
     public R handleAllocateBed(
-            @Validated AllocationDto allocationDto
+            @RequestBody @Validated AllocationDto allocationDto
     ) {
         return centerApplicationService.handleAllocateBed(allocationDto);
     }
