@@ -26,8 +26,11 @@ public class ReceiverController {
         return messageReceivingService.getMessageDetail(accountUserDetails,id);
     }
 
+    /**
+     * @deprecated 因为ES表结构设计原因，无法实现接口功能，故弃用
+     */
     @DeleteMapping("/inbox/{id}")
-    @Deprecated
+    @Deprecated(since="v0.0.6.0",forRemoval = true)
     public R DeleteMessage(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                            @PathVariable String id) {
         return messageReceivingService.deleteMessage(accountUserDetails,id);
