@@ -230,7 +230,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
                     new LambdaQueryWrapper<Admin>()
                             .select(Admin::getId, Admin::getName)
                             .inSql(Admin::getLoginAccountId, "SELECT id FROM login_account WHERE role = 5")
-                            .isNull(Admin::getDepartmentId));
+                            .notInSql(Admin::getId, "SELECT foreman_admin_id FROM apartment"));
 
             for (Admin admin : adminList) {
                 Map<String, Object> map = new HashMap<>();
