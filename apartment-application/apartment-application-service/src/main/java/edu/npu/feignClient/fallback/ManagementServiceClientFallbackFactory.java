@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,7 +56,7 @@ public class ManagementServiceClientFallbackFactory
             @Override
             public List<Bed> getBedsByApartmentId(Long apartmentId) {
                 log.error("调用management-api服务获取Beds失败，原因：{}", cause.getMessage());
-                return null;
+                return new ArrayList<>();
             }
         };
     }
