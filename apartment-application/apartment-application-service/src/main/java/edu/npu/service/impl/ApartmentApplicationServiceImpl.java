@@ -60,11 +60,18 @@ public class ApartmentApplicationServiceImpl extends ServiceImpl<ApplicationMapp
         );
 
 
-        Apartment apartment = managementServiceClient.getApartmentByAdminId(admin.getId());
-        if (apartment == null) {
-            return R.error(ResponseCodeEnum.NOT_FOUND, "该宿舍不存在");
+        List<Apartment> apartments =
+                managementServiceClient.getApartmentListByAdminId(admin.getId());
+
+        if (apartments.isEmpty()) {
+            return R.error(ResponseCodeEnum.NOT_FOUND, "宿舍不存在");
         }
-        List<Bed> beds = managementServiceClient.getBedsByApartmentId(apartment.getId());
+
+        List<Bed> beds = new ArrayList<>();
+        for (Apartment apartment : apartments) {
+            beds.addAll(managementServiceClient.getBedsByApartmentId(apartment.getId()));
+        }
+
         if (beds.isEmpty()) {
             return R.error(ResponseCodeEnum.NOT_FOUND, "该宿舍没有床位");
         }

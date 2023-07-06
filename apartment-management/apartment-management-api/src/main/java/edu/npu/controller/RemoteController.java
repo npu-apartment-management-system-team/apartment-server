@@ -75,8 +75,8 @@ public class RemoteController {
     }
 
     @GetMapping("/apartment")
-    Apartment getApartmentByAdminId(@RequestParam(value = "adminId") Long adminId) {
-        return apartmentService.getOne(
+    List<Apartment> getApartmentListByAdminId(@RequestParam(value = "adminId") Long adminId) {
+        return apartmentService.list(
                 new LambdaQueryWrapper<Apartment>().eq(
                         Apartment::getForemanAdminId, adminId
                 )

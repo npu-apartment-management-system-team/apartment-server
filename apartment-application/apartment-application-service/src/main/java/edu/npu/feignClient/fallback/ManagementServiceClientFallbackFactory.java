@@ -48,9 +48,9 @@ public class ManagementServiceClientFallbackFactory
             }
 
             @Override
-            public Apartment getApartmentByAdminId(Long id) {
+            public List<Apartment> getApartmentListByAdminId(Long id) {
                 log.error("调用management-api服务获取Apartment失败，原因：{}", cause.getMessage());
-                return null;
+                return new ArrayList<>();
             }
 
             @Override
