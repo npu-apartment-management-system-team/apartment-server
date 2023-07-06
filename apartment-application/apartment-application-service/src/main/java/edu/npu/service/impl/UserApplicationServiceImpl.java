@@ -83,7 +83,7 @@ public class UserApplicationServiceImpl extends ServiceImpl<ApplicationMapper, A
         // 查表 如果该用户有进行中的申请则不允许新增
         LambdaQueryWrapper<Application> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Application::getUserId, user.getId())
-                .between(Application::getApplicationStatus,
+                .and(i -> i.between(Application::getApplicationStatus,
                         CHECK_IN_SUBMIT.getValue(),
                         CHECK_IN_DEPOSIT.getValue())
                 .or()
@@ -92,7 +92,8 @@ public class UserApplicationServiceImpl extends ServiceImpl<ApplicationMapper, A
                         CENTER_DORM_MANAGER_CHANGE_CHECK_OUT_CONFIRM.getValue())
                 .or()
                 .eq(Application::getApplicationStatus,
-                        CHECK_OUT_SUBMIT.getValue());
+                        CHECK_OUT_SUBMIT.getValue())
+                );
         if (count(wrapper) > 0) {
             return R.error(ResponseCodeEnum.PRE_CHECK_FAILED,
                     "您有进行中的申请,请勿重复申请");

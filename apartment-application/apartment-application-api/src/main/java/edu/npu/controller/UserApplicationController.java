@@ -21,8 +21,8 @@ public class UserApplicationController {
     @Resource
     private UserApplicationService userApplicationService;
 
-    @PreAuthorize("hasAuthority('USER')")
     @GetMapping("/apply/status")
+    @PreAuthorize("hasAuthority('USER')")
     public R getApplicationStatus(
             @AuthenticationPrincipal AccountUserDetails accountUserDetails,
             @Validated UserStatusPageQueryDto pageQueryDto) {

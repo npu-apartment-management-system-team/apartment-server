@@ -1,5 +1,6 @@
 package edu.npu.feignClient.fallback;
 
+import edu.npu.entity.Apartment;
 import edu.npu.entity.Bed;
 import edu.npu.entity.Department;
 import edu.npu.entity.Room;
@@ -7,6 +8,9 @@ import edu.npu.feignClient.ManagementServiceClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author : [wangminan]
@@ -41,6 +45,18 @@ public class ManagementServiceClientFallbackFactory
             public boolean updateBed(Bed bed) {
                 log.error("调用management-api服务更新Bed失败，原因：{}", cause.getMessage());
                 return false;
+            }
+
+            @Override
+            public List<Apartment> getApartmentListByAdminId(Long id) {
+                log.error("调用management-api服务获取Apartment失败，原因：{}", cause.getMessage());
+                return new ArrayList<>();
+            }
+
+            @Override
+            public List<Bed> getBedsByApartmentId(Long apartmentId) {
+                log.error("调用management-api服务获取Beds失败，原因：{}", cause.getMessage());
+                return new ArrayList<>();
             }
         };
     }

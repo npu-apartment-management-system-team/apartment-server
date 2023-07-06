@@ -1,5 +1,6 @@
 package edu.npu.feignClient;
 
+import edu.npu.entity.Apartment;
 import edu.npu.entity.Bed;
 import edu.npu.entity.Department;
 import edu.npu.entity.Room;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @FeignClient(value = "management-api",
         path = "/management/remote",
@@ -26,4 +29,12 @@ public interface ManagementServiceClient {
 
     @PutMapping("/bed")
     boolean updateBed(@RequestBody Bed bed);
+
+    @GetMapping("/apartment")
+    List<Apartment> getApartmentListByAdminId(@RequestParam(value = "adminId") Long adminId);
+
+    @GetMapping("/bedsByApartment")
+    List<Bed> getBedsByApartmentId(
+            @RequestParam(value = "apartmentId") Long apartmentId
+    );
 }

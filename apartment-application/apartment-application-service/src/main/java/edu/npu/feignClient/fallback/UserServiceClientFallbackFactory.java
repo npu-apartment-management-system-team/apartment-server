@@ -51,7 +51,7 @@ public class UserServiceClientFallbackFactory implements FallbackFactory<UserSer
             }
 
             @Override
-            public List<User> getUserByBedId(Long bedId) {
+            public List<User> getUsersByBedId(Long bedId) {
                 log.error("调用user-api服务获取User列表失败，原因：{}", cause.getMessage());
                 return Collections.emptyList();
             }

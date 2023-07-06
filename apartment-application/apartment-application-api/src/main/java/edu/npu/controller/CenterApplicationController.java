@@ -6,11 +6,9 @@ import edu.npu.dto.BasicReviewDto;
 import edu.npu.service.CenterApplicationService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author : [wangminan]
@@ -24,6 +22,7 @@ public class CenterApplicationController {
     private CenterApplicationService centerApplicationService;
 
     @GetMapping("/checkin")
+    @PreAuthorize("hasAuthority('CENTER_CHECK_IN_CLERK')")
     public R getApplicationListForCenter(
             @Validated BasicPageQueryDto basicPageQueryDto) {
         return centerApplicationService.getApplicationListForCenter(
@@ -32,14 +31,16 @@ public class CenterApplicationController {
     }
 
     @PostMapping("/checkin")
+    @PreAuthorize("hasAuthority('CENTER_CHECK_IN_CLERK')")
     public R reviewApplicationForCenter(
-            @Validated BasicReviewDto basicReviewDto) {
+            @RequestBody @Validated BasicReviewDto basicReviewDto) {
         return centerApplicationService.reviewApplicationForCenter(
                 basicReviewDto
         );
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('CENTER_DORM_ALLOCATION_CLERK')")
     public R getWaitingAllocateList(
             @Validated BasicPageQueryDto basicPageQueryDto
     ) {
@@ -49,8 +50,9 @@ public class CenterApplicationController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('CENTER_DORM_ALLOCATION_CLERK')")
     public R handleAllocateBed(
-            @Validated AllocationDto allocationDto
+            @RequestBody @Validated AllocationDto allocationDto
     ) {
         return centerApplicationService.handleAllocateBed(allocationDto);
     }

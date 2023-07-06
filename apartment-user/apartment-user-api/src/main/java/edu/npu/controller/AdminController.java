@@ -39,6 +39,7 @@ public class AdminController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public R updateAdmin(@AuthenticationPrincipal UserDetails userDetails,
                          @PathVariable("id") Long id,
                          @RequestBody AdminDto adminDto) {

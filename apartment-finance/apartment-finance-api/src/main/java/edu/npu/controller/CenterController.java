@@ -6,6 +6,7 @@ import edu.npu.service.PaymentCenterService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,18 +55,21 @@ public class CenterController {
 
 
     @GetMapping("/charge")
+    @PreAuthorize("hasAuthority('CENTER_FINANCE_CLERK')")
     public R getChargeList(QueryDto queryDto) {
         return paymentCenterService.getChargeList(queryDto);
     }
 
 
     @GetMapping("/charge/detail")
+    @PreAuthorize("hasAuthority('CENTER_FINANCE_CLERK')")
     public R getChargeDetailById(Long id) {
         return paymentCenterService.getChargeDetailById(id);
     }
 
 
     @GetMapping("/charge/download")
+    @PreAuthorize("hasAuthority('CENTER_FINANCE_CLERK')")
     public R downloadChargeList(DownloadQueryDto downloadQueryDto) {
         return paymentCenterService.downloadChargeList(downloadQueryDto);
     }

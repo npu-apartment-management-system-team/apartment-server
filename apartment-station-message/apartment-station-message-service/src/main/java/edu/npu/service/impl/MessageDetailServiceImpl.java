@@ -35,6 +35,12 @@ public class MessageDetailServiceImpl extends ServiceImpl<MessageDetailMapper, M
     @Resource
     private UserServiceClient userServiceClient;
 
+    private static final String SENDER_ID_PREFIX = "senderId[";
+
+    private static final String MESSAGE_DONT_EXIST = "id[{}]的信息不存在或已删除";
+
+    private static final String MESSAGE_DONT_EXIST_SUFFIX = "]的信息不存在或已删除";
+
 
     @Override
     public R sendMessage(SendMessageDto sendMessageDto) {
@@ -65,7 +71,7 @@ public class MessageDetailServiceImpl extends ServiceImpl<MessageDetailMapper, M
                 messageReceiving.setReceiverAdminId(Long.valueOf(receiverAdminId));
                 int s1 = messageReceivingMapper.insert(messageReceiving);
                 if (0 == s1) {
-                    throw new ApartmentException("senderId[" + sendMessageDto.senderAdminId() + "]的messageReceiving关联数据存储失败");
+                    throw new ApartmentException(SENDER_ID_PREFIX + sendMessageDto.senderAdminId() + "]的messageReceiving关联数据存储失败");
                 }
             }
             for (String receiverUserId : sendMessageDto.receiverUserIds()) {
@@ -77,13 +83,13 @@ public class MessageDetailServiceImpl extends ServiceImpl<MessageDetailMapper, M
                 messageReceiving.setReceiverUserId(Long.valueOf(receiverUserId));
                 int s2 = messageReceivingMapper.insert(messageReceiving);
                 if (0 == s2) {
-                    throw new ApartmentException("senderId[" + sendMessageDto.senderAdminId() + "]的messageReceiving关联数据存储失败");
+                    throw new ApartmentException(SENDER_ID_PREFIX + sendMessageDto.senderAdminId() + "]的messageReceiving关联数据存储失败");
                 }
             }
-            return R.ok("senderId[" + sendMessageDto.senderAdminId() + "]message存储成功");
+            return R.ok(SENDER_ID_PREFIX + sendMessageDto.senderAdminId() + "]message存储成功");
         } else {
-            log.error("senderId[" + sendMessageDto.senderAdminId() + "]的messageDetail存储失败");
-            return R.error("senderId[" + sendMessageDto.senderAdminId() + "]的messageDetail存储失败");
+            log.error(SENDER_ID_PREFIX + sendMessageDto.senderAdminId() + "]的messageDetail存储失败");
+            return R.error(SENDER_ID_PREFIX + sendMessageDto.senderAdminId() + "]的messageDetail存储失败");
         }
 
     }
@@ -96,8 +102,8 @@ public class MessageDetailServiceImpl extends ServiceImpl<MessageDetailMapper, M
                 .eq(MessageDetail::getIsWithdrawn, 0)
                 .eq(MessageDetail::getIsDeleted, 0));
         if (messageDetail == null) {
-            log.error("id[{}]的信息不存在或已删除", id);
-            return R.error("id[" + id + "]的信息不存在或已删除");
+            log.error(MESSAGE_DONT_EXIST, id);
+            return R.error("id[" + id + MESSAGE_DONT_EXIST_SUFFIX);
         }
 
         List<MessageReceiving> messageReceivingList = messageReceivingMapper.selectList(new LambdaQueryWrapper<MessageReceiving>()
@@ -123,8 +129,8 @@ public class MessageDetailServiceImpl extends ServiceImpl<MessageDetailMapper, M
                 .eq(MessageDetail::getIsDeleted, 0));
 
         if (messageDetail == null) {
-            log.error("id[{}]的信息不存在或已删除", id);
-            return R.error("id[" + id + "]的信息不存在或已删除");
+            log.error(MESSAGE_DONT_EXIST, id);
+            return R.error("id[" + id + MESSAGE_DONT_EXIST_SUFFIX);
         }
         if (messageDetail.getIsWithdrawn() == 1) {
             log.error("id[{}]的信息已经撤回", id);
@@ -157,8 +163,8 @@ public class MessageDetailServiceImpl extends ServiceImpl<MessageDetailMapper, M
                 .eq(MessageDetail::getId, id)
                 .eq(MessageDetail::getIsDeleted, 0));
         if (messageDetail == null) {
-            log.error("id[{}]的信息不存在或已删除", id);
-            return R.error("id[" + id + "]的信息不存在或已删除");
+            log.error(MESSAGE_DONT_EXIST, id);
+            return R.error("id[" + id + MESSAGE_DONT_EXIST_SUFFIX);
         }
 
         messageDetail.setIsDeleted(1);
