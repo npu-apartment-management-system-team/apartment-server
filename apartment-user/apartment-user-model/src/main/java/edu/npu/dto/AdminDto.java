@@ -16,7 +16,7 @@ public record AdminDto(
         Integer role,
         @NotNull
         String name,
-        @NotNull
+
         Long departmentId,
         String email
 ) {
