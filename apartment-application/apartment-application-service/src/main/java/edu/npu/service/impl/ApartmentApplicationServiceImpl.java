@@ -86,7 +86,8 @@ public class ApartmentApplicationServiceImpl extends ServiceImpl<ApplicationMapp
 
         LambdaQueryWrapper<Application> wrapper =
             new LambdaQueryWrapper<Application>()
-                .in(Application::getUserId, users)
+                .in(Application::getUserId, users
+                        .stream().map(User::getId).toArray())
                 .and( i -> i// 入住
                         .eq(Application::getApplicationStatus,
                                 CHECK_IN_DEPOSIT.getValue())
