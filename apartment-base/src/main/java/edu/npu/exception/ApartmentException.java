@@ -15,7 +15,7 @@ public class ApartmentException extends RuntimeException{
     @Serial
     private static final long serialVersionUID = 165421815L;
 
-    private  String msg;
+    private String msg;
 
     public ApartmentException() {
         super();
@@ -30,4 +30,5 @@ public class ApartmentException extends RuntimeException{
         super(commonError.getErrMessage() + " " + message);
         this.msg = commonError.getErrMessage() + " " + message;
     }
+
 }

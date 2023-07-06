@@ -45,6 +45,8 @@ public class QueryServiceImpl implements QueryService {
     @Resource
     private ElasticsearchClient elasticsearchClient;
 
+    private static final String RECEIVER_ID = "receiverIds";
+
     @Override
     public R querySenderOutbox(AccountUserDetails accountUserDetails,
                                BasicQueryDto queryDto) {
@@ -116,7 +118,7 @@ public class QueryServiceImpl implements QueryService {
                     userServiceClient.getUserByLoginAccountId(
                             accountUserDetails.getId());
             loginAccountQuery = new MatchQuery.Builder()
-                    .field("receiverIds").query(user.getId())
+                    .field(RECEIVER_ID).query(user.getId())
                     .build()._toQuery();
         } else {
             // 除了receiverIds字段的数组还需要检索senderAdminId是否包含
@@ -126,7 +128,7 @@ public class QueryServiceImpl implements QueryService {
             if (Boolean.TRUE.equals(isOutBox)) {
                 loginAccountQuery = new BoolQuery.Builder()
                         .should(new MatchQuery.Builder()
-                                .field("receiverIds").query(admin.getId())
+                                .field(RECEIVER_ID).query(admin.getId())
                                 .build()._toQuery())
                         .should(new MatchQuery.Builder()
                                 .field("senderAdminId").query(admin.getId())
@@ -134,7 +136,7 @@ public class QueryServiceImpl implements QueryService {
                         .build()._toQuery();
             } else {
                 loginAccountQuery = new MatchQuery.Builder()
-                        .field("receiverIds").query(admin.getId())
+                        .field(RECEIVER_ID).query(admin.getId())
                         .build()._toQuery();
             }
         }
