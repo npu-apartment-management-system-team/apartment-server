@@ -7,6 +7,7 @@ import edu.npu.service.PaymentDepartmentService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -58,6 +59,7 @@ public class DepartmentController {
 
 
     @GetMapping("/charge")
+    @PreAuthorize("hasAuthority('DEPARTMENT_FINANCE_CLERK')")
     public R getChargeList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                     QueryDto queryDto) {
         return paymentDepartmentService.getChargeList(accountUserDetails, queryDto);
@@ -65,18 +67,21 @@ public class DepartmentController {
 
 
     @GetMapping("/charge/detail")
+    @PreAuthorize("hasAuthority('DEPARTMENT_FINANCE_CLERK')")
     public R getChargeDetailById(Long id) {
         return paymentDepartmentService.getChargeDetailById(id);
     }
 
 
     @GetMapping("/charge/download")
+    @PreAuthorize("hasAuthority('DEPARTMENT_FINANCE_CLERK')")
     public R downloadChargeList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                          DownloadQueryDto downloadQueryDto) {
         return paymentDepartmentService.downloadChargeList(accountUserDetails, downloadQueryDto);
     }
 
     @PostMapping("/pay/{id}")
+    @PreAuthorize("hasAuthority('DEPARTMENT_FINANCE_CLERK')")
     public R postChequeId(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                    @PathVariable("id") Long id, @RequestParam String chequeId) {
         return paymentDepartmentService.postChequeId(accountUserDetails, id, chequeId);

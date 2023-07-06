@@ -6,6 +6,7 @@ import edu.npu.service.PaymentUserService;
 import edu.npu.vo.R;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,12 +26,14 @@ public class UserController {
     private PaymentUserService paymentUserService;
 
     @GetMapping("/pay/list")
+    @PreAuthorize("hasAuthority('USER')")
     public R getPayList(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                         @Validated QueryDto queryDto) {
         return paymentUserService.getPayList(accountUserDetails, queryDto);
     }
 
     @PostMapping("/pay/{id}")
+    @PreAuthorize("hasAuthority('USER')")
     public R startPay(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                       @PathVariable("id") Long id) {
         return paymentUserService.startPay(accountUserDetails, id);
@@ -56,6 +59,7 @@ public class UserController {
      * @return R
      */
     @PutMapping("/pay/{paymentId}")
+    @PreAuthorize("hasAuthority('USER')")
     public R updatePay(@AuthenticationPrincipal AccountUserDetails accountUserDetails,
                        @PathVariable("paymentId") Long paymentId) {
         return paymentUserService.updatePay(accountUserDetails, paymentId);

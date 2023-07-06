@@ -22,8 +22,8 @@ public class DepartmentApplicationController {
     @Resource
     private DepartmentApplicationService departmentService;
 
-    @PreAuthorize("hasAuthority('DEPARTMENT_CHECK_IN_CLERK')")
     @GetMapping
+    @PreAuthorize("hasAuthority('DEPARTMENT_CHECK_IN_CLERK')")
     public R getApplicationListForDepartment(
             @AuthenticationPrincipal AccountUserDetails accountUserDetails,
             @Validated BasicPageQueryDto basicPageQueryDto) {
@@ -31,8 +31,8 @@ public class DepartmentApplicationController {
                 accountUserDetails,basicPageQueryDto);
     }
 
-    @PreAuthorize("hasAuthority('DEPARTMENT_CHECK_IN_CLERK')")
     @PostMapping
+    @PreAuthorize("hasAuthority('DEPARTMENT_CHECK_IN_CLERK')")
     public R reviewApplicationForDepartment(
             @AuthenticationPrincipal AccountUserDetails accountUserDetails,
             @Validated @RequestBody BasicReviewDto basicReviewDto) {
