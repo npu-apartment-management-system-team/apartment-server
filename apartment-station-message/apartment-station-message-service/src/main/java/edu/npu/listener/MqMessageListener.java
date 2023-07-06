@@ -125,6 +125,7 @@ public class MqMessageListener {
     private void handleUpdate(JsonNode jsonNode) {
         MessageDetail messageDetail = extractMessageFromJsonNode(jsonNode);
         log.info("收到Message:{}的更新消息,开始同步消息到ES", messageDetail);
+        updateWithMessageDetail(messageDetail);
         // 不是传统的逻辑删除
         log.info("更新消息成功");
     }

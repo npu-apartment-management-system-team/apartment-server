@@ -32,7 +32,7 @@ public class SendMailUtil {
             simpleMailMessage.setSubject(subject);
             simpleMailMessage.setText(content);
             //邮件发送时间
-            simpleMailMessage.setSentDate(new Date());
+            simpleMailMessage.setSentDate(new Date(System.currentTimeMillis()));
             javaMailSender.send(simpleMailMessage);
             return true;
         } catch (Exception e) {
