@@ -1,5 +1,6 @@
 package edu.npu.feignClient.fallback;
 
+import edu.npu.entity.Apartment;
 import edu.npu.entity.Bed;
 import edu.npu.entity.Department;
 import edu.npu.entity.Room;
@@ -41,6 +42,12 @@ public class ManagementServiceClientFallbackFactory
             public boolean updateBed(Bed bed) {
                 log.error("调用management-api服务更新Bed失败，原因：{}", cause.getMessage());
                 return false;
+            }
+
+            @Override
+            public Apartment getApartmentById(Long id) {
+                log.error("调用management-api服务获取Apartment失败，原因：{}", cause.getMessage());
+                return null;
             }
         };
     }

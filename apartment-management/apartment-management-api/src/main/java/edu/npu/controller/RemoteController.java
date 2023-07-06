@@ -1,15 +1,18 @@
 package edu.npu.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import edu.npu.entity.Apartment;
 import edu.npu.entity.Bed;
 import edu.npu.entity.Department;
 import edu.npu.entity.Room;
 import edu.npu.mapper.DepartmentMapper;
+import edu.npu.service.ApartmentService;
 import edu.npu.service.BedService;
 import edu.npu.service.RoomService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +31,9 @@ public class RemoteController {
 
     @Resource
     private RoomService roomService;
+
+    @Resource
+    private ApartmentService apartmentService;
 
     @GetMapping("/department")
     public Department getDepartmentById(@RequestParam(value = "id") Long id) {
@@ -66,5 +72,28 @@ public class RemoteController {
     public Room getRoomByBedId(@RequestParam(value = "bedId") Long bedId) {
         Bed bed = bedService.getById(bedId);
         return roomService.getById(bed.getRoomId());
+    }
+
+    @GetMapping("/apartment")
+    public Apartment getApartmentById(@RequestParam(value = "id") Long id) {
+        return apartmentService.getById(id);
+    }
+
+    @GetMapping("/bedsByApartment")
+    public List<Bed> getBedsByApartmentId(
+            @RequestParam(value = "apartmentId") Long apartmentId
+    ) {
+        List<Room> rooms = roomService.list(
+                new LambdaQueryWrapper<Room>().eq(Room::getApartmentId, apartmentId)
+        );
+
+        List<Bed> beds = new ArrayList<>();
+
+        for (Room room : rooms) {
+            beds.addAll(bedService.list(
+                    new LambdaQueryWrapper<Bed>().eq(Bed::getRoomId, room.getId())
+            ));
+        }
+        return beds;
     }
 }

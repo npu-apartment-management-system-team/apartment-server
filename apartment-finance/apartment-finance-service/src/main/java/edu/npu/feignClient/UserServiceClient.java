@@ -42,7 +42,7 @@ public interface UserServiceClient {
     boolean updateUser(@RequestBody User user);
 
     @GetMapping("/user/bed")
-    List<User> getUserByBedId(@RequestParam(value = "bedId") Long bedId);
+    List<User> getUsersByBedId(@RequestParam(value = "bedId") Long bedId);
 
     @GetMapping("/room/list/shard")
     List<User> getListByShardIndex(

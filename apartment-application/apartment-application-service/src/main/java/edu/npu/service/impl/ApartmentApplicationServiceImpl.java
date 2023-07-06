@@ -8,10 +8,9 @@ import edu.npu.common.ResponseCodeEnum;
 import edu.npu.common.UserStatusEnum;
 import edu.npu.dto.BasicPageQueryDto;
 import edu.npu.dto.BasicReviewDto;
-import edu.npu.entity.Application;
-import edu.npu.entity.ProcessingApplication;
-import edu.npu.entity.User;
+import edu.npu.entity.*;
 import edu.npu.feignClient.FinanceServiceClient;
+import edu.npu.feignClient.ManagementServiceClient;
 import edu.npu.feignClient.UserServiceClient;
 import edu.npu.mapper.ApplicationMapper;
 import edu.npu.mapper.ProcessingApplicationMapper;
@@ -22,7 +21,9 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static edu.npu.common.ApplicationStatusEnum.*;
@@ -40,31 +41,60 @@ public class ApartmentApplicationServiceImpl extends ServiceImpl<ApplicationMapp
     private UserServiceClient userServiceClient;
 
     @Resource
+    private ManagementServiceClient managementServiceClient;
+
+    @Resource
     private ProcessingApplicationMapper processingApplicationMapper;
 
     @Resource
     private FinanceServiceClient financeServiceClient;
 
     @Override
-    public R getApplicationList(BasicPageQueryDto basicPageQueryDto) {
+    public R getApplicationList(AccountUserDetails accountUserDetails,
+                                BasicPageQueryDto basicPageQueryDto) {
         Page<Application> page = new Page<>(
                 basicPageQueryDto.pageNum(), basicPageQueryDto.pageSize());
+
+        Admin admin = userServiceClient.getAdminByLoginAccountId(
+                accountUserDetails.getId()
+        );
+
+        Long apartmentId = admin.getDepartmentId();
+        Apartment apartment = managementServiceClient.getApartmentById(apartmentId);
+        if (apartment == null) {
+            return R.error(ResponseCodeEnum.NOT_FOUND, "该宿舍不存在");
+        }
+        List<Bed> beds = managementServiceClient.getBedsByApartmentId(apartmentId);
+        if (beds.isEmpty()) {
+            return R.error(ResponseCodeEnum.NOT_FOUND, "该宿舍没有床位");
+        }
+
+        List<User> users = new ArrayList<>();
+        for (Bed bed : beds) {
+            users.addAll(userServiceClient.getUsersByBedId(bed.getId()));
+        }
+        if (users.isEmpty()) {
+            return R.error(ResponseCodeEnum.NOT_FOUND, "该宿舍没有住户");
+        }
+
         LambdaQueryWrapper<Application> wrapper =
             new LambdaQueryWrapper<Application>()
-                // 入住
-                .eq(Application::getApplicationStatus,
-                    CHECK_IN_DEPOSIT.getValue())
-                .or()
-                // 调宿
-                .eq(Application::getApplicationStatus,
-                    CENTER_DORM_CHANGE_ALLOCATION.getValue())
-                .or()
-                .eq(Application::getApplicationStatus,
-                    ApplicationStatusEnum.
-                        CENTER_DORM_MANAGER_CHANGE_CHECK_OUT_CONFIRM.getValue())
-                // 退宿
-                .eq(Application::getApplicationStatus,
-                    ApplicationStatusEnum.CHECK_OUT_SUBMIT.getValue())
+                .in(Application::getUserId, users)
+                .and( i -> i// 入住
+                        .eq(Application::getApplicationStatus,
+                                CHECK_IN_DEPOSIT.getValue())
+                        .or()
+                        // 调宿
+                        .eq(Application::getApplicationStatus,
+                                CENTER_DORM_CHANGE_ALLOCATION.getValue())
+                        .or()
+                        .eq(Application::getApplicationStatus,
+                                ApplicationStatusEnum.
+                                        CENTER_DORM_MANAGER_CHANGE_CHECK_OUT_CONFIRM.getValue())
+                        .or()
+                        // 退宿
+                        .eq(Application::getApplicationStatus,
+                                ApplicationStatusEnum.CHECK_OUT_SUBMIT.getValue()))
                 .orderByDesc(Application::getUpdateTime);
         page = page(page, wrapper);
 

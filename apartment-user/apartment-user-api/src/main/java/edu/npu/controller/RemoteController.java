@@ -72,7 +72,7 @@ public class RemoteController {
     }
 
     @GetMapping("/user/bed")
-    public List<User> getUserByBedId(@RequestParam(value = "bedId") Long bedId) {
+    public List<User> getUsersByBedId(@RequestParam(value = "bedId") Long bedId) {
         return userMapper.selectList(
             new LambdaQueryWrapper<User>()
                 .eq(User::getBedId, bedId));

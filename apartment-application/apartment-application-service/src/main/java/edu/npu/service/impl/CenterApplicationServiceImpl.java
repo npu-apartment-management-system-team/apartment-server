@@ -154,7 +154,7 @@ public class CenterApplicationServiceImpl extends ServiceImpl<ApplicationMapper,
             return R.error(ResponseCodeEnum.PRE_CHECK_FAILED,
                     "分配床位与住宿职工职级不符");
         }
-        List<User> userList = userServiceClient.getUserByBedId(bed.getId());
+        List<User> userList = userServiceClient.getUsersByBedId(bed.getId());
         if (!userList.isEmpty()) {
             for (User tmpUser : userList) {
                 if (!tmpUser.getSex().equals(user.getSex())) {
