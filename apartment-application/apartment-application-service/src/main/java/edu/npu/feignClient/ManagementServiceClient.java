@@ -31,7 +31,7 @@ public interface ManagementServiceClient {
     boolean updateBed(@RequestBody Bed bed);
 
     @GetMapping("/apartment")
-    Apartment getApartmentById(@RequestParam(value = "id") Long id);
+    Apartment getApartmentByAdminId(@RequestParam(value = "adminId") Long adminId);
 
     @GetMapping("/bedsByApartment")
     List<Bed> getBedsByApartmentId(
