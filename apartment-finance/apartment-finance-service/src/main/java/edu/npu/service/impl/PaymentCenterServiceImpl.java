@@ -55,6 +55,10 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
 
     private static final String FAILED_GENERATE_VARIATION_LIST_MSG = "生成历史变动表失败";
 
+    private static final String FAILED_GENERATE_WITHHOLD_LIST_MSG = "生成部门代扣表失败";
+
+    private static final String FAILED_GENERATE_CHARGE_LIST_MSG = "生成职工自收表失败";
+
     private static final String BASE_DIR = "apartment/center/";
 
     private static final String TOTAL = "total";
@@ -204,7 +208,7 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
         String url = ossUtil.downloadWithholdList(withholdList, downloadQueryDto.beginTime(), downloadQueryDto.departmentId(), BASE_DIR);
 
         return StringUtils.hasText(url) ?
-                R.ok().put(RESULT, url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
+                R.ok().put(RESULT, url) : R.error(FAILED_GENERATE_WITHHOLD_LIST_MSG);
 
     }
 
@@ -299,7 +303,7 @@ public class PaymentCenterServiceImpl implements PaymentCenterService {
         String url = ossUtil.downloadChargeList(chargeList, downloadQueryDto.beginTime(), downloadQueryDto.departmentId(), BASE_DIR);
 
         return StringUtils.hasText(url) ?
-                R.ok().put(RESULT, url) : R.error(FAILED_GENERATE_VARIATION_LIST_MSG);
+                R.ok().put(RESULT, url) : R.error(FAILED_GENERATE_CHARGE_LIST_MSG);
     }
 
 

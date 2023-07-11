@@ -7,6 +7,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Date;
 
 //UserPayListQueryDto
+
+/**
+ * @author wangminan
+ * @description 用于获取职工支付列表和分页查询的dto
+ * @createDate 2023-07-02 16:45:55
+ */
 public record QueryDto(
         @NotNull(message = "pageNum不能为空")
         Integer pageNum,
