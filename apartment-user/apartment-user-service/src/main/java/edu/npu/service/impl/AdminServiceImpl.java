@@ -192,12 +192,15 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
                 adminMapper.selectPage(page, new LambdaQueryWrapper<Admin>()
                         .eq(Admin::getDepartmentId, adminPageQueryDto.departmentId())
                         .like(Admin::getName, adminPageQueryDto.query()));
+
             } else if(adminPageQueryDto.departmentId() != null) {
                 adminMapper.selectPage(page, new LambdaQueryWrapper<Admin>()
                         .eq(Admin::getDepartmentId, adminPageQueryDto.departmentId()));
+
             } else if(StringUtils.hasText(adminPageQueryDto.query())) {
                 adminMapper.selectPage(page, new LambdaQueryWrapper<Admin>()
                         .like(Admin::getName, adminPageQueryDto.query()));
+
             } else {
                 adminMapper.selectPage(page, null);
             }
@@ -232,6 +235,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
                             .inSql(Admin::getLoginAccountId, "SELECT id FROM login_account WHERE role = 5")
                             .notInSql(Admin::getId, "SELECT foreman_admin_id FROM apartment"));
 
+            //封装成map
             for (Admin admin : adminList) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("id", admin.getId());
